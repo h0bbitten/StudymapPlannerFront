@@ -1,49 +1,36 @@
-// Fetch the iCal data from your own server endpoint
-$.ajax({
-  url: "http://localhost:3000/ical", // Update to use your server endpoint
-  dataType: "text",
-  success: function(data) {
-    var schedule = parseICal(data);
+// Fetch the iCal data from your own server endpoint using fetch API
+fetch("http://localhost:3000/ical")
+  .then(response => {
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+    return response.text();
+  })
+  .then(data => {
+    const schedule = parseICal(data);
     displaySchedule(schedule);
-  },
-  error: function() {
-    console.log("Failed to fetch iCal data.");
-  }
-});
+  })
+  .catch(error => {
+    console.error("Failed to fetch iCal data:", error);
+  });
 
 function parseICal(data) {
-  var schedule = [];
-  var lines = data.split("\n");
-  for (var i = 0; i < lines.length; i++) {
-    var line = lines[i];
+  return data.split("\n").reduce((schedule, line, i, lines) => {
     if (line.startsWith("BEGIN:VEVENT")) {
-      var event = {};
-      while (i < lines.length && !lines[i].startsWith("END:VEVENT")) {
-        var line = lines[i];
-        if (line.startsWith("SUMMARY:")) {
-          event.summary = line.substring(8);
-        }
-        if (line.startsWith("DTSTART;")) {
-          event.startDate = line.substring(17, 25);
-        }
-        if (line.startsWith("DTEND;")) {
-          event.endDate = line.substring(15, 23);
-        }
-        i++;
+      let event = {};
+      for (; i < lines.length && !lines[i].startsWith("END:VEVENT"); i++) {
+        if (lines[i].startsWith("SUMMARY:")) event.summary = lines[i].substring(8);
+        if (lines[i].startsWith("DTSTART;")) event.startDate = lines[i].substring(17, 25);
+        if (lines[i].startsWith("DTEND;")) event.endDate = lines[i].substring(15, 23);
       }
       schedule.push(event);
     }
-  }
-  return schedule;
+    return schedule;
+  }, []);
 }
 
 function displaySchedule(schedule) {
-  var scheduleElement = $("#schedule");
-  for (var i = 0; i < schedule.length; i++) {
-    var event = schedule[i];
-    var eventElement = $("<div>");
-    eventElement.append("<h3>" + event.summary + "</h3>");
-    eventElement.append("<p>" + event.startDate + " - " + event.endDate + "</p>");
-    scheduleElement.append(eventElement);
-  }
+  schedule.forEach(event => {
+    $("#schedule").append($("<div>").append(`<h3>${event.summary}</h3><p>${event.startDate} - ${event.endDate}</p>`));
+  });
 }
