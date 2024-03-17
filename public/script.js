@@ -1,4 +1,3 @@
-$(document).ready(function() {
     // Fetch the iCal data
     $.ajax({
       url: "https://www.moodle.aau.dk/local/planning/ical.php?fid=3249",
@@ -13,8 +12,26 @@ $(document).ready(function() {
       error: function() {
         console.log("Failed to fetch iCal data.");
       }
+    }); // Add a comma here
+
+    $.ajax({
+      url: "https://www.moodle.aau.dk/local/planning/ical.php?fid=3249",
+      dataType: "text",
+      headers: {
+        "Authorization": "3528346e21ed517bf282eb4e46d35610"
+      },
+      success: function(data) {
+        // Parse the iCal data
+        var schedule = parseICal(data);
+
+        // Display the schedule
+        displaySchedule(schedule);
+      },
+      error: function() {
+        console.log("Failed to fetch iCal data.");
+      }
     });
-  
+
     function parseICal(data) {
       var schedule = [];
   
@@ -95,5 +112,4 @@ $(document).ready(function() {
         scheduleElement.append(eventElement);
       }
     }
-  });
   

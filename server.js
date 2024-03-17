@@ -6,6 +6,12 @@ const PORT = process.env.PORT || 3000;
 
 app.use(express.static('public'));
 
+// Add CORS header middleware
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  next();
+});
+
 app.get('/ical', async (req, res) => {
   try {
     const response = await axios.get('https://www.moodle.aau.dk/local/planning/ical.php?fid=3249');
