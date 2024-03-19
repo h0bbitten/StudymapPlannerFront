@@ -31,5 +31,5 @@ app.get('/getcourse', async (req, res) => {
   }
 });
 
-app.listen(PORT, () => console.log(`Server is running on http://localhost:${PORT}`));
+app.listen(PORT, () => console.log(`Server is running on http://localhost:${PORT}`), console.log(`To use program go to http://localhost:${PORT}/html/login.html`));
 // In this example, the server is using the Express.js framework to create an HTTP server.

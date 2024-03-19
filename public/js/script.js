@@ -50,8 +50,8 @@ function getCourse(id) {
 
 
 function displayCourses(course) {
-  $("#schedule").append($(`<div id="${course.id}">`).append(`<h3>${course.fullnamedisplay}</h3><p>${course.startdate} - ${course.enddate}</p>`));
+  $("#schedule").append($(`<div id="${course.id}">`).append(`<h3>${course.fullnamedisplay}</h3><p>${new Date(course.startdate * 1000).toUTCString()} - ${new Date(course.enddate * 1000).toUTCString()}</p>`));
 }
 
-let token = "";
+let token = sessionStorage.getItem("token");
 getCourses(token);
