@@ -8,12 +8,26 @@ const PORT = process.env.PORT || 3000;
 app.use(express.static('public'));
 app.use(cors()); // Apply CORS for all routes
 
-app.get('/ical', async (req, res) => {
+app.get('/getcourses', async (req, res) => {
   try {
-    const response = await axios.get('https://www.moodle.aau.dk/local/planning/ical.php?fid=3249');
+    const token = req.query.token;
+    const url = `https://www.moodle.aau.dk/webservice/rest/server.php?wstoken=${token}&moodlewsrestformat=json&wsfunction=core_course_get_enrolled_courses_by_timeline_classification&classification=inprogress`
+    const response = await axios.get(url);
     res.send(response.data);
   } catch {
-    res.status(500).send('Error fetching iCal data');
+    res.status(500).send('Error fetching users courses');
+  }
+});
+
+app.get('/getcourse', async (req, res) => {
+  try {
+    const token = req.query.token;
+    const id = req.query.id;
+    const url = `https://www.moodle.aau.dk/webservice/rest/server.php?wstoken=${token}&moodlewsrestformat=json&wsfunction=core_course_get_contents&courseid=${id}`
+    const response = await axios.get(url);
+    res.send(response.data);
+  } catch {
+    res.status(500).send(`Error fetching course id: ${id}`);
   }
 });
 

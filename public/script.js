@@ -1,36 +1,57 @@
 // Fetch the iCal data from your own server endpoint using fetch API
-fetch("http://localhost:3000/ical")
+let courses; //Array af kurser
+
+
+function getCourses(token) {
+  fetch(`http://localhost:3000/getcourses?token=${token}`)
   .then(response => {
     if (!response.ok) {
       throw new Error('Network response was not ok');
     }
-    return response.text();
+    return response.json();
   })
   .then(data => {
-    const schedule = parseICal(data);
-    displaySchedule(schedule);
+    courses = data.courses;
+    console.log(typeof(courses));
+    console.log(courses);
+    courses.forEach(course => {
+      displayCourses(course);
+      console.log(course.id);
+      getCourse(course.id);
+    })
+  })
+  .then(() => {
+/*     for (const key in courses.courses) {
+      console.log(key.id);
+      getCourse(key.id);
+    } */
   })
   .catch(error => {
-    console.error("Failed to fetch iCal data:", error);
+    console.error("Failed to retrieve courses:", error);
   });
+}
 
-function parseICal(data) {
-  return data.split("\n").reduce((schedule, line, i, lines) => {
-    if (line.startsWith("BEGIN:VEVENT")) {
-      let event = {};
-      for (; i < lines.length && !lines[i].startsWith("END:VEVENT"); i++) {
-        if (lines[i].startsWith("SUMMARY:")) event.summary = lines[i].substring(8);
-        if (lines[i].startsWith("DTSTART;")) event.startDate = lines[i].substring(17, 25);
-        if (lines[i].startsWith("DTEND;")) event.endDate = lines[i].substring(15, 23);
-      }
-      schedule.push(event);
+function getCourse(id) {
+  console.log(`http://localhost:3000/getcourse?token=${token}&id=${id}`);
+  fetch(`http://localhost:3000/getcourse?token=${token}&id=${id}`)
+  .then(response => {
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
     }
-    return schedule;
-  }, []);
-}
-
-function displaySchedule(schedule) {
-  schedule.forEach(event => {
-    $("#schedule").append($("<div>").append(`<h3>${event.summary}</h3><p>${event.startDate} - ${event.endDate}</p>`));
+    return response.json();
+  })
+  .then(data => {
+    console.log(data);
+  })
+  .catch(error => {
+    console.error("Failed to retrieve courses:", error);
   });
 }
+
+
+function displayCourses(course) {
+  $("#schedule").append($(`<div id="${course.id}">`).append(`<h3>${course.fullnamedisplay}</h3><p>${course.startdate} - ${course.enddate}</p>`));
+}
+
+let token = "";
+getCourses(token);
