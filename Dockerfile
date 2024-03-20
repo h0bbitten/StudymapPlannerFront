@@ -1,20 +1,37 @@
-# Use the official Node.js image as base
-FROM node:latest
+# Use the official Node.js image as a base for both server and client
+FROM node:14 AS server
 
-# Set the working directory in the container
+# Set the working directory for server-side code
+WORKDIR /app/server
+
+# Copy server-side code and dependencies
+COPY server/package*.json ./
+RUN npm install
+COPY server/ ./
+
+# Set up client-side code
+FROM node:14 AS client
+
+# Set the working directory for client-side code
+WORKDIR /app/client
+
+# Copy client-side code and dependencies
+COPY client/package*.json ./
+RUN npm install
+COPY client/ ./
+
+# Combine server and client into a single image
+FROM node:14
+
+# Set the working directory for the app
 WORKDIR /app
 
-# Copy package.json and package-lock.json to the container
-COPY package*.json ./
+# Copy server and client code from separate stages
+COPY --from=server /app/server /app/server
+COPY --from=client /app/client /app/client
 
-# Install dependencies
-RUN npm install
-
-# Copy the rest of the application code to the container
-COPY . .
-
-# Expose the port the app runs on
+# Expose the port for the server
 EXPOSE 3000
 
-# Start the application
-CMD ["npm", "start"]
+# Define the command to start the server
+CMD ["node", "server/index.js"]
