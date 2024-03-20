@@ -19,7 +19,8 @@ jobs:
       uses: docker/setup-buildx-action@v1
       
     - name: Login to Docker Hub
-      run: echo "${{ secrets.dckr_pat_ujusRPRBe8NQDOurA7HN85G2K2E }}" | docker login -u falseviking --password-stdin
+       run: echo "//docker.io/v1/ ${secrets.dckr_pat_ujusRPRBe8NQDOurA7HN85G2K2E }}" | docker login -u falseviking --password-stdin
+
       
     - name: Build and push Docker image
       run: |
