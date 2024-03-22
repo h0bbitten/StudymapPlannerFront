@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Schedule Viewer</title>
   <link id="theme-style" rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/skema.css">
 </head>
 <body>
   <nav id="navbar">
@@ -18,9 +19,72 @@
     </div>
   </nav>
   <h1>Schedule Viewer</h1>
-  <div id="schedule"></div>
+ 
+  <div class="schedule_container">
+    <div class="days_container">
+        <span class="corner"></span>
+        <div class="day">Mandag</div>
+        <div class="day">Tirsdag</div>
+        <div class="day">Onsdag</div>
+        <div class="day">Torsdag</div>
+        <div class="day">Fredag</div>
+        <div class="day">Lørdag</div>
+        <div class="day">Søndag</div>
+    </div>
+    <div class="part_day">
+      <span class="time">08:00 <br> - <br> 12:00</span>
+      <div class="task"></div>
+      <div class="task"></div>
+      <div class="task"></div>
+      <div class="task"></div>
+      <div class="task"></div>
+      <div class="task"></div>
+      <div class="task"></div>
+    </div>
+    <div class="part_day">
+      <span class="time">12:00 <br> - <br> 14:00</span>
+      <div class="task"></div>
+      <div class="task"></div>
+      <div class="task"></div>
+      <div class="task"></div>
+      <div class="task"></div>
+      <div class="task"></div>
+      <div class="task"></div>
+    </div>
+    <div class="part_day">
+      <span class="time">14:00 <br> - <br> 18:00</span>
+      <div class="task"></div>
+      <div class="task"></div>
+      <div class="task"></div>
+      <div class="task"></div>
+      <div class="task"></div>
+      <div class="task"></div>
+      <div class="task"></div>
+    </div>
+    <div class="part_day">
+      <span class="time">18:00 <br> - <br> 21:00</span>
+      <div class="task"></div>
+      <div class="task"></div>
+      <div class="task"></div>
+      <div class="task"></div>
+      <div class="task"></div>
+      <div class="task"></div>
+      <div class="task"></div>
+    </div>
+    <div class="part_day">
+      <span class="time">21:00 <br> - <br> 23:00</span>
+      <div class="task"></div>
+      <div class="task"></div>
+      <div class="task"></div>
+      <div class="task"></div>
+      <div class="task"></div>
+      <div class="task"></div>
+      <div class="task"></div>
+    </div>
+  </div>
 
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script type="module" src="../js/schedule.js"></script>
+  <script src="../js/skema.js"></script>
 </body>
 </html>
