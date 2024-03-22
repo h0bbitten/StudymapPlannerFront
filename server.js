@@ -17,7 +17,8 @@ app.get('/MoodleAPI', async (req, res) => {
       case 'core_course_get_enrolled_courses_by_timeline_classification':
         url = `https://www.moodle.aau.dk/webservice/rest/server.php?wstoken=${token}&moodlewsrestformat=json&wsfunction=${method}&classification=inprogress`;
         break;
-        
+      case 'core_webservice_get_site_info':
+        url = `https://www.moodle.aau.dk/webservice/rest/server.php?wstoken=${token}&moodlewsrestformat=json&wsfunction=${method}`
       default:
         break;
     }
