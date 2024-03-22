@@ -1,0 +1,6 @@
+, undefined, undefined
+https://moduler.aau.dk/course/2023-2024/DSNDATFB212?lang=en-GB, Danish Title: Internetværk og web-programmering, ECTS Points: 5
+https://moduler.aau.dk/course/2023-2024/DSNDATFB211, Danish Title: Algoritmer og datastrukturer, ECTS Points: 5
+https://moduler.aau.dk/course/2023-2024/DSNDATFB105, Danish Title: Imperativ programmering, ECTS Points: 5
+https://moduler.aau.dk/course/2022-2023/DSNIDAK122, Danish Title: Udvikling af software, ECTS Points: 10
+https://moduler.aau.dk/course/2023-2024/DSNIXDB111, Danish Title: Evaluering af design, ECTS Points: 10
