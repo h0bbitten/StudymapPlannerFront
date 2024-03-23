@@ -4,8 +4,17 @@ https://www.moodle.aau.dk/webservice/rest/server.php?wstoken=DIN_TOKEN&moodlewsr
 core_course_get_contents; Giver information omkring de forskellige moduler for et kursus, baseret på et kursus id (er sat til SLIAL lige nu):
 https://www.moodle.aau.dk/webservice/rest/server.php?wstoken=DIN_TOKEN&moodlewsrestformat=json&wsfunction=core_course_get_contents&courseid=50766
 
+mod_folder_get_folders_by_courses; Giver information omkring nogle filer, not sure:
+https://www.moodle.aau.dk/webservice/rest/server.php?wstoken=DIN_TOKEN&moodlewsrestformat=json&wsfunction=mod_folder_get_folders_by_courses&courseids[0]=50766
+
+mod_page_get_pages_by_courses; Giver informatoin omkring filerne i curser, bliver brugt til at finde webscrape hjemmesiden:
+https://www.moodle.aau.dk/webservice/rest/server.php?wstoken=DIN_TOKEN&moodlewsrestformat=json&wsfunction=mod_page_get_pages_by_courses&courseids[0]=50766
+
+
 Erstat DIN_TOKEN kan findes inde på Moodle
 
 Her er listen over alle de forskellige metoder vi kan kalde for at få Moodle information ----> https://www.moodle.aau.dk/webservice/wsdoc.php?id=60364
 
 Indtil vi kan få token generation til at fungerer, tænker jeg vi bare kan have et Log-in system der består af at copy-paste ens token inde fra Moodle af ind i vores side, til brug i API kaldene 
+
+

@@ -1,29 +1,22 @@
-const puppeteer = require('puppeteer');
-const fs = require('fs').promises;
+export {Webscraper};
 
-//tilføj links til fag fundet på https://moduler.aau.dk/
-const urls = [
-  'https://moduler.aau.dk/course/2023-2024/DSNDATFB212?lang=en-GB',
-  'https://moduler.aau.dk/course/2023-2024/DSNDATFB211',
-  'https://moduler.aau.dk/course/2023-2024/DSNDATFB105',
-  'https://moduler.aau.dk/course/2022-2023/DSNIDAK122',
-  'https://moduler.aau.dk/course/2023-2024/DSNIXDB111',
-  'https://moduler.aau.dk/course/2022-2023/22BMATSLIAL',
+import puppeteer from 'puppeteer';
+import { promises as fs } from 'fs';
 
-
-];
+/* const puppeteer = require('puppeteer');
+const fs = require('fs').promises; */
 
 //path til filen hvor scrapet data vil blive gemt
 const filePath = 'courseDetails.txt';
 
 //async tillader brugen af await funktionen, hvormed vi kan afvente til en handling er udført med at fortsætte funktionen
-(async () => {
+async function Webscraper(url) {
 
   // check om der er allerede eksisterende data fra hjemmesiden gemt i filen
   let existingData = {};
   try {
     //filecontent er en string, vi afventer som filen læses, filepath leder til courseDetails.txt, utf8 er tekstsprog og sikrer at filen bliver læst som teksstreng og ikke som tal-data
-    const fileContent = await fs.readFile(filePath, 'utf8');
+    const fileContent = await fs.readFile(filePath, { encoding: 'utf8' });
     //tag tekstindholdet og indel det i kategorierne URL, Titel og ECTS, adskilt af kommaer
     fileContent.split('\n').forEach(line => {
       const [url, title, ects] = line.split(', ');
@@ -40,8 +33,6 @@ const filePath = 'courseDetails.txt';
 
   // start en ny browser
   const browser = await puppeteer.launch();
-
-  for (const url of urls) {
     const page = await browser.newPage();
 
     // Åben linket, networkkidle0 hører under puppeteer, fungerer således at når "network har været idle i 500 ms", antag navigation som færdiggjort, sikrer at siden er loadet ordentligt
@@ -66,7 +57,6 @@ const filePath = 'courseDetails.txt';
     if (!existingData[url] || existingData[url].ects !== `ECTS Points: ${data.ectsValue}`) {
       existingData[url] = { title: `Danish Title: ${data.titleValue}`, ects: `ECTS Points: ${data.ectsValue}` };
     }
-  }
 
   // luk browseren
   await browser.close();
@@ -75,4 +65,6 @@ const filePath = 'courseDetails.txt';
   const newDataArray = Object.entries(existingData).map(([url, { title, ects }]) => `${url}, ${title}, ${ects}`);
   //skriv ny eller opdateret information ind i txt filen
   await fs.writeFile(filePath, newDataArray.join('\n'));
-})();
+  console.log(data.ectsValue);
+  return data.ectsValue;
+};

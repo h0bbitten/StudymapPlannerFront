@@ -15,7 +15,7 @@ function handleLogin() {
         }
         //Save token in temp session storage, and link to schedule
         sessionStorage.setItem("token", token);
-        window.location.href = "index.html";
+        window.location.href = "schedule.html";
     });
 }
 
