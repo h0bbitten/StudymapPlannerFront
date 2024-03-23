@@ -21,7 +21,16 @@ async function validToken(token) {
     console.log(`Checking token: ${token}`);
     // Check if the token input field is empty
     if (token.trim() === "") {
-        alert("Please enter a valid token.");
+        Toastify({
+            text: "Please enter a valid token.",
+            duration: 1500,
+            close: false,
+            gravity: "top",
+            position: "center",
+            style: {
+                background: "linear-gradient(to right, #ff416c, #ff4b2b)",
+            }
+        }).showToast();
         return false;
     }
     // Check if token is valid
@@ -29,7 +38,16 @@ async function validToken(token) {
         token = token.trim(" ");
         let tokenTry = await core_calendar_get_calendar_events(token);
         if (tokenTry.errorcode === 'invalidtoken') {
-            alert("Invalid token.");
+            Toastify({
+                text: "Invalid token.",
+                duration: 1500,
+                close: false,
+                gravity: "top",
+                position: "center",
+                style: {
+                    background: "linear-gradient(to right, #ff416c, #ff4b2b)",
+                }
+            }).showToast();
             return false;
         }
         return true;
