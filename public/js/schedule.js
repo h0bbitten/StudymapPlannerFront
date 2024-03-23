@@ -111,10 +111,22 @@ class WSfunction {
     
   }
   function displayCourses(courses) {
-    courses.forEach(course => {
-      $("#schedule").append($(`<div id="${course.id}">`).append(`<h3>${course.fullnamedisplay}</h3><p>${new Date(course.startdate * 1000).toUTCString()} - ${new Date(course.enddate * 1000).toUTCString()}</p>`));
+    courses.forEach(course => { // Loop over each course
+      // Make sure the course has a dayOfWeek and timeSlot property before proceeding
+      if (course.dayOfWeek && course.timeSlot) {
+        const dayColumn = $(`.day[data-day="${course.dayOfWeek.toLowerCase()}"]`).closest('.part_day');
+        const timeSlot = dayColumn.find(`.task[data-time="${course.timeSlot}"]`);
+        
+        // Check if the timeSlot element exists before trying to append to it
+        if (timeSlot.length > 0) {
+          const courseElement = $(`<div class="course-detail">`).append(`<h4>${course.fullnamedisplay}</h4><p>${course.ECTS} ECTS</p>`);
+          timeSlot.append(courseElement);
+        }
+      }
     });
   }
+  
+
   function displayProfile(profile) {
     console.log(profile);
     $("#navbar").append($(`<div id="user_profile">`).append(`<p> Welcome back ${profile.fullname}</p><img src="${profile.userpictureurl}" alt="Profile pic">`));
