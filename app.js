@@ -19,7 +19,10 @@ async function MoodleAPI(req, res) {
             url = `https://www.moodle.aau.dk/webservice/rest/server.php?wstoken=${token}&moodlewsrestformat=json&wsfunction=${method}&courseid=${courseid}`;
             break;
           case 'mod_page_get_pages_by_courses':
-            url = `https://www.moodle.aau.dk/webservice/rest/server.php?wstoken=${token}&moodlewsrestformat=json&wsfunction=mod_page_get_pages_by_courses&courseids[0]=${courseid}`;
+            url = `https://www.moodle.aau.dk/webservice/rest/server.php?wstoken=${token}&moodlewsrestformat=json&wsfunction=${method}&courseids[0]=${courseid}`;
+            break;
+          case 'core_calendar_get_calendar_events':
+            url = `https://www.moodle.aau.dk/webservice/rest/server.php?wstoken=${token}&moodlewsrestformat=json&wsfunction=${method}`
             break;  
           default:
             break;
