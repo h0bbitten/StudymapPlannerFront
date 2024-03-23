@@ -1,8 +1,16 @@
 import express from 'express';
 import cors from 'cors';
+import session from 'express-session';
 import routing from './routing.js';
 
 const app = express();
+
+// Session middleware setup
+app.use(session({
+    secret: 'secret_key', // Encryption, tbd
+    resave: false,
+    saveUninitialized: false
+}));
 
 app.use(cors());
 app.use(express.json());
@@ -14,5 +22,4 @@ app.use(cors());
 
 routing(app);
 
-app.listen(PORT, () => {console.log(`Server is running on http://localhost:${PORT}`),
-console.log(`To use program go to http://localhost:${PORT}/html/login.html`)});
+app.listen(PORT, () => {console.log(`Server is running on http://localhost:${PORT}`)});
