@@ -18,6 +18,8 @@ body{
     padding: 1rem;
     border-radius: 10px;
     margin: 50px;
+    width: 800px;
+    height: 550px;
 }
 
 .days_container{
@@ -66,4 +68,10 @@ body{
     justify-content: center;
     align-items: center;
     font-size: 2rem;
+}
+.week-navigation{
+    display: flex;
+    justify-content: space-between;
+    margin: 1rem;
+    box-sizing: border-box;
 }
