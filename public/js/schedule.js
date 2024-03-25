@@ -99,8 +99,11 @@ class WSfunction {
       courses.forEach(async course => {
         course.contents = await user.wsfunction.core_course_get_contents(course.id);
         course.pages = await user.wsfunction.mod_page_get_pages_by_courses(course.id);
-        course.modulelink = await findModulelink(course);
-        if (course.modulelink) course.ECTS = await user.getECTS(course.modulelink);
+       // course.modulelink = await findModulelink(course);
+       // if (course.modulelink) course.ECTS = await user.getECTS(course.modulelink);
+       course.contents.forEach(async lecture => {
+        console.log(lecture.name);
+       })
       });
       console.log(courses);
       displayCourses(courses);
