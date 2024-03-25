@@ -9,16 +9,12 @@ COPY server/package*.json ./
 RUN npm install
 COPY server/ ./
 
-# Set up client-side code
-FROM node:14 AS client
-
-# Set the working directory for client-side code
-WORKDIR /app/client
-
-# Copy client-side code and dependencies
-COPY client/package*.json ./
-RUN npm install
-COPY client/ ./
+# Set up client-side code (assuming client directory is not used)
+# FROM node:14 AS client
+# WORKDIR /app/client
+# COPY client/package*.json ./
+# RUN npm install
+# COPY client/ ./
 
 # Combine server and client into a single image
 FROM node:14
@@ -26,12 +22,11 @@ FROM node:14
 # Set the working directory for the app
 WORKDIR /app
 
-# Copy server and client code from separate stages
+# Copy server code from the server stage
 COPY --from=server /app/server /app/server
-COPY --from=client /app/client /app/client
 
 # Expose the port for the server
-EXPOSE 3000
+EXPOSE 8080
 
 # Define the command to start the server
-CMD ["node", "server/index.js"]
+CMD ["node", "server.js"]  # Assuming server.js is the entry point for your server code
