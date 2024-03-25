@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login</title>
+  <link id="theme-style" rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+</head>
+<body>
+  <nav>
+    <div class="navbar-icons">
+      <div class="navbar-icon">
+        <img id="dark-mode-btn" src="../img/dark-mode-solid-svgrepo-com.svg" alt="Dark mode">
+      </div>
+      <div class="navbar-icon">
+        <img src="../img/settings-svgrepo-com.svg" alt="Settings">
+      </div>
+    </div>
+  </nav>
+  <h1>Login (input Moodle.aau.dk Token)</h1>
+  <label for="tokenInput">Token</label>  
+  <input id="tokenInput" placeholder="Token">
+  <input id="tokenButn" type="button" value="Submit">
+  <a href="https://www.moodle.aau.dk/user/managetoken.php" target="_blank">Moodle Token Link</a>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+  <script type="module" src="../js/login.js"></script>
+</body>
+</html>
