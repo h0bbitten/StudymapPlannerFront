@@ -105,7 +105,7 @@ async function scheduleInitialization() {
 
       // Create a dropdown for each course
       const courseDropdown = $(`<select class="course-dropdown" name="course_${course.id}"></select>`);
-      courseDropdown.append(`<option value="">Select Lecture</option>`);
+      courseDropdown.append(`<option value="">Se lectures her</option>`);
       
       for (const lecture of course.contents) {
         courseDropdown.append(`<option value="${lecture.id}">${lecture.name}</option>`);
@@ -141,7 +141,7 @@ async function scheduleInitialization() {
 
   function displayProfile(profile) {
     console.log(profile);
-    $("#navbar").append($(`<div id="user_profile">`).append(`<p> Welcome back ${profile.fullname}</p><img src="${profile.userpictureurl}" alt="Profile pic">`));
+    $("#navbar").append($(`<div id="user_profile">`).append(`<p id="welcomeMessage"> Velkommen tilbage ${profile.fullname}</p><img src="${profile.userpictureurl}" alt="Profile pic">`));
   }
   async function findModulelink(course) {
     const regex = /https:\/\/moduler\.aau\.dk\/course\/([^?]+)/;

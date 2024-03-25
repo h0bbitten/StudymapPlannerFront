@@ -1,107 +1,100 @@
-/* Reset default browser styles */
-html, body, h1, h3, p, nav, div, img, input, label, a {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: Arial, sans-serif;
+/* Basic Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-/* Global styles */
 body {
-    background-color: #333; /* Dark background */
-    color: #f5f5f5; /* Light text color */
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #121212; /* Dark background */
+  color: #e0e0e0; /* Light text */
+  padding: 20px;
 }
 
 nav {
-    background-color: #333; /* Dark background */
-    padding: 10px 20px;
-    display: flex;
-    justify-content: flex-end; /* Align items to the end (right) */
-    align-items: center; /* Center vertically */
-}
-
-.navbar-icons {
-    display: flex;
-    justify-content: flex-end; /* Align items to the end (right) */
-    align-items: center; /* Center vertically */
-}
-
-.navbar-icon img {
-    width: 30px;
-    height: 30px;
-}
-
-h1, h3 {
-    color: #f5f5f5; /* Light text color */
-    margin-bottom: 10px;
-}
-
-/* Specific styles for Schedule Viewer */
-#navbar {
-    background-color: #ffa500; /* Dark background */
-    padding: 10px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  background-color: #1f1f1f; /* Slightly lighter dark shade for navbar */
+  box-shadow: 0 2px 4px rgba(0,0,0,0.5); /* Darker shadow for depth */
+  padding: 10px 20px;
+  display: flex;
+  justify-content: flex-end;
 }
 
 #navbar img {
-    width: 30px;
-    height: 30px;
+  width: 35px;
+  height: 35px;
 }
+
+.navbar-icons {
+  display: flex;
+}
+
+.navbar-icon {
+  margin-left: 20px;
+}
+
+.navbar-icon img {
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  filter: invert(1); /* Invert icons for better visibility */
+}
+
 
 #schedule {
-    margin-top: 20px;
+  margin-top: 20px;
 }
 
-#schedule div {
-    background-color: #444; /* Slightly lighter dark background */
-    padding: 20px;
-    margin-bottom: 20px;
-    border-radius: 5px;
-    box-shadow: 0 2px 4px rgba(255, 255, 255, 0.1); /* Inverted shadow */
-}
-
-/* Specific styles for Login */
-h1 {
-    margin-top: 20px;
-}
-
-label {
-    display: block;
-    margin-bottom: 5px;
-    color: #f5f5f5; /* Light text color */
+h1, h3 {
+  text-align: center;
+  margin: 20px 0;
 }
 
 input[type="text"], input[type="button"] {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 10px;
-    border: 1px solid #777; /* Lighter border */
-    border-radius: 5px;
-    transition: border-color 0.3s ease;
-    background-color: #444; /* Slightly lighter dark background */
-    color: #f5f5f5; /* Light text color */
+  display: block;
+  width: 100%;
+  max-width: 400px;
+  padding: 10px;
+  margin: 10px auto;
+  border-radius: 5px;
+  border: 1px solid #333; /* Darker border for inputs */
+  background-color: #222; /* Dark input fields */
+  color: #ddd; /* Light text for inputs */
 }
 
 input[type="button"] {
-    background-color: #ffa500; /* Moodle orange */
-    color: #333; /* Dark text color */
-    cursor: pointer;
+  background-color: #2979ff; /* Bright blue for contrast */
+  color: white;
+  cursor: pointer;
+  border: none;
 }
 
 input[type="button"]:hover {
-    background-color: #ff7f00; /* Darker Moodle orange on hover */
+  background-color: #1c54b2; /* Darker shade of blue on hover */
 }
 
 a {
-    color: #ffa500; /* Moodle orange */
-    text-decoration: none;
+  display: block;
+  text-align: center;
+  margin-top: 20px;
+  color: #82b1ff; /* Light blue for links */
+  text-decoration: none;
+}
+
+#tokenInput {
+  display: block;
+  width: 100%;
+  max-width: 400px;
+  padding: 10px;
+  margin: 10px auto;
+  border-radius: 5px;
+  border: 1px solid #ccc;
 }
 
 a:hover {
-    text-decoration: underline;
+  text-decoration: underline;
 }
+
   /* Container */
   #container {
     padding: 20px;
@@ -123,7 +116,7 @@ a:hover {
   
   #weekdays {
     
-    background-color: #ffa500;
+    background-color: #1c54b2;
     color: #ffffff;
     width: 100%;
     display: flex;
@@ -149,19 +142,19 @@ a:hover {
     justify-content: space-between;
   }
   .day:hover {
-    background-color: rgb(100, 100, 100);
+    background-color: #1c54b2;
   }
   
   .day + #currentDay {
-    background-color:#ad7100;
+    background-color:#385280;
   }
   .day + #currentDay:hover{
-    background-color:#df9100;
+    background-color: #1c54b2;
   }
   .event {
     font-size: 10px;
     padding: 3px;
-    background-color: #ffa500;
+    background-color: #1c54b2;
     color: white;
     border-radius: 5px;
     max-height: 55px;
@@ -175,7 +168,7 @@ a:hover {
   
   /* Buttons */
   button {
-    background-color: #ffa500;
+    background-color: #1c54b2;
     color: #ffffff;
     border: none;
     padding: 10px 20px;
@@ -191,6 +184,6 @@ a:hover {
   }
   
   button:hover {
-    background-color: #c47f00;
+    background-color: #385280;
   }
   
