@@ -80,39 +80,48 @@ class WSfunction {
     }
 }
 
-  async function scheduleInitialization() {
-    const user = new MoodleUser;
-    let courses = {};
-    try {
-      const profile = await user.wsfunction.core_webservice_get_site_info();
-      displayProfile(profile);
-    }
-    catch (error) {
-      console.error('Failed to get profile info:', error);
-    }
-    try {
-      const coursesresponse = await user.wsfunction.core_course_get_enrolled_courses_by_timeline_classification();
-      courses = coursesresponse.courses;
-      console.log(courses);
-      courses = courses.filter(course => course.enddate !== 2527282800); // Hard code filter out standard enrolled courses by common enddate, not pretty but functional
-      console.log(courses);
-      courses.forEach(async course => {
-        course.contents = await user.wsfunction.core_course_get_contents(course.id);
-        course.pages = await user.wsfunction.mod_page_get_pages_by_courses(course.id);
-       // course.modulelink = await findModulelink(course);
-       // if (course.modulelink) course.ECTS = await user.getECTS(course.modulelink);
-       course.contents.forEach(async lecture => {
-        console.log(lecture.name);
-       })
-      });
-      console.log(courses);
-      displayCourses(courses);
-    }
-    catch (error) {
-      console.error('Failed to get enrolled courses:', error);
-    }
-    
+async function scheduleInitialization() {
+  const lectureNamesContainer = $('.lectureNames');
+  lectureNamesContainer.empty();
+  const user = new MoodleUser;
+  let courses = {};
+  try {
+    const profile = await user.wsfunction.core_webservice_get_site_info();
+    displayProfile(profile);
+  } catch (error) {
+    console.error('Failed to get profile info:', error);
   }
+  try {
+    const coursesresponse = await user.wsfunction.core_course_get_enrolled_courses_by_timeline_classification();
+    courses = coursesresponse.courses;
+    console.log(courses);
+    // Filter out standard enrolled courses by common enddate
+    courses = courses.filter(course => course.enddate !== 2527282800);
+    console.log(courses);
+    
+    for (const course of courses) {
+      course.contents = await user.wsfunction.core_course_get_contents(course.id);
+      course.pages = await user.wsfunction.mod_page_get_pages_by_courses(course.id);
+
+      // Create a dropdown for each course
+      const courseDropdown = $(`<select class="course-dropdown" name="course_${course.id}"></select>`);
+      courseDropdown.append(`<option value="">Select Lecture</option>`);
+      
+      for (const lecture of course.contents) {
+        courseDropdown.append(`<option value="${lecture.id}">${lecture.name}</option>`);
+      }
+      
+      // Append the dropdown to the container in schedule.html. The container is a div with the class "lectureNames"
+      lectureNamesContainer.append(`<div class="course-dropdown-container"><label>${course.fullname}</label></div>`);
+      lectureNamesContainer.find('.course-dropdown-container:last').append(courseDropdown);
+    }
+    console.log(courses);
+    displayCourses(courses);
+  } catch (error) {
+    console.error('Failed to get enrolled courses:', error);
+  }
+}
+
   function displayCourses(courses) {
     courses.forEach(course => { // Loop over each course
       // Make sure the course has a dayOfWeek and timeSlot property before proceeding
