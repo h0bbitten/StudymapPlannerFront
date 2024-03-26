@@ -112,13 +112,15 @@ a:hover {
   #weekdays div {
     width: 100px;
     padding: 10px;
+    margin: auto;
+    border-right: 2px solid #000000;
   }
   
   #weekdays {
     
     background-color: #1c54b2;
     color: #ffffff;
-    width: 100%;
+    width: 775px;
     display: flex;
   }
   
@@ -166,21 +168,43 @@ a:hover {
     box-shadow: none !important;
   }
   
-  /* Buttons */
-  button {
+  #backButton {
+    font-size: 1.15em;
     background-color: #1c54b2;
     color: #ffffff;
     border: none;
     padding: 10px 20px;
     cursor: pointer;
     transition: background-color 0.3s ease;
-    width: 100px;
+    width: 35px;
     cursor: pointer;
     box-shadow: 0px 0px 2px gray;
     border: none;
     outline: none;
     padding: 5px;
     border-radius: 5px;
+    position: relative;
+    top:  15px;
+    right: 100px;
+  }
+  #nextButton {
+    font-size: 1.15em;
+    background-color: #1c54b2;
+    color: #ffffff;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    width: 35px;
+    cursor: pointer;
+    box-shadow: 0px 0px 2px gray;
+    border: none;
+    outline: none;
+    padding: 5px;
+    border-radius: 5px;
+    position: relative;
+    top:  15px;
+    right: 95px;
   }
   
   button:hover {
