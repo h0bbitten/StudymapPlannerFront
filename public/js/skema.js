@@ -26,26 +26,38 @@ function load() {
 
 
   document.getElementById('monthDisplay').innerText = 
-    `${dt.toLocaleDateString('en-us', { month: 'long' })} ${year}`;
+  `${dt.toLocaleDateString('en-us', { month: 'long' })} ${year}`;
 
-  calendar.innerHTML = '';
+calendar.innerHTML = '';
 
-  for(let i = 1; i <= paddingDays + daysInMonth; i++) {
-    const daySquare = document.createElement('div');
-    daySquare.classList.add('day');
+// Loop over all the days in the calendar
+for(let i = 1; i <= paddingDays + daysInMonth; i++) {
+  const daySquare = document.createElement('div');
+  daySquare.classList.add('day');
 
-    if (i > paddingDays) {
-      daySquare.innerText = i - paddingDays;
+  if (i > paddingDays) {
+    const dayNumber = i - paddingDays;
+    daySquare.innerText = dayNumber;
 
-      if (i - paddingDays === day && nav === 0) {
-        daySquare.id = 'currentDay';
-      }
-    } else {
-      daySquare.classList.add('padding');
+    const eventPara = document.createElement('p');
+    eventPara.classList.add('event');
+
+    // Add your event to Friday the 1st
+    if (dayNumber === 14 && (paddingDays === 5 || (paddingDays === 4 && year % 4 === 0 && month === 2))) {
+      // Since your calendar week starts on Monday, paddingDays 5 would be Friday.
+      eventPara.textContent = 'Lecture 1'; // Replace with your actual event name
+      daySquare.appendChild(eventPara);
     }
 
-    calendar.appendChild(daySquare);    
+    if (dayNumber === day && nav === 0) {
+      daySquare.id = 'currentDay';
+    }
+  } else {
+    daySquare.classList.add('padding');
   }
+
+  calendar.appendChild(daySquare);    
+}
 }
 
 function initButtons() {
