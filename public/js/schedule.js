@@ -8,7 +8,7 @@ class MoodleUser {
     }
     async getECTS(link) {
       try {
-        const response = await fetch(`http://localhost:4000/webscraper?link=${link}`);
+        const response = await fetch(`http://localhost:3000/webscraper?link=${link}`);
         if (!response.ok) {
           throw new Error('Network response error');
         }
@@ -28,7 +28,7 @@ class WSfunction {
   
     async core_course_get_enrolled_courses_by_timeline_classification() {
       try {
-        const response = await fetch(`http://localhost:4000/MoodleAPI?token=${token}&wsfunction=core_course_get_enrolled_courses_by_timeline_classification`);
+        const response = await fetch(`http://localhost:3000/MoodleAPI?token=${token}&wsfunction=core_course_get_enrolled_courses_by_timeline_classification`);
         if (!response.ok) {
           throw new Error('Network response error');
         }
@@ -41,7 +41,7 @@ class WSfunction {
     }
     async core_webservice_get_site_info() {
       try {
-        const response = await fetch(`http://localhost:4000/MoodleAPI?token=${token}&wsfunction=core_webservice_get_site_info`);
+        const response = await fetch(`http://localhost:3000/MoodleAPI?token=${token}&wsfunction=core_webservice_get_site_info`);
         if (!response.ok) {
           throw new Error('Network response error');
         }
@@ -54,7 +54,7 @@ class WSfunction {
     }
     async core_course_get_contents(course_id) {
       try {
-        const response = await fetch(`http://localhost:4000/MoodleAPI?token=${token}&wsfunction=core_course_get_contents&courseid=${course_id}`);
+        const response = await fetch(`http://localhost:3000/MoodleAPI?token=${token}&wsfunction=core_course_get_contents&courseid=${course_id}`);
         if (!response.ok) {
           throw new Error('Network response error');
         }
@@ -67,7 +67,7 @@ class WSfunction {
     }
     async mod_page_get_pages_by_courses(course_id) {
       try {
-        const response = await fetch(`http://localhost:4000/MoodleAPI?token=${token}&wsfunction=mod_page_get_pages_by_courses&courseid=${course_id}`);
+        const response = await fetch(`http://localhost:3000/MoodleAPI?token=${token}&wsfunction=mod_page_get_pages_by_courses&courseid=${course_id}`);
         if (!response.ok) {
           throw new Error('Network response error');
         }
@@ -81,8 +81,6 @@ class WSfunction {
 }
 
   async function scheduleInitialization() {
-    const lectureNamesContainer = $('.lectureNames');
-    lectureNamesContainer.empty();x
     const user = new MoodleUser;
     let courses = {};
     try {
@@ -103,18 +101,6 @@ class WSfunction {
         course.pages = await user.wsfunction.mod_page_get_pages_by_courses(course.id);
         course.modulelink = await findModulelink(course);
         if (course.modulelink) course.ECTS = await user.getECTS(course.modulelink);
-
-              // Create a dropdown for each course
-      const courseDropdown = $(`<select class="course-dropdown" name="course_${course.id}"></select>`);
-      courseDropdown.append(`<option value="">Se lectures her</option>`);
-      
-      for (const lecture of course.contents) {
-        courseDropdown.append(`<option value="${lecture.id}">${lecture.name}</option>`);
-      }
-      
-      // Append the dropdown to the container in schedule.html. The container is a div with the class "lectureNames"
-      lectureNamesContainer.append(`<div class="course-dropdown-container"><label>${course.fullname}</label></div>`);
-      lectureNamesContainer.find('.course-dropdown-container:last').append(courseDropdown);
       });
       console.log(courses);
       displayCourses(courses);
