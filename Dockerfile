@@ -2,7 +2,7 @@
 FROM node:14 AS server
 
 # Set the working directory for server-side code
-WORKDIR /app/server
+#There is none. 
 
 # Copy server-side code and dependencies
 #COPY server/package*.json ./
@@ -26,7 +26,7 @@ WORKDIR /app
 COPY --from=server /app/server /app/server
 
 # Expose the port for the server
-EXPOSE 8080
+EXPOSE 3000
 
 # Define the command to start the server
 CMD ["node", "server.js"]  # Assuming server.js is the entry point for your server code
