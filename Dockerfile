@@ -5,9 +5,9 @@ FROM node:14 AS server
 WORKDIR /app/server
 
 # Copy server-side code and dependencies
-COPY server/package*.json ./
+#COPY server/package*.json ./
 RUN npm install
-COPY server/ ./
+#COPY server/ ./
 
 # Set up client-side code (assuming client directory is not used)
 # FROM node:14 AS client
