@@ -81,6 +81,8 @@ class WSfunction {
 }
 
   async function scheduleInitialization() {
+    const lectureNamesContainer = $('.lectureNames');
+    lectureNamesContainer.empty();
     const user = new MoodleUser;
     let courses = {};
     try {
@@ -99,6 +101,18 @@ class WSfunction {
       courses.forEach(async course => {
         course.contents = await user.wsfunction.core_course_get_contents(course.id);
         course.pages = await user.wsfunction.mod_page_get_pages_by_courses(course.id);
+              // Create a dropdown for each course
+      const courseDropdown = $(`<select class="course-dropdown" name="course_${course.id}"></select>`);
+      courseDropdown.append(`<option value="">Se lectures her</option>`);
+      
+      for (const lecture of course.contents) {
+        courseDropdown.append(`<option value="${lecture.id}">${lecture.name}</option>`);
+      }
+      
+      // Append the dropdown to the container in schedule.html. The container is a div with the class "lectureNames"
+      lectureNamesContainer.append(`<div class="course-dropdown-container"><label>${course.fullname}</label></div>`);
+      lectureNamesContainer.find('.course-dropdown-container:last').append(courseDropdown);
+
         course.modulelink = await findModulelink(course);
         if (course.modulelink) course.ECTS = await user.getECTS(course.modulelink);
       });
