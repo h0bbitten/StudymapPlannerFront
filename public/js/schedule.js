@@ -36,7 +36,7 @@ class WSfunction {
         return response.json(); 
       } 
       catch (error) {
-        console.error('Error fetching enrolled courses:', error);
+        console.error('Error fetching enrolled courses:', error); 
         throw error;
       }
     }
@@ -78,7 +78,7 @@ class WSfunction {
         return response.json();
       } 
       catch (error) {
-        console.error('Error fetching course pages:', error);
+        console.error('Error fetching course pages:', error); 
         throw error;
       }
     }
