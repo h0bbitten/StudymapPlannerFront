@@ -20,7 +20,7 @@ RUN npm install
 FROM node:14
 
 # Set the working directory for the app
-WORKDIR /app
+#WORKDIR /app
 
 # Copy server code from the server stage
 COPY --from=server /app/server /app/server
