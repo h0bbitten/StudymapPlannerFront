@@ -23,7 +23,7 @@ FROM node:14
 #WORKDIR /app
 
 # Copy server code from the server stage
-COPY --from=server /app/server /app/server
+#COPY --from=server /app/server /app/server
 
 # Expose the port for the server
 EXPOSE 3000
