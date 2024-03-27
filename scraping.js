@@ -66,5 +66,5 @@ async function Webscraper(url) {
   //skriv ny eller opdateret information ind i txt filen
   await fs.writeFile(filePath, newDataArray.join('\n'));
   console.log(data.ectsValue);
-  return data.ectsValue;
+  return Number(data.ectsValue);
 };

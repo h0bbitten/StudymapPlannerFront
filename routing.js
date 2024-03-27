@@ -1,7 +1,7 @@
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import path from 'path';
-import { MoodleAPI, ECTSscraper} from "./app.js";
+import { MoodleAPI, getMoodleInfo} from "./app.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -35,7 +35,7 @@ const routing = function(app) {
         // Send the /html/settings.html file when /settings is accessed
         res.sendFile(path.join(__dirname, 'public', 'html', 'settings.html'));
     });
-    app.get('/favicon.ico', (req, res) => { // And this doesn't work for some reason, nevermind for some reason it just decided to work
+    app.get('/favicon.ico', (req, res) => {
         res.sendFile(path.join(__dirname, '/public/img/favicon.ico'))
     });
     app.get('/MoodleAPI', async (req, res) => {
@@ -44,9 +44,9 @@ const routing = function(app) {
             res.status(500).send("Internal Server Error");
         });
     });
-    app.get('/webscraper', async (req, res) => {
-        await ECTSscraper(req, res).catch(error => {
-            console.error("Error in ECTSscraper:", error);
+    app.get('/getMoodleInfo', async (req, res) => {
+        await getMoodleInfo(req, res).catch(error => {
+            console.error("Error in getMoodleInfo:", error);
             res.status(500).send("Internal Server Error");
         });
     });
