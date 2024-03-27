@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Schedule Viewer</title>
   <link id="theme-style" rel="stylesheet" href="../css/style.css">
-  <link rel="stylesheet" href="../css/skema.css">
 </head>
 <body>
   <nav id="navbar">
@@ -14,73 +13,37 @@
         <img id="dark-mode-btn" src="../img/dark-mode-solid-svgrepo-com.svg" alt="Dark mode">
       </div>
       <div class="navbar-icon">
-        <img src="../img/settings-svgrepo-com.svg" alt="Settings">
+        <img id="settingsBtn" src="../img/settings-svgrepo-com.svg" alt="Settings">
       </div>
     </div>
   </nav>
-  <h1 id="schedule">Schedule Viewer</h1>
- 
-  <div class="schedule_container">
-    <div class="days_container">
-        <span class="corner"></span>
-        <div class="day" data-day="monday">Mandag</div>
-        <div class="day" data-day="tuesday">Tirsdag</div>
-        <div class="day" data-day="wednesday">Onsdag</div>
-        <div class="day" data-day="thursday">Torsdag</div>
-        <div class="day" data-day="friday">Fredag</div>
-        <div class="day" data-day="saturday">Lørdag</div>
-        <div class="day" data-day="sunday">Søndag</div>
+
+  <div id="container">
+    <div id="header">
+      <div id="monthDisplay"></div>
+      <div>
+        <button id="backButton"><</button>
+        <button id="nextButton">></button>
+      </div>
     </div>
-    <div class="part_day">
-      <span class="time">08:00 <br> - <br> 12:00</span>
-      <div class="task time-slot-1"></div>
-      <div class="task time-slot-1"></div>
-      <div class="task time-slot-1"></div>
-      <div class="task time-slot-1"></div>
-      <div class="task time-slot-1"></div>
-      <div class="task time-slot-1"></div>
-      <div class="task time-slot-1"></div>
+
+    <div id="weekdays">
+      <div>Mandag</div>
+      <div>Tirsdag</div>
+      <div>Onsdag</div>
+      <div>Torsdag</div>
+      <div>Fredag</div>
+      <div>Lørdag</div>
+      <div>Søndag</div>
     </div>
-    <div class="part_day">
-      <span class="time">12:00 <br> - <br> 14:00</span>
-      <div class="task time-slot-2"></div>
-      <div class="task time-slot-2"></div>
-      <div class="task time-slot-2"></div>
-      <div class="task time-slot-2"></div>
-      <div class="task time-slot-2"></div>
-      <div class="task time-slot-2"></div>
-      <div class="task time-slot-2"></div>
-    </div>
-    <div class="part_day">
-      <span class="time">14:00 <br> - <br> 18:00</span>
-      <div class="task time-slot-3"></div>
-      <div class="task time-slot-3"></div>
-      <div class="task time-slot-3"></div>
-      <div class="task time-slot-3"></div>
-      <div class="task time-slot-3"></div>
-      <div class="task time-slot-3"></div>
-      <div class="task time-slot-3"></div>
-    </div>
-    <div class="part_day">
-      <span class="time">18:00 <br> - <br> 21:00</span>
-      <div class="task time-slot-4"></div>
-      <div class="task time-slot-4"></div>
-      <div class="task time-slot-4"></div>
-      <div class="task time-slot-4"></div>
-      <div class="task time-slot-4"></div>
-      <div class="task time-slot-4"></div>
-      <div class="task time-slot-4"></div>
-    </div>
-    <div class="part_day">
-      <span class="time">21:00 <br> - <br> 23:00</span>
-      <div class="task time-slot-5"></div>
-      <div class="task time-slot-5"></div>
-      <div class="task time-slot-5"></div>
-      <div class="task time-slot-5"></div>
-      <div class="task time-slot-5"></div>
-      <div class="task time-slot-5"></div>
-      <div class="task time-slot-5"></div>
-    </div>
+
+    <div id="calendar"></div>
+  </div>
+
+  <div id="modalBackDrop"></div>
+
+  <div class="lectureNames"></div>
+
 
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script type="module" src="../js/schedule.js"></script>
