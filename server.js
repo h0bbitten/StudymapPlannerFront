@@ -9,7 +9,12 @@ const app = express();
 app.use(session({
     secret: 'secret_key', // Encryption, tbd
     resave: false,
-    saveUninitialized: false
+    saveUninitialized: true,
+    cookie: { 
+        expires: new Date(Date.now() + 360000), // 6 mins
+        //secure: true, breaks stuff, so guess we won't have it secure :shrug:
+        httpOnly: true
+    }
 }));
 
 app.use(cors());

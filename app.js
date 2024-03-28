@@ -1,4 +1,4 @@
-export {MoodleAPI, getMoodleInfo};
+export {getMoodleInfo, testToken};
 import {Webscraper} from "./scraping.js";
 import axios from 'axios';
 
@@ -60,10 +60,30 @@ class WSfunctions {
     }
   }
 }
-
+async function testToken(req, res) {
+  let token = req.query.token;
+  let test = new WSfunctions(token)
+  let validity = "";
+  try {
+    let tokenTry = await test.core_webservice_get_site_info();
+    if (tokenTry.errorcode === 'invalidtoken') {
+      validity = "Invalid Token";
+    }
+    else {
+      req.session.token = token;
+      req.session.loggedIn = true;
+      validity = "Valid Token";
+    }
+    console.log(validity);
+    res.send(validity);
+  }
+  catch (error) {
+    console.error('Failed to test token:', error);
+  }
+}
 async function getMoodleInfo(req, res) {
   try {
-    const token = req.query.token;
+    let token = req.session.token;
     let Moodle = new WSfunctions(token);
     let user = {};
     try {
