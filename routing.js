@@ -49,17 +49,6 @@ const routing = function(app) {
             res.status(500).send("Internal Server Error");
         });
     });
-    // Route to set session variable
-    app.get('/setSessionVariable', (req, res) => {
-        req.session.myVariable = 'Hello, World!';
-        res.send('Session variable set');
-    });
-  
-    // Route to retrieve session variable
-    app.get('/getSessionVariable', (req, res) => {
-        const myVariable = req.session.myVariable;
-        res.send(myVariable);
-    });
     app.get('*', (req, res) => {
         res.status(404);
         res.sendFile(path.join(__dirname, 'public', 'html', 'default.html'));

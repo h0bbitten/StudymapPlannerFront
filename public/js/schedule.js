@@ -19,12 +19,22 @@ async function getMoodleInfo(token){
 
 async function scheduleInitialization() {
 
-  let User = await getMoodleInfo(token);
+  $("#loading").show();
+  $("#loading-overlay").show();
 
   try {
+    let User = await getMoodleInfo(token);
     displayProfile(User);
+
+    $("#loading").hide();
+    $("#loading-overlay").hide();
+
   }
   catch (error) {
+
+    $("#loading").hide();
+    $("#loading-overlay").hide();
+
     console.error('Failed to display profile info:', error);
   }
   

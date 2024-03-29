@@ -7,11 +7,12 @@ const app = express();
 
 // Session middleware setup
 app.use(session({
-    secret: 'secret_key', // Encryption, tbd
+    secret: process.env.SESSION_SECRET|| 'secret_key',
     resave: false,
-    saveUninitialized: true,
+    saveUninitialized: false,
+    rolling: true,
     cookie: { 
-        expires: new Date(Date.now() + 360000), // 6 mins
+        maxAge: 360000, // 6 mins
         //secure: true, breaks stuff, so guess we won't have it secure :shrug:
         httpOnly: true
     }
