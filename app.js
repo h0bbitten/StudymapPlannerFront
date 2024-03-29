@@ -86,6 +86,7 @@ async function getMoodleInfo(req, res) {
     let token = req.session.token;
     let Moodle = new WSfunctions(token);
     let user = {};
+
     try {
       user = await Moodle.core_webservice_get_site_info();
       let courseresponse = await Moodle.core_course_get_enrolled_courses_by_timeline_classification();
@@ -95,6 +96,7 @@ async function getMoodleInfo(req, res) {
       let coursePromises = user.courses.map(async course => {
         course.contents = await Moodle.core_course_get_contents(course.id);
         course.pages = await Moodle.mod_page_get_pages_by_courses(course.id);
+        course.color = await assignColor(course.id);
         course.modulelink = await findModulelink(course);
         if (course.modulelink) course.ECTS = await Webscraper(course.modulelink);
       });
@@ -108,6 +110,128 @@ async function getMoodleInfo(req, res) {
     res.status(500).send(`Error getting Moodle info: ${error}`);
   }
 }
+
+const colors = [
+  "#FF0000", // Red
+  "#00FF00", // Lime
+  "#0000FF", // Blue
+  "#FFFF00", // Yellow
+  "#FF00FF", // Magenta
+  "#00FFFF", // Cyan
+  "#800000", // Maroon
+  "#008000", // Green
+  "#000080", // Navy
+  "#808000", // Olive
+  "#800080", // Purple
+  "#008080", // Teal
+  "#C0C0C0", // Silver
+  "#808080", // Gray
+  "#FFA500", // Orange
+  "#A52A2A", // Brown
+  "#800000", // Maroon
+  "#FF4500", // OrangeRed
+  "#D2691E", // Chocolate
+  "#FF8C00", // DarkOrange
+  "#FF7F50", // Coral
+  "#DC143C", // Crimson
+  "#FF6347", // Tomato
+  "#FFD700", // Gold
+  "#B8860B", // DarkGoldenRod
+  "#DAA520", // GoldenRod
+  "#FF69B4", // HotPink
+  "#FF1493", // DeepPink
+  "#C71585", // MediumVioletRed
+  "#DB7093", // PaleVioletRed
+  "#00BFFF", // DeepSkyBlue
+  "#87CEEB", // SkyBlue
+  "#4682B4", // SteelBlue
+  "#B0C4DE", // LightSteelBlue
+  "#ADD8E6", // LightBlue
+  "#B0E0E6", // PowderBlue
+  "#AFEEEE", // PaleTurquoise
+  "#00CED1", // DarkTurquoise
+  "#48D1CC", // MediumTurquoise
+  "#40E0D0", // Turquoise
+  "#00FFFF", // Aqua
+  "#00FFFF", // Cyan
+  "#5F9EA0", // CadetBlue
+  "#66CDAA", // MediumAquaMarine
+  "#7FFFD4", // Aquamarine
+  "#7FFFD4", // AquaMarine
+  "#8A2BE2", // BlueViolet
+  "#9932CC", // DarkOrchid
+  "#8B008B", // DarkMagenta
+  "#9400D3", // DarkViolet
+  "#800080", // Purple
+  "#BA55D3", // MediumOrchid
+  "#9370DB", // MediumPurple
+  "#663399", // RebeccaPurple
+  "#4B0082", // Indigo
+  "#7B68EE", // MediumSlateBlue
+  "#6A5ACD", // SlateBlue
+  "#483D8B", // DarkSlateBlue
+  "#E6E6FA", // Lavender
+  "#D8BFD8", // Thistle
+  "#DDA0DD", // Plum
+  "#DA70D6", // Orchid
+  "#FF00FF", // Magenta
+  "#FF00FF", // Fuchsia
+  "#FFC0CB", // Pink
+  "#FFB6C1", // LightPink
+  "#FA8072", // Salmon
+  "#FFA07A", // LightSalmon
+  "#FF7F50", // Coral
+  "#FF4500", // OrangeRed
+  "#FF6347", // Tomato
+  "#FF8C00", // DarkOrange
+  "#FFA500", // Orange
+  "#FFD700", // Gold
+  "#FFFF00", // Yellow
+  "#FFFFE0", // LightYellow
+  "#FFFACD", // LemonChiffon
+  "#FAFAD2", // LightGoldenRodYellow
+  "#FFEFD5", // PapayaWhip
+  "#FFE4B5", // Moccasin
+  "#FFDAB9", // PeachPuff
+  "#EEE8AA", // PaleGoldenRod
+  "#F0E68C", // Khaki
+  "#BDB76B", // DarkKhaki
+  "#F5DEB3", // Wheat
+  "#DEB887", // BurlyWood
+  "#D2B48C", // Tan
+  "#BC8F8F", // RosyBrown
+  "#F4A460", // SandyBrown
+  "#D2691E", // Chocolate
+  "#CD853F", // Peru
+  "#8B4513", // SaddleBrown
+  "#A0522D", // Sienna
+  "#A52A2A", // Brown
+  "#800000", // Maroon
+  "#000000", // Black
+  "#2F4F4F", // DarkSlateGray
+  "#696969", // DimGray
+  "#708090", // SlateGray
+  "#778899", // LightSlateGray
+  "#808080", // Gray
+  "#A9A9A9", // DarkGray
+  "#C0C0C0", // Silver
+  "#D3D3D3", // LightGray
+  "#FFFFFF"  // White
+];
+
+async function assignColor(integer){
+  return new Promise((resolve, reject) => {
+    if (Number.isInteger(integer) && integer > 0) {
+        let index = integer % colors.length;
+        let color = colors[index];
+
+        colors.splice(index, 1);
+
+        resolve(color);
+    } else {
+        reject(new Error("Input must be a positive integer"));
+    }
+});}
 
 async function findModulelink(course) {
   const regex = /https:\/\/moduler\.aau\.dk\/course\/([^?]+)/;

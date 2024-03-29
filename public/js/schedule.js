@@ -19,25 +19,34 @@ async function getMoodleInfo(token){
 
 async function scheduleInitialization() {
 
-  $("#loading").show();
-  $("#loading-overlay").show();
+  LoadingScreen('show');
 
   try {
     let User = await getMoodleInfo(token);
+    console.log(User);
     displayProfile(User);
 
-    $("#loading").hide();
-    $("#loading-overlay").hide();
+    LoadingScreen('hide');
 
   }
   catch (error) {
 
-    $("#loading").hide();
-    $("#loading-overlay").hide();
+    LoadingScreen('hide');
 
     console.error('Failed to display profile info:', error);
   }
   
+}
+
+function LoadingScreen(toggle){
+  if (toggle === 'show') {
+    $("#loading").show();
+    $("#loading-overlay").show();
+  }
+  if (toggle === 'hide') {
+    $("#loading").hide();
+    $("#loading-overlay").hide();
+  }
 }
 
 function displayProfile(profile) {
