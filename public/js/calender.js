@@ -9,55 +9,51 @@ function load() {
     dt.setMonth(new Date().getMonth() + nav);
   }
 
-  const day = dt.getDate();
   const month = dt.getMonth();
   const year = dt.getFullYear();
 
   const firstDayOfMonth = new Date(year, month, 1);
   const daysInMonth = new Date(year, month + 1, 0).getDate();
-  
-  const dateString = firstDayOfMonth.toLocaleDateString('en-us', {
+
+  const dateString = firstDayOfMonth.toLocaleDateString('da-dk', {
     weekday: 'long',
     year: 'numeric',
     month: 'numeric',
     day: 'numeric',
   });
-  const paddingDays = (weekdays.indexOf(dateString.split(', ')[0]) + 6) % 7;
-
+  const paddingDays = weekdays.indexOf(dateString.split(', ')[0]);
 
   document.getElementById('monthDisplay').innerText = 
-  `${dt.toLocaleDateString('en-us', { month: 'long' })} ${year}`;
+    `${dt.toLocaleDateString('da-dk', { month: 'long' })} ${year}`;
 
-calendar.innerHTML = '';
+  calendar.innerHTML = '';
 
-// Loop over all the days in the calendar
-for(let i = 1; i <= paddingDays + daysInMonth; i++) {
-  const daySquare = document.createElement('div');
-  daySquare.classList.add('day');
 
-  if (i > paddingDays) {
-    const dayNumber = i - paddingDays;
-    daySquare.innerText = dayNumber;
+  const storedLectureNames = localStorage.getItem('lectureNames'); // Henter lectureNames fra local storage som er gemt i schedule.js
+  let lectures = storedLectureNames ? JSON.parse(storedLectureNames) : [];
 
-    const eventPara = document.createElement('p');
-    eventPara.classList.add('event');
+  let lectureIndex = 0;
 
-    // Add your event to Friday the 1st
-    if (dayNumber === 14 && (paddingDays === 5 || (paddingDays === 4 && year % 4 === 0 && month === 2))) {
-      // Since your calendar week starts on Monday, paddingDays 5 would be Friday.
-      eventPara.textContent = 'Lecture 1'; // Replace with your actual event name
-      daySquare.appendChild(eventPara);
+  for(let i = 1; i <= paddingDays + daysInMonth; i++) {
+    const daySquare = document.createElement('div');
+    daySquare.classList.add('day');
+
+    if (i > paddingDays) {
+      const dayNumber = i - paddingDays;
+      daySquare.innerText = dayNumber;
+
+      if (month === 2 && lectureIndex < lectures.length) { // Lige nu er der hardcoded til at vise lectures i marts siden der ikke kan hentes rigtige datoer fra moodle. Tænker vi stadig kan bruge den her metode til algoritmen.
+        const eventPara = document.createElement('p');
+        eventPara.classList.add('event');
+        eventPara.textContent = lectures[lectureIndex++];
+        daySquare.appendChild(eventPara);
+      }
+    } else {
+      daySquare.classList.add('padding');
     }
 
-    if (dayNumber === day && nav === 0) {
-      daySquare.id = 'currentDay';
-    }
-  } else {
-    daySquare.classList.add('padding');
+    calendar.appendChild(daySquare);    
   }
-
-  calendar.appendChild(daySquare);    
-}
 }
 
 function initButtons() {
