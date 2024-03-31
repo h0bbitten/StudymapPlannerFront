@@ -1,5 +1,4 @@
 import {applyTheme} from './script.js';
-
 let token = sessionStorage.getItem("token");
 
 class MoodleUser {

@@ -31,9 +31,9 @@ const routing = function(app) {
             res.redirect('/login');
         } */
     });
-    app.get('/settings', (req, res) => {
+    app.get('/setup', (req, res) => {
         // Send the /html/settings.html file when /settings is accessed
-        res.sendFile(path.join(__dirname, 'public', 'html', 'settings.html'));
+        res.sendFile(path.join(__dirname, 'public', 'html', 'setup.html'));
     });
     app.get('/favicon.ico', (req, res) => { // And this doesn't work for some reason, nevermind for some reason it just decided to work
         res.sendFile(path.join(__dirname, '/public/img/favicon.ico'))
