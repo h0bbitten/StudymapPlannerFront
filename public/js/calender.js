@@ -1,53 +1,51 @@
 let nav = 0;
+let view = 'month';
 const calendar = document.getElementById('calendar');
-const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+const weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
 function load() {
-  const dt = new Date(); // Datoen i dag
+  if (view === 'week') {
+    loadWeekView();
+  } else {
+    loadMonthView();
+  }
+}
 
-  if (nav !== 0) { // Hvis nav ikke er 0, så tilføj eller træk fra måneden. Nav er en global variabel som bruges til at holde styr på hvilken måned der vises.
-    dt.setMonth(new Date().getMonth() + nav); // Sætter måneden til den nuværende måned + nav
+function loadMonthView() {
+  const dt = new Date();
+  
+  if (nav !== 0) {
+    dt.setMonth(new Date().getMonth() + nav);
   }
 
-  const month = dt.getMonth(); // Måneden i dag
-  const year = dt.getFullYear(); // Året i dag
+  const month = dt.getMonth();
+  const year = dt.getFullYear();
+  const firstDayOfMonth = new Date(year, month, 1);
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
 
-  const firstDayOfMonth = new Date(year, month, 1); // Første dag i måneden. I parantesen er det år, måned og dag.
-  const daysInMonth = new Date(year, month + 1, 0).getDate(); // Antal dage i måneden. I parantesen er det år, måned og dag.
-
-  const dateString = firstDayOfMonth.toLocaleDateString('da-dk', { // Datoen i dag som en string
-    weekday: 'long', // Dagen på ugen
-    year: 'numeric', // Året
-    month: 'numeric', // Måneden
-    day: 'numeric', // Dagen
+  const dateString = firstDayOfMonth.toLocaleDateString('en-gb', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'numeric',
+    day: 'numeric',
   });
-  const paddingDays = weekdays.indexOf(dateString.split(', ')[0]); // Finder ud af hvor mange dage der skal være før den første dag i måneden. Det gør den ved at finde indexet af dagen i ugen i weekdays arrayet.
+  let paddingDays = weekdays.indexOf(dateString.split(', ')[0]);
 
-  document.getElementById('monthDisplay').innerText = // Skriver måneden og året i h1 tagget
-    `${dt.toLocaleDateString('da-dk', { month: 'long' })} ${year}`;
+  if(paddingDays === -1) {
+    paddingDays = 6;
+  }
+
+  document.getElementById('monthDisplay').innerText = 
+    `${dt.toLocaleDateString('en-us', { month: 'long' })} ${year}`;
 
   calendar.innerHTML = '';
 
-
-  const storedLectureNames = localStorage.getItem('lectureNames'); // Henter lectureNames fra local storage som er gemt i schedule.js
-  let lectures = storedLectureNames ? JSON.parse(storedLectureNames) : [];
-
-  let lectureIndex = 0;
-
-  for(let i = 1; i <= paddingDays + daysInMonth; i++) { // Laver en for loop som kører fra 1 til antal dage i måneden + paddingDays. PaddingDays er de dage der skal være før den første dag i måneden.
+  for(let i = 1; i <= paddingDays + daysInMonth; i++) {
     const daySquare = document.createElement('div');
     daySquare.classList.add('day');
 
-    if (i > paddingDays) { // Hvis i er større end paddingDays, så er det en dag i måneden
-      const dayNumber = i - paddingDays; // Finder ud af hvilken dag i måneden det er
-      daySquare.innerText = dayNumber; // Skriver dagen i firkanten
-
-      if (month === 2 && lectureIndex < lectures.length) { // Lige nu er der hardcoded til at vise lectures i marts siden der ikke kan hentes rigtige datoer fra moodle. Tænker vi stadig kan bruge den her metode til algoritmen.
-        const eventPara = document.createElement('p');
-        eventPara.classList.add('event');
-        eventPara.textContent = lectures[lectureIndex++];
-        daySquare.appendChild(eventPara);
-      }
+    if (i > paddingDays) {
+      daySquare.innerText = i - paddingDays;
     } else {
       daySquare.classList.add('padding');
     }
@@ -56,21 +54,59 @@ function load() {
   }
 }
 
+function loadWeekView() {
+  const today = new Date();
+  today.setDate(today.getDate() + nav);
+
+  const dayOfWeek = today.getDay();
+  const startOfWeek = new Date(today.setDate(today.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1)));
+
+  document.getElementById('monthDisplay').innerText = 
+    `Week of ${startOfWeek.toLocaleDateString('en-us', { month: 'long', day: 'numeric' })}`;
+
+  calendar.innerHTML = '';
+
+  for(let i = 0; i < 7; i++) {
+    const daySquare = document.createElement('div');
+    daySquare.classList.add('day');
+    let weekDay = new Date(startOfWeek.setDate(startOfWeek.getDate() + (i === 0 ? 0 : 1)));
+    daySquare.innerText = weekDay.getDate();
+    calendar.appendChild(daySquare);
+  }
+}
+
 function initButtons() {
   document.getElementById('nextButton').addEventListener('click', () => {
-    nav++;
-    load();
+    if(view === 'month') {
+      nav++;
+      load();
+    } else {
+      nav += 7;
+      loadWeekView();
+    }
   });
 
   document.getElementById('backButton').addEventListener('click', () => {
-    nav--;
+    if(view === 'month') {
+      nav--;
+      load();
+    } else {
+      nav -= 7;
+      loadWeekView();
+    }
+  });
+
+  document.getElementById('weekButton').addEventListener('click', () => {
+    view = 'week';
+    nav = 0;
     load();
   });
 
-}
-
-function showWeek(){
-  
+  document.getElementById('monthButton').addEventListener('click', () => {
+    view = 'month';
+    nav = 0;
+    load();
+  });
 }
 
 initButtons();
