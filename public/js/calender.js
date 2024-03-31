@@ -3,6 +3,11 @@ let view = 'month';
 const calendar = document.getElementById('calendar');
 const weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
+const storedLectureNames = localStorage.getItem('lectureNames'); // Henter lectureNames fra local storage som er gemt i schedule.js
+let lectures = storedLectureNames ? JSON.parse(storedLectureNames) : [];
+
+let lectureIndex = 0;
+
 function load() {
   if (view === 'week') {
     loadWeekView();
@@ -12,6 +17,7 @@ function load() {
 }
 
 function loadMonthView() {
+  calendar.classList.remove('week-view');
   const dt = new Date();
   
   if (nav !== 0) {
@@ -50,11 +56,26 @@ function loadMonthView() {
       daySquare.classList.add('padding');
     }
 
+    if (i > paddingDays) {
+      const dayNumber = i - paddingDays;
+      daySquare.innerText = dayNumber;
+
+      if (month === 2 && lectureIndex < lectures.length) { // Lige nu er der hardcoded til at vise lectures i marts siden der ikke kan hentes rigtige datoer fra moodle. Tænker vi stadig kan bruge den her metode til algoritmen.
+        const eventPara = document.createElement('p');
+        eventPara.classList.add('event');
+        eventPara.textContent = lectures[lectureIndex++];
+        daySquare.appendChild(eventPara);
+      }
+    } else {
+      daySquare.classList.add('padding');
+    }
+
     calendar.appendChild(daySquare);    
   }
 }
 
 function loadWeekView() {
+  calendar.classList.add('week-view');
   const today = new Date();
   today.setDate(today.getDate() + nav);
 
@@ -71,6 +92,17 @@ function loadWeekView() {
     daySquare.classList.add('day');
     let weekDay = new Date(startOfWeek.setDate(startOfWeek.getDate() + (i === 0 ? 0 : 1)));
     daySquare.innerText = weekDay.getDate();
+    if (weekDay.toDateString() === new Date().toDateString()) {
+      daySquare.classList.add('current-day');
+    }
+
+    if (lectures.length > 0) {
+      const eventPara = document.createElement('p');
+      eventPara.classList.add('event');
+      eventPara.textContent = lectures[(lectureIndex + i) % lectures.length];
+      daySquare.appendChild(eventPara);
+    }
+
     calendar.appendChild(daySquare);
   }
 }
