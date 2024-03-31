@@ -86,6 +86,17 @@ function loadWeekView() {
     `Week of ${startOfWeek.toLocaleDateString('en-us', { month: 'long', day: 'numeric' })}`;
 
   calendar.innerHTML = '';
+  let times = ['08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00'];
+  const timeTest = document.createElement('div');
+  timeTest.classList.add('times');
+
+  for (let i = 0; i < times.length; i++) {
+    const timeItem = document.createElement('div');
+    timeItem.classList.add('time');
+    timeItem.textContent = times[i];
+    timeTest.appendChild(timeItem);
+  }
+  calendar.appendChild(timeTest);
 
   for(let i = 0; i < 7; i++) {
     const daySquare = document.createElement('div');
