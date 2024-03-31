@@ -3,9 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="stylesheet" href="..\css\setup.css">
     <title>Setup</title>
 </head>
 <body>
+    <nav>
+        <div class="navbar-icons">
+          <div class="navbar-icon">
+            <img id="dark-mode-btn" src="../img/dark-mode-solid-svgrepo-com.svg" alt="Dark mode">
+          </div>
+          <div class="navbar-icon">
+            <img src="../img/settings-svgrepo-com.svg" alt="Settings">
+          </div>
+        </div>
+      </nav>
+    <h2 id="header">Hvilke fag vil du læse op i?</h2>
+    <div id="container" class="box">
+      <form id="input-form" role="form" action="" class="margin-top-fortypx">
+        <div class="checkbox checkbox-container">
+           <label class="checkbox-label" for="checkbox1">
+              <input type="checkbox" id="checkbox1" name="type" value="1"/>               
+            </label>
+         </div>
+     
+         <div class="checkbox checkbox-container">
+            <label class="checkbox-label" for="checkbox2">
+               <input type="checkbox" id="checkbox2" name="type" value="2" />                
+             </label>
+          </div> 
+          <div class="checkbox checkbox-container">
+            <label class="checkbox-label" for="checkbox3">
+               <input type="checkbox" id="checkbox3" name="type" value="3" />
+             </label>
+          </div> 
+       </form>
+       <button id="nextPage">Færdig</button>
+    </div>
     
+   
+    <script src="..\js\setup.js"></script>
 </body>
 </html>

@@ -1,0 +1,45 @@
+.box {
+    width: 700px;
+    height: 150px;
+    background-color: #ffa500;
+    padding: 10px;
+    margin-left: 500px;
+    border-radius: 10px;
+    
+  }
+
+
+input[type=checkbox]{
+    transform: scale(1.5);
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+
+#nextPage {
+    margin-top: 40px;
+    margin-left: px;
+}
+#header {
+    margin-left: 500px;
+}
+
+body {
+    background-color: #f5f5f5; /* Light gray background */
+    color: #333; /* Dark text color */
+}
+
+nav {
+    background-color: #ffa500; /* Moodle orange */
+    padding: 10px 20px;
+}
+
+.navbar-icons {
+    display: flex;
+    justify-content: space-between;
+}
+
+.navbar-icon img {
+    width: 30px;
+    height: 30px;
+}
