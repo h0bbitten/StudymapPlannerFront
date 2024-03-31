@@ -8,6 +8,15 @@
     
   }
 
+.box2 {
+    width: 700px;
+    height: 400px;
+    background-color: #ffa500;
+    padding: 10px;
+    margin-left: 500px;
+    border-radius: 10px;
+    
+  }
 
 input[type=checkbox]{
     transform: scale(1.5);
