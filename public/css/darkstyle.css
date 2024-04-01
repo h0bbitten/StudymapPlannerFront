@@ -6,7 +6,7 @@
   }
   
   body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Aldrich';font-size: 22px;
     background-color: #121212; /* Dark background */
     color: #e0e0e0; /* Light text */
     padding: 20px;
@@ -99,13 +99,23 @@
     #container {
       padding: 20px;
       width: 900px;
+      text-align: left;
+      margin-left: auto;
+      margin-right: auto;
     }
     
-    #header {
+    #header > div{
       display: flex;
-      justify-content: space-between;
-      margin-bottom: 20px;
+      justify-content: flex-end;
+      align-items: center;
+      padding: 10px;
+      /*margin-bottom: 20px;*/
       
+    }
+    #monthDisplay{
+      font-family: 'Aldrich';font-size: 22px;
+      text-align: left;
+      flex-grow: 1;
     }
     
     #header div,
@@ -212,8 +222,7 @@
       padding: 5px;
       border-radius: 5px;
       position: relative;
-      top:  15px;
-      right: 100px;
+      margin-left: 0px;
     }
     #nextButton {
       font-size: 1.15em;
@@ -231,8 +240,7 @@
       padding: 5px;
       border-radius: 5px;
       position: relative;
-      top:  15px;
-      right: 30px;
+      margin-left: 10px;
     }
     #weekButton{
       font-size: 1.15em;
@@ -242,7 +250,7 @@
       padding: 10px 20px;
       cursor: pointer;
       transition: background-color 0.3s ease;
-      width: 60px;
+      width: 80px;
       cursor: pointer;
       box-shadow: 0px 0px 2px gray;
       border: none;
@@ -250,12 +258,25 @@
       padding: 5px;
       border-radius: 5px;
       position: relative;
-      top:  15px;
-      right: 95px;
+      margin-left: 10px;
     }
-    
-    button:hover {
-      background-color: #385280;
+    #monthButton{
+      font-size: 1.15em;
+      background-color: #1c54b2;
+      color: #ffffff;
+      border: none;
+      padding: 10px 20px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      width: 80px;
+      cursor: pointer;
+      box-shadow: 0px 0px 2px gray;
+      border: none;
+      outline: none;
+      padding: 5px;
+      border-radius: 5px;
+      position: relative;
+      margin-left: 10px;
     }
 
     .times{
