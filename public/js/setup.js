@@ -12,7 +12,7 @@ document.getElementById("checkbox3Text").textContent = "Option 1";
 /* Modtag svar fra checkbox*/
 var form = document.getElementById('input-form');
 
-document.getElementById('nextPage').addEventListener('click', function(e) {
+document.getElementById('faerdig').addEventListener('click', function(e) {
     
 
     form.querySelectorAll('input').forEach(function(input) {
@@ -23,11 +23,33 @@ document.getElementById('nextPage').addEventListener('click', function(e) {
 
     // Store the array data in local storage
     localStorage.setItem('myArray', JSON.stringify(myArray));
-    location.href = "setup2.html";
-    console.log(myArray);
+    location.href = "setup2.html?myArray=" + JSON.stringify(myArray);
+    
+}); 
+
+document.getElementById('lectureHeadline').textContent = "Hello";
+
+//if (myArray.length > 0) {
+//    for(let i = 0; i < myArray.length; i++) {
+//        location.href = "setup2.html?myArray=" + JSON.stringify(myArray);
+//    }
+//} else {
+//    location.href = "schedule.html";
+//}
+
+// setup 2 
+// setup 2
+var lectures = [];
+
+// Save each checked lecture
+document.querySelectorAll('input[type="checkbox"]').forEach(function(input) {
+    if (input.checked) {
+        lectures.push(input.value);
+    }
 });
 
-document.getElementById('lectureHeadline').textContent = "Hvilke emner vil du læse op på i " + myArray[0] + "?";
+// Store the lectures array in local storage
+localStorage.setItem('lectures', JSON.stringify(lectures));
 
-document.getElementById('lectureHeadline').textContent = "Hvilke emner vil du læse op på i" + myArray[0] + "?";
-
+// Redirect to the next page
+location.href = "nextPage.html";
