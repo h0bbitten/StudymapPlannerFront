@@ -51,6 +51,22 @@ function peek(queue, value, priority)
     return index;
 }
 
+function dequeue()
+{
+    let index = peek();
+ 
+    // Shift the element one index before
+    // from the position of the element
+    // with highest priority is found
+    for (var i = index; i < sizeMP; i++) {
+        MainPriorityQueue[i] = MainPriorityQueue[i + 1];
+    }
+ 
+    // Decrease the size of the
+    // priority queue by one
+    sizeMP--;
+}
+
 function Course(name, examDate, ECTS, subjects)
 {
     //Course info skal fetches her
