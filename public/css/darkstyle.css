@@ -6,7 +6,7 @@
   }
   
   body {
-    font-family: 'Aldrich';font-size: 22px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background-color: #121212; /* Dark background */
     color: #e0e0e0; /* Light text */
     padding: 20px;
@@ -113,7 +113,7 @@
       
     }
     #monthDisplay{
-      font-family: 'Aldrich';font-size: 22px;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       text-align: left;
       flex-grow: 1;
     }
