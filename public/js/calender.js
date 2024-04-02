@@ -87,44 +87,41 @@ function loadWeekView() {
 
   calendar.innerHTML = '';
 
-  let timeTest = container.querySelector('.times');
-  if (!timeTest) {
-    timeTest = document.createElement('div'); 
-    timeTest.classList.add('times');
-    container.appendChild(timeTest);
-  }
-
-  while (timeTest.firstChild) {
-    timeTest.removeChild(timeTest.firstChild);
-  }
-
-  let times = ['08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00'];
-  times.forEach(time => {
-    const timeItem = document.createElement('div');
-    timeItem.classList.add('time');
-    timeItem.textContent = time;
-    timeTest.appendChild(timeItem);
-  });
-
   for (let i = 0; i < 7; i++) {
+    const dayInterval = document.createElement('div');
+    dayInterval.classList.add('day-interval');
+
     const daySquare = document.createElement('div');
     daySquare.classList.add('day');
+
     let weekDay = new Date(startOfWeek.getFullYear(), startOfWeek.getMonth(), startOfWeek.getDate() + i);
-    daySquare.innerText = weekDay.getDate();
+    daySquare.innerText = weekDay.toLocaleDateString('en-us', { weekday: 'long', month: 'numeric', day: 'numeric' });
 
     if (weekDay.toDateString() === new Date().toDateString()) {
       daySquare.classList.add('current-day');
     }
 
-    if (lectures.length > 0) {
-      const eventPara = document.createElement('p');
-      eventPara.classList.add('event');
-      eventPara.textContent = lectures[(lectureIndex + i) % lectures.length];
-      daySquare.appendChild(eventPara);
-    }
-    
+    dayInterval.appendChild(daySquare);
 
-    calendar.appendChild(daySquare);
+    // Create time slots within the day interval
+    for (let hour = 8; hour <= 20; hour++) {
+      const hourSlot = document.createElement('div');
+      hourSlot.classList.add('hour');
+      hourSlot.style.height = '37.5px'; // Assuming each hour slot has a height of 60px
+      dayInterval.appendChild(hourSlot);
+    }
+
+    // Position the lecture at 14:00 within each day square
+    const eventDiv = document.createElement('div');
+    eventDiv.classList.add('event');
+    eventDiv.textContent = lectures[lectureIndex % lectures.length].name; // Using modulus to cycle through lectures
+    // The top offset for 14:00 would be 6 hour slots (8, 9, 10, 11, 12, 13) times the height of an hour slot
+    eventDiv.style.position = 'absolute';
+    eventDiv.style.top = '360px'; // 6 * 60px since the 14th hour starts at 6 slots down from 8:00
+    daySquare.appendChild(eventDiv);
+
+    calendar.appendChild(dayInterval);
+    lectureIndex++; // Increment the lectureIndex to cycle through lectures for subsequent days
   }
 }
 
