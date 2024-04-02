@@ -2,150 +2,78 @@ import {applyTheme} from './script.js';
 
 let token = sessionStorage.getItem("token");
 
-class MoodleUser {
-    constructor() {
-      this.wsfunction = new WSfunction();
+async function getMoodleInfo(token){
+  try {
+    const response = await fetch(`http://localhost:3000/getMoodleInfo?token=${token}`);
+    if (!response.ok) {
+      throw new Error('Network response error');
     }
-    async getECTS(link) {
-      try {
-        const response = await fetch(`http://localhost:3000/webscraper?link=${link}`);
-        if (!response.ok) {
-          throw new Error('Network response error');
-        }
-        const data = await response.text(); // Extracting response body as text
-        console.log('Data from server:', data);
-        return data; // Returning the data received from the server
-      } 
-      catch (error) {
-        console.error('Error fetching enrolled courses:', error);
-        throw error;
-      }
-    }
-} 
-  
-class WSfunction {
-    constructor() {}
-  
-    async core_course_get_enrolled_courses_by_timeline_classification() {
-      try {
-        const response = await fetch(`http://localhost:3000/MoodleAPI?token=${token}&wsfunction=core_course_get_enrolled_courses_by_timeline_classification`);
-        if (!response.ok) {
-          throw new Error('Network response error');
-        }
-        return response.json();
-      } 
-      catch (error) {
-        console.error('Error fetching enrolled courses:', error);
-        throw error;
-      }
-    }
-    async core_webservice_get_site_info() {
-      try {
-        const response = await fetch(`http://localhost:3000/MoodleAPI?token=${token}&wsfunction=core_webservice_get_site_info`);
-        if (!response.ok) {
-          throw new Error('Network response error');
-        }
-        return response.json();
-      } 
-      catch (error) {
-        console.error('Error fetching user info:', error);
-        throw error;
-      }
-    }
-    async core_course_get_contents(course_id) {
-      try {
-        const response = await fetch(`http://localhost:3000/MoodleAPI?token=${token}&wsfunction=core_course_get_contents&courseid=${course_id}`);
-        if (!response.ok) {
-          throw new Error('Network response error');
-        }
-        return response.json();
-      } 
-      catch (error) {
-        console.error('Error fetching course contents:', error);
-        throw error;
-      }
-    }
-    async mod_page_get_pages_by_courses(course_id) {
-      try {
-        const response = await fetch(`http://localhost:3000/MoodleAPI?token=${token}&wsfunction=mod_page_get_pages_by_courses&courseid=${course_id}`);
-        if (!response.ok) {
-          throw new Error('Network response error');
-        }
-        return response.json();
-      } 
-      catch (error) {
-        console.error('Error fetching course pages:', error);
-        throw error;
-      }
-    }
+    return response.json();
+  } 
+  catch (error) {
+    console.error('Error fetching course pages:', error);
+    throw error;
+  }
+
 }
 
-  async function scheduleInitialization() {
-    const user = new MoodleUser;
-    let courses = {};
-    try {
-      const profile = await user.wsfunction.core_webservice_get_site_info();
-      displayProfile(profile);
-    }
-    catch (error) {
-      console.error('Failed to get profile info:', error);
-    }
-    try {
-      const coursesresponse = await user.wsfunction.core_course_get_enrolled_courses_by_timeline_classification();
-      courses = coursesresponse.courses;
-      console.log(courses);
-      courses = courses.filter(course => course.enddate !== 2527282800); // Hard code filter out standard enrolled courses by common enddate, not pretty but functional
-      console.log(courses);
-      courses.forEach(async course => {
-        course.contents = await user.wsfunction.core_course_get_contents(course.id);
-        course.pages = await user.wsfunction.mod_page_get_pages_by_courses(course.id);
-        course.modulelink = await findModulelink(course);
-        if (course.modulelink) course.ECTS = await user.getECTS(course.modulelink);
-      });
-      console.log(courses);
-      displayCourses(courses);
-    }
-    catch (error) {
-      console.error('Failed to get enrolled courses:', error);
-    }
-    
+async function scheduleInitialization() {
+
+  LoadingScreen('show');
+
+  try {
+    let User = await getMoodleInfo(token);
+    console.log(User);
+    displayProfile(User);
+
+    LoadingScreen('hide');
+
   }
-  function displayCourses(courses) {
-    courses.forEach(course => { // Loop over each course
-      // Make sure the course has a dayOfWeek and timeSlot property before proceeding
-      if (course.dayOfWeek && course.timeSlot) {
-        const dayColumn = $(`.day[data-day="${course.dayOfWeek.toLowerCase()}"]`).closest('.part_day');
-        const timeSlot = dayColumn.find(`.task[data-time="${course.timeSlot}"]`);
-        
-        // Check if the timeSlot element exists before trying to append to it
-        if (timeSlot.length > 0) {
-          const courseElement = $(`<div class="course-detail">`).append(`<h4>${course.fullnamedisplay}</h4><p>${course.ECTS} ECTS</p>`);
-          timeSlot.append(courseElement);
-        }
-      }
-    });
+  catch (error) {
+
+    LoadingScreen('hide');
+
+    console.error('Failed to display profile info:', error);
   }
   
+}
 
-  function displayProfile(profile) {
-    console.log(profile);
-    $("#navbar").append($(`<div id="user_profile">`).append(`<p> Welcome back ${profile.fullname}</p><img src="${profile.userpictureurl}" alt="Profile pic">`));
+function LoadingScreen(toggle){
+  if (toggle === 'show') {
+    $("#loading").show();
+    $("#loading-overlay").show();
   }
-  async function findModulelink(course) {
-    const regex = /https:\/\/moduler\.aau\.dk\/course\/([^?]+)/;
-    
-    let linkPart = null;
+  if (toggle === 'hide') {
+    $("#loading").hide();
+    $("#loading-overlay").hide();
+  }
+}
 
-    course.pages.pages.forEach(page => {
-        const content = page.content;
-        const match = regex.exec(content);
-        if (match && match[1]) {
-            linkPart = match[1];
-            return;
-        }
+function displayProfile(profile) {
+  $("#user_profile").html(`<p>Welcome back ${profile.fullname}</p><img src="${profile.userpictureurl}" alt="Profile pic">`);
+
+  const lectureNames = [];
+  profile.courses.forEach(course => {
+    course.contents.forEach(lecture => {
+      lectureNames.push(lecture.name);
     });
 
-    return linkPart !== null ? `https://moduler.aau.dk/course/${linkPart}?lang=en-GB` : undefined;
+  });
+  localStorage.setItem('lectureNames', JSON.stringify(lectureNames));
+
+ // if (profile.courses && profile.courses.length > 0) {
+  //  profile.courses.forEach(course => {
+  //    const courseLecturesList = $(`<div class="course-lectures"><h3>${course.fullname} Lectures:</h3><ul></ul></div>`);
+  //    course.contents.forEach(lecture => {
+  //      courseLecturesList.find("ul").append(`<li>${lecture.name}</li>`);
+   //   });
+      //$("#courses").append(courseLecturesList);
+     // $("#courses").append(courseLecturesList);
+    //});
+  //} else {
+  //  $("#courses").append("<p>You are not enrolled in any courses.</p>");
+  //}
 }
-  applyTheme();
-  scheduleInitialization();  
+
+applyTheme();
+scheduleInitialization();  
