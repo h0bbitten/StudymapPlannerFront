@@ -1,3 +1,17 @@
+class Course 
+{
+    constructor(queue, size, name, examDate, ECTS, subjects) 
+    {
+        //Course info skal fetches her
+        this.queue = [];
+        this.size = -1;
+        this.name = name;
+        this.examDate = examDate;
+        this.ECTS = ECTS;
+        this.subjects = subjects;
+    }
+}
+
 class CourseItem {
     constructor()
     {
@@ -8,43 +22,40 @@ class CourseItem {
     }
 }
 
-let MainPriorityQueue = [];
-
 for (var i = 0; i < 1000; i++)
 {
-    MainPriorityQueue.push(new CourseItem);
+    this.queue.push(new CourseItem);
 }
 
-let sizeMP = -1;
+let size = -1;
 
-function enqueue(queue, value, priority)
+function enqueue(value, priority)
 {
-    this.queue = queue;
-    sizeMP++;
+    this.size++;
 
-    MainPriorityQueue[sizeMP] = new CourseItem();
-    MainPriorityQueue[sizeMP].value = value;
-    MainPriorityQueue[sizeMP].priority = priority;
+    this.queue[size] = new CourseItem();
+    this.queue[size].value = value;
+    this.queue[size].priority = priority;
 
 }
 
-function peek(queue, value, priority)
+function peek(value, priority)
 {
-    this.queue = queue;
     let highestPriority = Number.MIN_SAFE_INTEGER;
     let index = -1
 
-    for (var i = 0; i <= sizeMP; i++) 
+    for (var i = 0; i <= this.size; i++) 
     {
         // If priority is same choose
         // the element with the
         // highest value
-        if (highestPriority == MainPriorityQueue[i].priority && index > -1
-            && MainPriorityQueue[index].value < MainPriorityQueue[i].value) 
+        if (highestPriority == this.queue[i].priority && index > -1
+            && this.queue[index].value < this.queue[i].value) 
         {
-            highestPriority = MainPriorityQueue[i].priority;
+            highestPriority = this.queue[i].priority;
             index = i;
         }
+        
         
     }
 
@@ -58,22 +69,14 @@ function dequeue()
     // Shift the element one index before
     // from the position of the element
     // with highest priority is found
-    for (var i = index; i < sizeMP; i++) {
-        MainPriorityQueue[i] = MainPriorityQueue[i + 1];
+    for (var i = index; i < this.size; i++) 
+    {
+        this.queue[i] = this.queue[i + 1];
     }
  
     // Decrease the size of the
     // priority queue by one
-    sizeMP--;
-}
-
-function Course(name, examDate, ECTS, subjects)
-{
-    //Course info skal fetches her
-    this.name = name;
-    this.examDate = examDate;
-    this.ECTS = ECTS;
-    this.subjects = subjects;
+    this.size--;
 }
 
 function studyBlock(date, duration)
@@ -92,5 +95,5 @@ function createSchedule(courses, availableTimes, Queues)
 
 function sortExamsByDates()
 {
-    examDate
+    Course.examDate.sort();
 }
