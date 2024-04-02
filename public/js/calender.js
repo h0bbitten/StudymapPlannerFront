@@ -1,5 +1,5 @@
 let nav = 0;
-let view = 'month';
+let view = 'week';
 const calendar = document.getElementById('calendar');
 const weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
@@ -107,18 +107,18 @@ function loadWeekView() {
     for (let hour = 8; hour <= 20; hour++) {
       const hourSlot = document.createElement('div');
       hourSlot.classList.add('hour');
-      hourSlot.style.height = '37.5px'; // Assuming each hour slot has a height of 60px
+      hourSlot.style.height = '60px'; // Assuming each hour slot has a height of 60px
       dayInterval.appendChild(hourSlot);
     }
 
     // Position the lecture at 14:00 within each day square
-    const eventDiv = document.createElement('div');
-    eventDiv.classList.add('event');
-    eventDiv.textContent = lectures[lectureIndex % lectures.length].name; // Using modulus to cycle through lectures
+    const event = document.createElement('div');
+    event.classList.add('event');
+    event.textContent = lectures[lectureIndex % lectures.length].name; // Using modulus to cycle through lectures
     // The top offset for 14:00 would be 6 hour slots (8, 9, 10, 11, 12, 13) times the height of an hour slot
-    eventDiv.style.position = 'absolute';
-    eventDiv.style.top = '360px'; // 6 * 60px since the 14th hour starts at 6 slots down from 8:00
-    daySquare.appendChild(eventDiv);
+    event.style.position = 'absolute';
+    event.style.top = '660px'; // 6 * 60px since the 14th hour starts at 6 slots down from 8:00
+    daySquare.appendChild(event);
 
     calendar.appendChild(dayInterval);
     lectureIndex++; // Increment the lectureIndex to cycle through lectures for subsequent days
