@@ -11,45 +11,32 @@ document.getElementById("checkbox3Text").textContent = "Option 1";
 
 /* Modtag svar fra checkbox*/
 var form = document.getElementById('input-form');
+let lectures = [];
 
-document.getElementById('faerdig').addEventListener('click', function(e) {
+document.getElementById('goToNextPage').addEventListener('click', function() {
     
+        form.querySelectorAll('input').forEach(function(input) {
+            if (input.type === 'checkbox' && input.checked) {
+                myArray.push(input.value);
+                console.log(myArray);
+                console.log("test");
+                // Save array data
+                localStorage.setItem('myArrayData', JSON.stringify(myArray));
+            }
+        });
+    }); 
 
-    form.querySelectorAll('input').forEach(function(input) {
-        if (input.type === 'checkbox' && input.checked) {
-            myArray.push(input.value);
-        }
-    });
-
-    // Store the array data in local storage
-    localStorage.setItem('myArray', JSON.stringify(myArray));
-    location.href = "setup2.html?myArray=" + JSON.stringify(myArray);
-    
-}); 
-
-document.getElementById('lectureHeadline').textContent = "Hello";
-
-//if (myArray.length > 0) {
-//    for(let i = 0; i < myArray.length; i++) {
-//        location.href = "setup2.html?myArray=" + JSON.stringify(myArray);
-//    }
-//} else {
-//    location.href = "schedule.html";
-//}
-
-// setup 2 
-// setup 2
-var lectures = [];
-
-// Save each checked lecture
-document.querySelectorAll('input[type="checkbox"]').forEach(function(input) {
-    if (input.checked) {
-        lectures.push(input.value);
-    }
-});
-
-// Store the lectures array in local storage
-localStorage.setItem('lectures', JSON.stringify(lectures));
-
-// Redirect to the next page
-location.href = "nextPage.html";
+// 2nd page code goes here
+document.getElementById('lecture1Text').textContent = "Lecture 1";
+document.getElementById('lecture2Text').textContent = "Lecture 2";
+document.getElementById('lecture3Text').textContent = "Lecture 3";
+document.getElementById('lecture4Text').textContent = "Lecture 4";
+document.getElementById('lecture5Text').textContent = "Lecture 5";
+document.getElementById('lecture6Text').textContent = "Lecture 6";
+document.getElementById('lecture7Text').textContent = "Lecture 7";
+document.getElementById('lecture8Text').textContent = "Lecture 8";
+document.getElementById('lecture9Text').textContent = "Lecture 9";
+document.getElementById('lecture10Text').textContent = "Lecture 10";
+document.getElementById('lecture11Text').textContent = "Lecture 11";
+document.getElementById('lecture12Text').textContent = "Lecture 12";
+document.getElementById('lecture13Text').textContent = "Lecture 13";
