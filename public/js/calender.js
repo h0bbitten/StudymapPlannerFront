@@ -86,23 +86,32 @@ function loadWeekView() {
     `Week of ${startOfWeek.toLocaleDateString('en-us', { month: 'long', day: 'numeric' })}`;
 
   calendar.innerHTML = '';
-  let times = ['08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00'];
-  const timeTest = document.createElement('div');
-  timeTest.classList.add('times');
 
-  for (let i = 0; i < times.length; i++) {
+  let timeTest = container.querySelector('.times');
+  if (!timeTest) {
+    timeTest = document.createElement('div'); 
+    timeTest.classList.add('times');
+    container.appendChild(timeTest);
+  }
+
+  while (timeTest.firstChild) {
+    timeTest.removeChild(timeTest.firstChild);
+  }
+
+  let times = ['08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00'];
+  times.forEach(time => {
     const timeItem = document.createElement('div');
     timeItem.classList.add('time');
-    timeItem.textContent = times[i];
+    timeItem.textContent = time;
     timeTest.appendChild(timeItem);
-  }
-  calendar.appendChild(timeTest);
+  });
 
-  for(let i = 0; i < 7; i++) {
+  for (let i = 0; i < 7; i++) {
     const daySquare = document.createElement('div');
     daySquare.classList.add('day');
-    let weekDay = new Date(startOfWeek.setDate(startOfWeek.getDate() + (i === 0 ? 0 : 1)));
+    let weekDay = new Date(startOfWeek.getFullYear(), startOfWeek.getMonth(), startOfWeek.getDate() + i);
     daySquare.innerText = weekDay.getDate();
+
     if (weekDay.toDateString() === new Date().toDateString()) {
       daySquare.classList.add('current-day');
     }
@@ -113,10 +122,12 @@ function loadWeekView() {
       eventPara.textContent = lectures[(lectureIndex + i) % lectures.length];
       daySquare.appendChild(eventPara);
     }
+    
 
     calendar.appendChild(daySquare);
   }
 }
+
 
 function initButtons() {
   document.getElementById('nextButton').addEventListener('click', () => {
