@@ -68,6 +68,7 @@ function displayProfile(profile) {
   //      courseLecturesList.find("ul").append(`<li>${lecture.name}</li>`);
    //   });
       //$("#courses").append(courseLecturesList);
+     // $("#courses").append(courseLecturesList);
     //});
   //} else {
   //  $("#courses").append("<p>You are not enrolled in any courses.</p>");
