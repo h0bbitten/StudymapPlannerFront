@@ -123,3 +123,12 @@ body {
     position: absolute;
     background-color: rgba(0,0,0,0.8);
   }
+  .crossed-out {
+    text-decoration: line-through;
+    color: #999; 
+  }
+  
+  .highlight {
+    background-color: yellow;
+  }
+  

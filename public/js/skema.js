@@ -24,6 +24,24 @@ function openModal(date) {
   backDrop.style.display = 'block';
 }
 
+//Frederiks kode til at markere datoer
+calendar.addEventListener('contextmenu', function(e) {
+  e.preventDefault();   // Prevent the default browser context menu from appearing when right clicking on a day
+  
+  
+  const daySquare = e.target.closest('.day');  // Get the day that was right clicked on
+  
+  if (daySquare) {
+    const date = daySquare.getAttribute('data-date');   // Get the date of the day that was right clicked on
+    
+    
+    daySquare.classList.toggle('crossed-out');
+  }
+  
+});
+
+
+
 function load() {
   const dt = new Date();
 
