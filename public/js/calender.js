@@ -103,25 +103,32 @@ function loadWeekView() {
 
     dayInterval.appendChild(daySquare);
 
-    // Create time slots within the day interval
     for (let hour = 8; hour <= 20; hour++) {
       const hourSlot = document.createElement('div');
       hourSlot.classList.add('hour');
-      hourSlot.style.height = '60px'; // Assuming each hour slot has a height of 60px
-      dayInterval.appendChild(hourSlot);
+      hourSlot.style.height = '60px'; 
+    
+      const hourLabel = document.createElement('span');
+      hourLabel.classList.add('hour-label');
+      hourLabel.textContent = `${hour}:00`; 
+      hourSlot.appendChild(hourLabel); 
+
+    daySquare.appendChild(hourSlot);
     }
 
-    // Position the lecture at 14:00 within each day square
-    const event = document.createElement('div');
-    event.classList.add('event');
-    event.textContent = lectures[lectureIndex % lectures.length].name; // Using modulus to cycle through lectures
-    // The top offset for 14:00 would be 6 hour slots (8, 9, 10, 11, 12, 13) times the height of an hour slot
-    event.style.position = 'absolute';
-    event.style.top = '660px'; // 6 * 60px since the 14th hour starts at 6 slots down from 8:00
-    daySquare.appendChild(event);
+    lectures.forEach(lecture => {
+      let testLectures = ['You', 'are', 'a', 'mother', 'fucker'];
+      const event = document.createElement('div');
+      event.classList.add('event');
+      for(let i = 0; i < testLectures.length; i++){
+        event.textContent = testLectures;
+      event.style.position = 'absolute';
+      event.style.top = '60px'; //Hver hour er 60px. Hours starter fra 08:00 til 20:00, så hvis man vil placere en lecture kl. 08:00, så skal man skrive '0px'. Hvis den skal placeres kl. 14:00 er det 6 gange 60 fordi der er 6 timer fra kl. 08:00 til 14:00, og så skrive '360px'.
+      daySquare.appendChild(event); 
+      }
+    });
 
     calendar.appendChild(dayInterval);
-    lectureIndex++; // Increment the lectureIndex to cycle through lectures for subsequent days
   }
 }
 

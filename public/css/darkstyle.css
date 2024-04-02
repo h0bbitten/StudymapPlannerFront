@@ -170,6 +170,7 @@
       width: 100px;
       padding: 10px;
       height: 450px;
+      position: relative;
       cursor: pointer;
       box-sizing: border-box;
       background-color: rgb(63, 63, 63);
@@ -190,7 +191,16 @@
     .week-view .day + #currentDay:hover{
       background-color: #385280;
     }
-    
+    .hour-label {
+      display: block; 
+      text-align: right; 
+      padding-right: 5px; 
+      color: #fff; 
+      font-size: 0.8em; 
+      height: 20px; 
+      line-height: 20px; 
+      border-bottom: 1px #000000 solid;
+    }
 
 
     .event {
