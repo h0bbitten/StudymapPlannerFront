@@ -123,7 +123,7 @@ function loadWeekView() {
       for(let i = 0; i < testLectures.length; i++){
         event.textContent = testLectures;
       event.style.position = 'absolute';
-      event.style.top = '60px'; //Hver hour er 60px. Hours starter fra 08:00 til 20:00, så hvis man vil placere en lecture kl. 08:00, så skal man skrive '0px'. Hvis den skal placeres kl. 14:00 er det 6 gange 60 fordi der er 6 timer fra kl. 08:00 til 14:00, og så skrive '360px'.
+      event.style.top = '60px'; //Hver hour er 30px. Hours starter fra 08:00 til 20:00, så hvis man vil placere en lecture kl. 08:00, så skal man skrive '0px'. Hvis den skal placeres kl. 14:00 er det 6 gange 30 fordi der er 6 timer fra kl. 08:00 til 14:00, og så skrive '360px'.
       daySquare.appendChild(event); 
       }
     });
