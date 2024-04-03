@@ -1,4 +1,4 @@
-import {applyTheme, LoadingScreen} from './script.js';
+import {applyTheme, LoadingScreen, displayProfile} from './script.js';
 
 let token = sessionStorage.getItem("token");
 let index = 0;
@@ -6,44 +6,30 @@ let User = {};
 let amountOfCourses = 1;
 let checkboxes = null;
 
-class Buttons {
-    addNext() {
+class Button {
+    constructor(id, text) {
+        this.id = id;
+        this.text = text;
+    }
+    addButton() {
         $("#buttons").append(`
-        <button id="goToNextPage" class="btn btn-primary" style="display: none;">Next</button>
+        <button id="${this.id}" class="btn btn-primary" style="display: none;">${this.text}</button>
         `);
     }
-    addPrevious() {
-        $("#buttons").append(`
-        <button id="goToPreviousPage" class="btn btn-primary" style="display: none;">Previous</button>
-        `);
+    showButton() {
+        $(`#${this.id}`).show();
     }
-    addSave() {
-        $("#buttons").append(`
-        <button id="save" class="btn btn-primary" style="display: none;">Save</button>
-        `);
+    hideButton() {
+        $(`#${this.id}`).hide();
     }
-    showNext() {
-        $("#goToNextPage").show();
+    removeButton() {
+        $(`#${this.id}`).remove();
     }
-    showPrevious() {
-        $("#goToPreviousPage").show();
-    }
-    showSave() {
-        $("#save").show();
-    }
-    hidePrevious() {
-        $("#goToPreviousPage").hide();
-    }
-    hideNext() {
-        $("#goToNextPage").hide();
-    }
-    hideSave() {
-        $("#save").hide();
-    }
-
 }
 
-let buttons = new Buttons();
+let previous = new Button('goToPreviousPage', 'Previous');
+let next = new Button('goToNextPage', 'Next');
+let save = new Button('save', 'Save');
 
 async function getMoodleInfo(token){
   try {
@@ -71,12 +57,14 @@ async function setupInitialization() {
         User = await getMoodleInfo(token);
         console.log(User);
         sessionStorage.setItem("userid", User.userid);
+        displayProfile(User);
         showCourses(User);
 
-        buttons.addPrevious();
-        buttons.addNext();
-        buttons.addSave();
-        buttons.showNext();
+
+        previous.addButton();
+        next.addButton();
+        save.addButton();
+        next.showButton();
         Loading.hide();
 
     }
@@ -103,8 +91,8 @@ function resetForm() {
 function goToPreviousPage() {
     console.log(`index is ${index}`);
     if (index === amountOfCourses) {
-        buttons.hideSave();
-        buttons.showNext();
+        save.hideButton();
+        next.showButton();
     }
     if (index > 0) {
         index--;
@@ -112,7 +100,8 @@ function goToPreviousPage() {
         $(`#form${index}`).show();
     }
     if (index === 0) {
-        buttons.hidePrevious();
+        $('#header').text('Which courses do you want to study for the exam?');
+        previous.hideButton();
         resetForm();
     }
 }
@@ -125,8 +114,9 @@ function goToNextPage() {
         $(`#form${index - 1}`).hide();
         $(`#form${index}`).show();
         if (index === amountOfCourses) {
-            buttons.hideNext();
-            buttons.showSave();
+
+            next.hideButton();
+            save.showButton();
             return;
         }
     }
@@ -155,7 +145,7 @@ function goToNextPage() {
                 $('#forms').append(`
                     <div id="form${index2}div">
                     <form id="form${index2}" style="display: none;">
-                    <h2 id="${User.courses[i].id}">${User.courses[i].shortname}</h2>
+                    <h3 id="${User.courses[i].id}">${User.courses[i].fullnamedisplay}</h3>
                     </form>
                     </div>
                 `);
@@ -173,12 +163,13 @@ function goToNextPage() {
         });    
         $('#form0').hide();
         $('#form1').show();
-        buttons.showPrevious();
+        $('#header').text('Which lectures do you want to study for the exam?');
+        previous.showButton();
     }
     console.log(amountOfCourses);
     if (index === amountOfCourses) {
-        buttons.hideNext();
-        buttons.showSave();
+        next.hideButton();
+        save.showButton();
         return;
     }
 }
@@ -241,7 +232,7 @@ function showCourses(User) {
             <div class="checkbox checkbox-container">
             <label class="checkbox-label" for="checkbox${index}">
                <input type="checkbox" id="checkbox${index}" name="type" value="${index}" checked/>
-                 <span id="checkbox${index}Text">${course.shortname}</span>              
+                 <span id="checkbox${index}Text">${course.fullnamedisplay}</span>              
              </label>
           </div>`);
         });

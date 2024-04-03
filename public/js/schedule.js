@@ -1,4 +1,4 @@
-import {applyTheme, LoadingScreen} from './script.js';
+import {applyTheme, LoadingScreen, displayProfile} from './script.js';
 
 let userid = sessionStorage.getItem("userid");
 
@@ -27,6 +27,7 @@ async function scheduleInitialization() {
     let User = await getUserData(userid);
     console.log(User);
     displayProfile(User);
+    displayCalLectures(User);
 
     loading.hide();
 
@@ -40,8 +41,8 @@ async function scheduleInitialization() {
   
 }
 
-function displayProfile(profile) {
-  $("#user_profile").html(`<p>Welcome back ${profile.fullname}</p><img src="${profile.userpictureurl}" alt="Profile pic">`);
+function displayCalLectures(profile) {
+
 
   const lectureNames = [];
   profile.courses.forEach(course => {

@@ -1,4 +1,4 @@
-export {applyTheme, setCookie, getCookie, LoadingScreen};
+export {applyTheme, setCookie, getCookie, LoadingScreen, displayProfile};
 
 //Dark mode toggle
 async function applyTheme() {
@@ -68,3 +68,6 @@ class LoadingScreen {
   }
 }
 
+function displayProfile(profile) {
+  $("#user_profile").html(`<p>Welcome back ${profile.fullname}</p><img src="${profile.userpictureurl}" alt="Profile pic">`);
+}
