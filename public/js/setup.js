@@ -3,7 +3,7 @@
 /*indsætter tekst til checkbox */
 let kursusNavn="Hej!";
 var myArray = [];
-let index = 1;
+let index = 0;
 
 /*Kryds af*/
 document.getElementById("checkbox1Text").textContent = "Option 4";
@@ -13,6 +13,8 @@ document.getElementById("checkbox3Text").textContent = "Option 1";
 /* Modtag svar fra checkbox*/
 //var form = document.getElementById('input-form');
 let lectures = [];
+//let lectures2 = [];
+//let lectures3 = [];
 
 // 2nd page code goes here
 document.getElementById('lecture1Text').textContent = "Lecture 1";
@@ -30,7 +32,8 @@ document.getElementById('lecture12Text').textContent = "Lecture 12";
 document.getElementById('lecture13Text').textContent = "Lecture 13";
 
 $(document).ready(function() {
-    $('#form1').show();
+    $('#form0').show();
+    $('#form1').hide();
     $('#form2').hide();
     $('#form3').hide();
 });
@@ -40,14 +43,17 @@ function goToPreviousPage() {
         $(`#form${index}`).hide();
         $(`#form${index - 1}`).show();
         index--;
-        console.log(index);
+        if (index === 0) {
+            myArray = [];
+        }
     }
 
-function goToNextPage() {
-    let form = document.querySelector('form');
-    
-    if (index === 1) {
-    form.querySelectorAll('input').forEach(function(input) {
+function goToNextPage(user) {
+    let formCourse = document.querySelector('form');
+    let formLectures = document.querySelector('form');
+
+    if (index === 0) {
+    formCourse.querySelectorAll('input').forEach(function(input) {
         if (input.type === 'checkbox' && input.checked) {
             myArray.push(input.value);
             console.log(myArray);
@@ -56,12 +62,26 @@ function goToNextPage() {
             localStorage.setItem('myArrayData', JSON.stringify(myArray));
         }
     });}
+    else if (index <= myArray.length) {
+        formLectures.querySelectorAll('input').forEach(function(input) {
+            if (input.type === 'checkbox' && input.checked) {
+/*                 lectures.push(input.value);
+                console.log(lectures);
+                
+                // Save array data
+                localStorage.setItem('lectureData', JSON.stringify(lectures));
+                
+ */            
+    // user.courses[CourseIndex].checked = 
+            }
+        });
+    }
     
     $(`#form${index}`).hide();
     $(`#form${index + 1}`).show();
     index++;
     console.log(index);
-    if (index === 4){
+    if (index > myArray.length){
     location.href = "schedule.html";
     }
 
