@@ -26,8 +26,9 @@ async function scheduleInitialization() {
     console.log(User);
     displayProfile(User);
 
+    console.log(Algorithm(User));
     LoadingScreen('hide');
-
+    
   }
   catch (error) {
 
