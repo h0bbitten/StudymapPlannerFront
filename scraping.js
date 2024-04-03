@@ -65,6 +65,6 @@ async function Webscraper(url) {
   const newDataArray = Object.entries(existingData).map(([url, { title, ects }]) => `${url}, ${title}, ${ects}`);
   //skriv ny eller opdateret information ind i txt filen
   await fs.writeFile(filePath, newDataArray.join('\n'));
-  console.log(data.ectsValue);
-  return data.ectsValue;
+  console.log(data.titleValue,'ECTS:', data.ectsValue);
+  return Number(data.ectsValue);
 };

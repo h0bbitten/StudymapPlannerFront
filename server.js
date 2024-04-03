@@ -7,9 +7,15 @@ const app = express();
 
 // Session middleware setup
 app.use(session({
-    secret: 'secret_key', // Encryption, tbd
+    secret: process.env.SESSION_SECRET|| 'secret_key',
     resave: false,
-    saveUninitialized: false
+    saveUninitialized: false,
+    rolling: true,
+    cookie: { 
+        maxAge: 360000, // 6 mins
+        //secure: true, breaks stuff, so guess we won't have it secure :shrug:
+        httpOnly: true
+    }
 }));
 
 app.use(cors());

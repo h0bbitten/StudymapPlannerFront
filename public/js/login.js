@@ -10,8 +10,7 @@ function handleLogin() {
         let isValid = await validToken(token);
         console.log(isValid);
         if (isValid) {
-            //Save token in temp session storage, and link to schedule
-            sessionStorage.setItem("token", token);
+            //sessionStorage.setItem("token", token);
             window.location.href = "schedule";
         };
     });
@@ -36,10 +35,11 @@ async function validToken(token) {
     // Check if token is valid
     try {
         token = token.trim(" ");
-        let tokenTry = await core_calendar_get_calendar_events(token);
-        if (tokenTry.errorcode === 'invalidtoken') {
+        let response = await testToken(token);
+        console.log(response);
+        if (response === 'Invalid Token') {
             Toastify({
-                text: "Invalid token.",
+                text: "Invalid Token.",
                 duration: 1500,
                 close: false,
                 gravity: "top",
@@ -50,23 +50,26 @@ async function validToken(token) {
             }).showToast();
             return false;
         }
-        return true;
+        else {
+            return true;
+        }
     } catch (error) {
         console.error('Error validating token:', error);
         return false;
     }
 }
 
-async function core_calendar_get_calendar_events(token) {
+async function testToken(token) {
     try {
-        const response = await fetch(`http://localhost:3000/MoodleAPI?token=${token}&wsfunction=core_webservice_get_site_info`);
+        let response = await fetch(`http://localhost:3000/testToken?token=${token}`);
         if (!response.ok) {
           throw new Error('Network response error');
         }
-        return response.json();
+        const data = await response.text();
+        return data;
       } 
       catch (error) {
-        console.error('Error fetching calendar events :', error);
+        console.error('Error fetching token validity:', error);
         throw error;
     }
 }
