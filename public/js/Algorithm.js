@@ -1,14 +1,14 @@
-class Course 
-{
-    constructor(queue, size, name, examDate, ECTS, subjects) 
-    {
+function Algorithm(User) {
+class Course {
+    constructor(queue, size, name, examDate, ECTS, subjects) {
         //Course info skal fetches her
         this.queue = [];
         this.size = -1;
-        this.name = name;
+        this.name = User.name;
         this.examDate = examDate;
         this.ECTS = ECTS;
         this.subjects = subjects;
+        console.log(this.name);
     }
 }
 
@@ -96,4 +96,7 @@ function createSchedule(courses, availableTimes, Queues)
 function sortExamsByDates()
 {
     Course.examDate.sort();
+}
+
+return Course
 }
