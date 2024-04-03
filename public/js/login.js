@@ -11,7 +11,7 @@ function handleLogin() {
         console.log(isValid);
         if (isValid) {
             //sessionStorage.setItem("token", token);
-            window.location.href = "schedule";
+            window.location.href = "setup";
         };
     });
 }

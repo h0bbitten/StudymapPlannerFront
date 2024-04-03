@@ -1,17 +1,17 @@
-import {applyTheme} from './script.js';
+import {applyTheme, LoadingScreen} from './script.js';
 
-let token = sessionStorage.getItem("token");
+let userid = sessionStorage.getItem("userid");
 
-async function getMoodleInfo(token){
+async function getUserData(userid){
   try {
-    const response = await fetch(`http://localhost:3000/getMoodleInfo?token=${token}`);
+    const response = await fetch(`http://localhost:3000/getUserData?userid=${userid}`);
     if (!response.ok) {
       throw new Error('Network response error');
     }
     return response.json();
   } 
   catch (error) {
-    console.error('Error fetching course pages:', error);
+    console.error('Error fetching user data:', error);
     throw error;
   }
 
@@ -19,34 +19,25 @@ async function getMoodleInfo(token){
 
 async function scheduleInitialization() {
 
-  LoadingScreen('show');
+  let loading = new LoadingScreen();
+  loading.add();
+  loading.show();
 
   try {
-    let User = await getMoodleInfo(token);
+    let User = await getUserData(userid);
     console.log(User);
     displayProfile(User);
 
-    LoadingScreen('hide');
+    loading.hide();
 
   }
   catch (error) {
 
-    LoadingScreen('hide');
+    loading.hide();
 
     console.error('Failed to display profile info:', error);
   }
   
-}
-
-function LoadingScreen(toggle){
-  if (toggle === 'show') {
-    $("#loading").show();
-    $("#loading-overlay").show();
-  }
-  if (toggle === 'hide') {
-    $("#loading").hide();
-    $("#loading-overlay").hide();
-  }
 }
 
 function displayProfile(profile) {
