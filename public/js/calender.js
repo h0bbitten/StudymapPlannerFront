@@ -1,5 +1,5 @@
 let nav = 0;
-let view = 'week';
+let view = 'month';
 const calendar = document.getElementById('calendar');
 const weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 

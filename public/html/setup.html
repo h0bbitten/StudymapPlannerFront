@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="stylesheet" href="..\css\setup.css">
+    <title>Setup</title>
+</head>
+<body>
+    <nav>
+        <div class="navbar-icons">
+          <div class="navbar-icon">
+            <img id="dark-mode-btn" src="../img/dark-mode-solid-svgrepo-com.svg" alt="Dark mode">
+          </div>
+          <div class="navbar-icon">
+            <img src="../img/settings-svgrepo-com.svg" alt="Settings">
+          </div>
+        </div>
+      </nav>
+    <form id="form1">
+      <h2 id="header">Hvilke fag vil du læse op i?</h2>
+    <div id="container" class="box">
+      <form id="input-form" role="form" action="" class="margin-top-fortypx">
+        <div class="checkbox checkbox-container">
+           <label class="checkbox-label" for="checkbox1">
+              <input type="checkbox" id="checkbox1" name="type" value="1"/>
+                <span id="checkbox1Text"></span>              
+            </label>
+         </div>
+     
+         <div class="checkbox checkbox-container">
+            <label class="checkbox-label" for="checkbox2">
+               <input type="checkbox" id="checkbox2" name="type" value="2" />
+                <span id="checkbox2Text"></span>               
+             </label>
+          </div> 
+          <div class="checkbox checkbox-container">
+            <label class="checkbox-label" for="checkbox3">
+               <input type="checkbox" id="checkbox3" name="type" value="3" />
+                <span id="checkbox3Text"></span>
+             </label>
+          </div> 
+       </form>
+      </div>
+      <button id="goToNextPage" onclick="goToNextPage()">Next</button>
+      <button id="goToPreviousPage" onclick="goToPreviousPage()">Previous</button>
+    </form>
+    <form id="form2">
+      <h2 id="lectureHeadline"></h2>
+      <div id="container" class="box2">
+        <form id="lectureList" class="lecture-checkbox">
+            <div class="checkbox lecture-container">
+                <label class="lectureLabel" for="lecture1">
+                    <input type="checkbox" id="lecture1" name="type" value="1">
+                    <span id="lecture1Text"></span>
+                </label>
+            </div>
+            <div class="checkbox lecture-container">
+                <label class="lectureLabel" for="lecture2">
+                    <input type="checkbox" id="lecture2" name="type" value="2">
+                    <span id="lecture2Text"></span>
+                </label>
+            </div>
+            <div class="checkbox lecture-container">
+                <label class="lectureLabel" for="lecture3">
+                    <input type="checkbox" id="lecture3" name="type" value="3">
+                    <span id="lecture3Text"></span>
+                </label>
+            </div>
+            <div class="checkbox lecture-container">
+                <label class="lectureLabel" for="lecture4">
+                    <input type="checkbox" id="lecture4" name="type" value="4">
+                    <span id="lecture4Text"></span>
+                </label>
+            </div>
+            <div class="checkbox lecture-container">
+                <label class="lectureLabel" for="lecture5">
+                    <input type="checkbox" id="lecture5" name="type" value="5">
+                    <span id="lecture5Text"></span>
+                </label>
+            </div>
+            <div class="checkbox lecture-container">
+                <label class="lectureLabel" for="lecture6">
+                    <input type="checkbox" id="lecture6" name="type" value="6">
+                    <span id="lecture6Text"></span>
+                </label>
+            </div>
+            <div class="checkbox lecture-container">
+                <label class="lectureLabel" for="lecture7">
+                    <input type="checkbox" id="lecture7" name="type" value="7">
+                    <span id="lecture7Text"></span>
+                </label>
+            </div>
+            <div class="checkbox lecture-container">
+                <label class="lectureLabel" for="lecture8">
+                    <input type="checkbox" id="lecture8" name="type" value="8">
+                    <span id="lecture8Text"></span>
+                </label>
+            </div>
+            <div class="checkbox lecture-container">
+                <label class="lectureLabel" for="lecture9">
+                    <input type="checkbox" id="lecture9" name="type" value="9">
+                    <span id="lecture9Text"></span>
+                </label>
+            </div>
+            <div class="checkbox lecture-container">
+                <label class="lectureLabel" for="lecture10">
+                    <input type="checkbox" id="lecture10" name="type" value="10">
+                    <span id="lecture10Text"></span>
+                </label>
+            </div>
+            <div class="checkbox lecture-container">
+                <label class="lectureLabel" for="lecture11">
+                    <input type="checkbox" id="lecture11" name="type" value="11">
+                    <span id="lecture11Text"></span>
+                </label>
+            </div>
+            <div class="checkbox lecture-container">
+                <label class="lectureLabel" for="lecture12">
+                    <input type="checkbox" id="lecture12" name="type" value="12">
+                    <span id="lecture12Text"></span>
+                </label>
+            </div>
+            <div class="checkbox lecture-container">
+                <label class="lectureLabel" for="lecture13">
+                    <input type="checkbox" id="lecture13" name="type" value="13">
+                    <span id="lecture13Text"></span>
+                </label>
+            </div>
+          </form>
+
+    </form>
+    <form id="form3">
+      <div id="container" class="box2"></div>
+
+    </form>
+      
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="..\js\setup.js"></script>
+        <script>
+        let index = 1;
+        $(document).ready(function() {
+            $('#form1').show();
+            $('#form2').hide();
+            $('#form3').hide();
+        });
+
+        
+        function goToPreviousPage() {
+              $(`#form${index}`).hide();
+              $(`#form${index - 1}`).show();
+              index--;
+              console.log(index);
+            }
+
+        function goToNextPage() {
+          $(`#form${index}`).hide();
+          $(`#form${index + 1}`).show();
+          index++;
+          console.log(index);
+          if (index == 4){
+            location.href = "schedule.html";
+          }
+          }
+    </script>
+</body>
+</html>
+</html>
