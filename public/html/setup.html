@@ -43,8 +43,8 @@
           </div> 
        </form>
       </div>
-      <button id="goToNextPage" onclick="goToNextPage()">Next</button>
       <button id="goToPreviousPage" onclick="goToPreviousPage()">Previous</button>
+      <button id="goToNextPage" onclick="goToNextPage()">Next</button>
     </form>
     <form id="form2">
       <h2 id="lectureHeadline"></h2>
@@ -139,32 +139,6 @@
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="..\js\setup.js"></script>
-        <script>
-        let index = 1;
-        $(document).ready(function() {
-            $('#form1').show();
-            $('#form2').hide();
-            $('#form3').hide();
-        });
-
-        
-        function goToPreviousPage() {
-              $(`#form${index}`).hide();
-              $(`#form${index - 1}`).show();
-              index--;
-              console.log(index);
-            }
-
-        function goToNextPage() {
-          $(`#form${index}`).hide();
-          $(`#form${index + 1}`).show();
-          index++;
-          console.log(index);
-          if (index == 4){
-            location.href = "schedule.html";
-          }
-          }
-    </script>
 </body>
 </html>
 </html>
