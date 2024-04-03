@@ -95,7 +95,7 @@ function loadWeekView() {
     daySquare.classList.add('day');
 
     let weekDay = new Date(startOfWeek.getFullYear(), startOfWeek.getMonth(), startOfWeek.getDate() + i);
-    daySquare.innerText = weekDay.toLocaleDateString('en-us', { weekday: 'long', month: 'numeric', day: 'numeric' });
+    //daySquare.innerText = weekDay.toLocaleDateString('en-us', { weekday: 'long', month: 'numeric', day: 'numeric' });
 
     if (weekDay.toDateString() === new Date().toDateString()) {
       daySquare.classList.add('current-day');
@@ -103,7 +103,7 @@ function loadWeekView() {
 
     dayInterval.appendChild(daySquare);
 
-    for (let hour = 8; hour <= 20; hour++) {
+    for (let hour = 7; hour <= 21; hour++) {
       const hourSlot = document.createElement('div');
       hourSlot.classList.add('hour');
       hourSlot.style.height = '60px'; 
@@ -123,7 +123,7 @@ function loadWeekView() {
       for(let i = 0; i < testLectures.length; i++){
         event.textContent = testLectures;
       event.style.position = 'absolute';
-      event.style.top = '60px'; //Hver hour er 30px. Hours starter fra 08:00 til 20:00, så hvis man vil placere en lecture kl. 08:00, så skal man skrive '0px'. Hvis den skal placeres kl. 14:00 er det 6 gange 30 fordi der er 6 timer fra kl. 08:00 til 14:00, og så skrive '360px'.
+      event.style.top = '120px'; //Hver hour er 30px. Hours starter fra 08:00 til 20:00, så hvis man vil placere en lecture kl. 08:00, så skal man skrive '30px'. Hvis den skal placeres kl. 14:00 er det 6 gange 30 fordi der er 6 timer fra kl. 08:00 til 14:00, og så skrive '360px'.
       daySquare.appendChild(event); 
       }
     });
