@@ -14,19 +14,6 @@ document.getElementById("checkbox3Text").textContent = "Option 1";
 //var form = document.getElementById('input-form');
 let lectures = [];
 
-document.getElementById('goToNextPage').addEventListener('click', function() {
-    console.log("test");
-        form.querySelectorAll('input').forEach(function(input) {
-            if (input.type === 'checkbox' && input.checked) {
-                myArray.push(input.value);
-                console.log(myArray);
-                
-                // Save array data
-                localStorage.setItem('myArrayData', JSON.stringify(myArray));
-            }
-        });
-    }); 
-
 // 2nd page code goes here
 document.getElementById('lecture1Text').textContent = "Lecture 1";
 document.getElementById('lecture2Text').textContent = "Lecture 2";
@@ -57,6 +44,18 @@ function goToPreviousPage() {
     }
 
 function goToNextPage() {
+    let form = document.querySelector('form');
+    
+    form.querySelectorAll('input').forEach(function(input) {
+        if (input.type === 'checkbox' && input.checked) {
+            myArray.push(input.value);
+            console.log(myArray);
+            
+            // Save array data
+            localStorage.setItem('myArrayData', JSON.stringify(myArray));
+        }
+    });
+    
     $(`#form${index}`).hide();
     $(`#form${index + 1}`).show();
     index++;
@@ -64,4 +63,5 @@ function goToNextPage() {
     if (index == 4){
     location.href = "schedule.html";
     }
-    }
+
+}
