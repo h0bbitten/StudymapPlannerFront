@@ -46,6 +46,7 @@ function goToPreviousPage() {
 function goToNextPage() {
     let form = document.querySelector('form');
     
+    if (index === 1) {
     form.querySelectorAll('input').forEach(function(input) {
         if (input.type === 'checkbox' && input.checked) {
             myArray.push(input.value);
@@ -54,13 +55,13 @@ function goToNextPage() {
             // Save array data
             localStorage.setItem('myArrayData', JSON.stringify(myArray));
         }
-    });
+    });}
     
     $(`#form${index}`).hide();
     $(`#form${index + 1}`).show();
     index++;
     console.log(index);
-    if (index == 4){
+    if (index === 4){
     location.href = "schedule.html";
     }
 
