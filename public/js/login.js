@@ -1,21 +1,20 @@
 import {applyTheme} from './script.js';
-//import {getToken} from '../database.js';
+import {getToken} from '../database.js';
 
 //Login function
 function handleLogin() {
     let loginBtn = document.getElementById("tokenButn");
     
     loginBtn.addEventListener("click", async () => {
-        //Get token from input field
         let token = document.getElementById("tokenInput").value;
         let isValid = await validToken(token);
-        console.log(isValid);
         if (isValid) {
-            //sessionStorage.setItem("token", token);
+            await postTokenToDatabase(token); // Post token to the database if it's valid
             window.location.href = "schedule";
         };
     });
 }
+
 
 async function validToken(token) {
     console.log(`Checking token: ${token}`);
@@ -74,5 +73,15 @@ async function testToken(token) {
         throw error;
     }
 }
+
+async function postTokenToDatabase(token) {
+    try {
+        await getToken(token);
+        console.log('Token posted to the database successfully.');
+    } catch (error) {
+        console.error('Error posting token to the database:', error);
+    }
+}
+
 applyTheme();
 handleLogin();
