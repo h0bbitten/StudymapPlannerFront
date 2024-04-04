@@ -1,4 +1,5 @@
 import {applyTheme} from './script.js';
+//import {getToken} from '../database.js';
 
 //Login function
 function handleLogin() {

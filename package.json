@@ -6,6 +6,7 @@
     "cors": "^2.8.5",
     "express": "^4.19.2",
     "express-session": "^1.18.0",
+    "mysql": "^2.18.1",
     "mysql2": "^3.9.3",
     "puppeteer": "^22.6.1"
   },
@@ -16,7 +17,6 @@
   "description": "Front end of the Studymap Planner for our P2 project",
   "version": "1.0.0",
   "main": "app.js",
-  "devDependencies": {},
   "keywords": [],
   "author": "",
   "license": "ISC"
