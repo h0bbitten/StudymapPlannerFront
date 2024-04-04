@@ -9,3 +9,11 @@ const pool = mysql.createPool({
 
 const result =await pool.query("SELECT * FROM users")
 console.log(result)
+
+export async function getToken(){
+    const [result] = await pool.query(`
+    INSERT INTO users (token)
+    VALUE (?)
+    `, [token])
+    const id = result.insertId
+}
