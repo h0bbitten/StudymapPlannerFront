@@ -1,12 +1,17 @@
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import path from 'path';
+import {swaggerDocs} from './server.js';
 import {getMoodleInfo, testToken, saveOptions, getUserData} from "./app.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
+const PORT = process.env.PORT || 3000;
+
 
 const routing = function(app) {
+    swaggerDocs(app, PORT);
+    
     //Gets
     app.get('/', async (req, res) => {
         console.log(req.session.loggedIn);
@@ -17,6 +22,7 @@ const routing = function(app) {
             res.redirect('/login');
         }    
     });
+
     app.get('/login', (req, res) => {
         // Send the /html/login.html file when /login is accessed
         res.sendFile(path.join(__dirname, 'public', 'html', 'login.html'));
