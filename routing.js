@@ -1,7 +1,7 @@
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import path from 'path';
-import {swaggerDocs} from './server.js';
+import {swaggerDocs} from './swagger.js';
 import {getMoodleInfo, testToken, saveOptions, getUserData} from "./app.js";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -10,9 +10,10 @@ const PORT = process.env.PORT || 3000;
 
 
 const routing = function(app) {
+    // Swagger setup
     swaggerDocs(app, PORT);
     
-    //Gets
+    //Side routes
     app.get('/', async (req, res) => {
         console.log(req.session.loggedIn);
         if (req.session.loggedIn === true) {
@@ -53,34 +54,92 @@ const routing = function(app) {
     app.get('/favicon.ico', (req, res) => {
         res.sendFile(path.join(__dirname, '/public/img/favicon.ico'))
     });
+
+    //GET Endpoints
+    /**
+     * @swagger
+     * /getMoodleInfo:
+     *   get:
+     *     description: Retrieves Moodle information from Moodle API and server manipulations
+     *     responses:
+     *       200:
+     *         description: Successful response
+     *       500:
+     *         description: Internal server error
+     */
     app.get('/getMoodleInfo', async (req, res) => {
         await getMoodleInfo(req, res).catch(error => {
             console.error("Error in getMoodleInfo:", error);
             res.status(500).send("Internal Server Error");
         });
     });
+    /**
+     * @swagger
+     * /testToken:
+     *   get:
+     *     description: Tests user token against Moodle API
+     *     responses:
+     *       200:
+     *         description: Successful response
+     *       500:
+     *         description: Internal server error
+     */
     app.get('/testToken', async (req, res) => {
         await testToken(req, res).catch(error => {
             console.error("Error in testToken:", error);
             res.status(500).send("Internal Server Error");
         });
     });
+    /**
+     * @swagger
+     * /getUserData:
+     *   get:
+     *     description: Gets user data from server database
+     *     responses:
+     *       200:
+     *         description: Successful response
+     *       500:
+     *         description: Internal server error
+     */
     app.get('/getUserData', async (req, res) => {
         await getUserData(req, res).catch(error => {
             console.error("Error in getting user:", error);
             res.status(500).send("Internal Server Error");
         });
     });
-    app.get('*', (req, res) => {
-        res.status(404);
-        res.sendFile(path.join(__dirname, 'public', 'html', 'default.html'));
-    });
-    //Posts
+    // POST Endpoints
+    /**
+     * @swagger
+     * /saveOptions:
+     *   post:
+     *     description: Saves user options in server database
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         application/json:
+     *           schema:
+     *             type: object
+     *             properties:
+     *               option1:
+     *                 type: string
+     *                 description: Description of option1
+     *               option2:
+     *                 type: boolean
+     *                 description: Description of option2
+     *     responses:
+     *       '200':
+     *         description: Successful response
+     */ 
     app.post('/saveOptions', async (req, res) => {
         await saveOptions(req, res).catch(error => {
             console.error("Error in saving user options:", error);
             res.status(500).send("Internal Server Error");
         });
+    });
+    //Default route
+    app.get('*', (req, res) => {
+        res.status(404);
+        res.sendFile(path.join(__dirname, 'public', 'html', 'default.html'));
     });
 };
 
