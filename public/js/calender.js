@@ -82,10 +82,25 @@ function loadWeekView() {
   const dayOfWeek = today.getDay();
   const startOfWeek = new Date(today.setDate(today.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1)));
 
-  document.getElementById('monthDisplay').innerText = 
+  document.getElementById('monthDisplay').innerText =
     `Week of ${startOfWeek.toLocaleDateString('en-us', { month: 'long', day: 'numeric' })}`;
 
   calendar.innerHTML = '';
+
+  const timeLabelContainer = document.createElement('div');
+  timeLabelContainer.classList.add('time-labels');
+
+  for (let hour = 8; hour <= 20; hour++) {
+    const hourLabel = document.createElement('div');
+    hourLabel.classList.add('hour');
+    hourLabel.textContent = `${hour}:00`;
+    hourLabel.style.height = '35px'; // Set the height to match your hour slots.
+    hourLabel.style.display = 'flex'; // Use flex display to align text vertically.
+    hourLabel.style.alignItems = 'center'; // Align text in the center of the div.
+    hourLabel.style.paddingLeft = '10px'; // Adjust padding as needed.
+    timeLabelContainer.appendChild(hourLabel);
+  }
+  calendar.appendChild(timeLabelContainer);
 
   for (let i = 0; i < 7; i++) {
     const dayInterval = document.createElement('div');
@@ -93,40 +108,33 @@ function loadWeekView() {
 
     const daySquare = document.createElement('div');
     daySquare.classList.add('day');
+    daySquare.style.flex = '1';
 
     let weekDay = new Date(startOfWeek.getFullYear(), startOfWeek.getMonth(), startOfWeek.getDate() + i);
-    //daySquare.innerText = weekDay.toLocaleDateString('en-us', { weekday: 'long', month: 'numeric', day: 'numeric' });
-
     if (weekDay.toDateString() === new Date().toDateString()) {
       daySquare.classList.add('current-day');
     }
 
     dayInterval.appendChild(daySquare);
 
-    for (let hour = 7; hour <= 21; hour++) {
+    for (let hour = 8; hour <= 20; hour++) {
       const hourSlot = document.createElement('div');
       hourSlot.classList.add('hour');
-      hourSlot.style.height = '60px'; 
-    
-      const hourLabel = document.createElement('span');
-      hourLabel.classList.add('hour-label');
-      hourLabel.textContent = `${hour}:00`; 
-      hourSlot.appendChild(hourLabel); 
-
-    daySquare.appendChild(hourSlot);
+      hourSlot.style.height = '35px';
+      daySquare.appendChild(hourSlot);
     }
 
-    lectures.forEach(lecture => {
-      let testLectures = ['You', 'are', 'a', 'mother', 'fucker'];
-      const event = document.createElement('div');
-      event.classList.add('event');
-      for(let i = 0; i < testLectures.length; i++){
-        event.textContent = testLectures;
-      event.style.position = 'absolute';
-      event.style.top = '120px'; //Hver hour er 30px. Hours starter fra 08:00 til 20:00, så hvis man vil placere en lecture kl. 08:00, så skal man skrive '30px'. Hvis den skal placeres kl. 14:00 er det 6 gange 30 fordi der er 6 timer fra kl. 08:00 til 14:00, og så skrive '360px'.
-      daySquare.appendChild(event); 
-      }
-    });
+    //lectures.forEach(lecture => {
+      //let testLectures = ['You', 'are', 'a', 'mother', 'fucker'];
+      //const event = document.createElement('div');
+      //event.classList.add('event');
+      //for(let i = 0; i < testLectures.length; i++){
+      //  event.textContent = testLectures;
+     // event.style.position = 'absolute';
+     // event.style.top = '120px'; //Hver hour er 30px. Hours starter fra 08:00 til 20:00, så hvis man vil placere en lecture kl. 08:00, så skal man skrive '30px'. Hvis den skal placeres kl. 14:00 er det 6 gange 30 fordi der er 6 timer fra kl. 08:00 til 14:00, og så skrive '360px'.
+     // daySquare.appendChild(event); 
+     // }
+    //});
 
     calendar.appendChild(dayInterval);
   }
