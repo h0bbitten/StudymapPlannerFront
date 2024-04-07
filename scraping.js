@@ -38,13 +38,18 @@ async function Webscraper(url) {
     // Åben linket, networkkidle0 hører under puppeteer, fungerer således at når "network har været idle i 500 ms", antag navigation som færdiggjort, sikrer at siden er loadet ordentligt
     await page.goto(url, { waitUntil: 'networkidle0' });
 
-    // hent danske titel og ECTS point ved at finde <td> elementerne og nedhent teksten derimellem
+    // hent danske/engelske titel og ECTS point ved at finde <td> elementerne og nedhent teksten derimellem
     const data = await page.evaluate(() => {
       const tdElements = Array.from(document.querySelectorAll('td'));
-      const titleIndex = tdElements.findIndex(td => td.textContent.includes('Danish title'));
+
+      let titleIndex = tdElements.findIndex(td => td.textContent.includes('Danish title'));
+      if (titleIndex === -1) titleIndex = tdElements.findIndex(td => td.textContent.includes('English title'));
+      
+      //find index for ECTS point
       const ectsIndex = tdElements.findIndex(td => td.textContent.includes('ECTS'));
 
-      const titleValue = titleIndex !== -1 ? tdElements[titleIndex + 1].textContent.trim() : 'Danish title not found';
+      //hent teksten fra de fundne index
+      const titleValue = titleIndex !== -1 ? tdElements[titleIndex + 1].textContent.trim() : 'title not found';
       const ectsValue = ectsIndex !== -1 ? tdElements[ectsIndex + 1].textContent.trim() : 'ECTS points not found';
 
       return { titleValue, ectsValue };
