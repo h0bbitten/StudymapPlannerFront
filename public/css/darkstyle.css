@@ -1,3 +1,5 @@
+@import url("//fonts.googleapis.com/css2?family=Alata:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap");
+@import url("//fonts.googleapis.com/css2?family=Allerta:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap");
 /* Basic Reset */
 * {
     margin: 0;
@@ -109,14 +111,17 @@
       justify-content: flex-end;
       align-items: center;
       padding: 10px;
+      transform:translatex(0px) translatey(0px);
       /*margin-bottom: 20px;*/
       
     }
-    #monthDisplay{
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      text-align: left;
-      flex-grow: 1;
-    }
+/* Month display */
+ #monthDisplay{
+  font-family:'Alata', sans-serif;
+  font-size:22px;
+  color:#edad4e;
+  line-height:41px;
+ }
     
     #header div,
     #weekdays div {
@@ -130,7 +135,7 @@
       order: 2;
       background-color: #385280;
       color: #ffffff;
-      width: 700px;
+      width: 750px;
       display: flex;
     }
     
@@ -219,6 +224,7 @@
     }
     
     #backButton {
+      font-family:'Allerta', sans-serif;
       font-size: 1.15em;
       background-color: #385280;
       color: #ffffff;
@@ -234,9 +240,10 @@
       padding: 5px;
       border-radius: 5px;
       position: relative;
-      margin-left: 0px;
+      left:320px;
     }
     #nextButton {
+      font-family:'Allerta', sans-serif;
       font-size: 1.15em;
       background-color: #385280;
       color: #ffffff;
@@ -252,9 +259,10 @@
       padding: 5px;
       border-radius: 5px;
       position: relative;
-      margin-left: 10px;
+      transform:translatex(329px) translatey(0px);
     }
     #weekButton{
+      font-family:'Allerta', sans-serif;
       font-size: 1.15em;
       background-color: #385280;
       color: #ffffff;
@@ -270,9 +278,10 @@
       padding: 5px;
       border-radius: 5px;
       position: relative;
-      margin-left: 10px;
+      left:326px;
     }
     #monthButton{
+      font-family:'Allerta', sans-serif;
       font-size: 1.15em;
       background-color: #385280;
       color: #ffffff;
@@ -288,7 +297,7 @@
       padding: 5px;
       border-radius: 5px;
       position: relative;
-      margin-left: 10px;
+      left:323px;
     }
 
     .times{
