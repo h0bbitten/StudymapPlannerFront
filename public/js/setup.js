@@ -90,9 +90,11 @@ function resetForm() {
 
 function goToPreviousPage() {
     console.log(`index is ${index}`);
-    if (index === amountOfCourses) {
+    if (index === amountOfCourses + 1) {
+        index--;
         save.hideButton();
         next.showButton();
+        $(`#form${index + 1}`).hide();
     }
     if (index > 0) {
         index--;
@@ -113,7 +115,7 @@ function goToNextPage() {
         console.log(`index is ${index}`);
         $(`#form${index - 1}`).hide();
         $(`#form${index}`).show();
-        if (index === amountOfCourses) {
+        if (index === amountOfCourses + 2) {
 
             next.hideButton();
             save.showButton();
@@ -166,8 +168,37 @@ function goToNextPage() {
         $('#header').text('Which lectures do you want to study for the exam?');
         previous.showButton();
     }
+    
     console.log(amountOfCourses);
-    if (index === amountOfCourses) {
+    if (index === amountOfCourses + 1) {
+        $('#forms').append(`
+            <div id="form${index + 1}div">
+                <form id="form${index + 1}" style="display: none;">
+                    <h2>Choose Study Time</h2>
+                        <div class="form-group">
+                        <label for="startStudyTime">Select Starting Study Time: </label>
+                        <select class="form-control" id="startStudyTime" name="startStudyTime">
+                            <option value="08:00">08:00</option>
+                            <option value="09:00">09:00</option>
+                            <option value="10:00">10:00</option>
+                            <!-- Add more options as needed -->
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="endStudyTime">Select Ending Study Time: </label>
+                        <select class="form-control" id="endStudyTime" name="endStudyTime">
+                            <option value="16:00">16:00</option>
+                            <option value="17:00">17:00</option>
+                            <option value="18:00">18:00</option>
+                            <!-- Add more options as needed -->
+                        </select>
+                    </div>
+                </form>
+            </div>
+        `);
+        $(`#form${index}`).hide();
+        $(`#form${index + 1}`).show();
+        $('#header').text('Choose Study Time');
         next.hideButton();
         save.showButton();
         return;
@@ -195,6 +226,7 @@ async function saveOptions() {
 
     });
     await saveOptionsToDB(User);
+    
     window.location.href = "schedule";
 }
 
