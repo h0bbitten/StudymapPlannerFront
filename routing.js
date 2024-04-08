@@ -53,6 +53,19 @@ const routing = function(app) {
         res.status(404);
         res.sendFile(path.join(__dirname, 'public', 'html', 'default.html'));
     });
+
+    app.post('/database/token', async (req, res) => {
+        const { token } = req.body;
+        try {
+            const tokenId = await getToken(token);
+            res.status(200).json({ id: tokenId, message: 'Token inserted successfully' });
+        } catch (error) {
+            console.error('Error inserting token to the database:', error);
+            res.status(500).json({ error: 'Internal server error' });
+        }
+    });
+    
 };
+
 
 export default routing;

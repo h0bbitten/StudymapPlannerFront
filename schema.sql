@@ -4,7 +4,7 @@ USE users;
 CREATE TABLE users (
     id integer PRIMARY KEY AUTO_INCREMENT,
     token VARCHAR(255) NOT NULL,
-    ects DECIMAL (5.1) NOT NULL,
-    schedule VARCHAR(255) NOT NULL,
     created TIMESTAMP NOT NULL DEFAULT NOW()
 );
+
+
