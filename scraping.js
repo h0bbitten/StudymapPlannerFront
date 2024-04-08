@@ -10,7 +10,7 @@ const fs = require('fs').promises; */
 const filePath = 'courseDetails.txt';
 
 //async tillader brugen af await funktionen, hvormed vi kan afvente til en handling er udført med at fortsætte funktionen
-async function Webscraper(url) {
+async function Webscraper(url, forceUpdate = false) {
 
   // check om der er allerede eksisterende data fra hjemmesiden gemt i filen
   let existingData = {};
@@ -28,12 +28,18 @@ async function Webscraper(url) {
       console.error('Error reading file:', error);
       return;
     }
-    // 
   }
+
+  //scrape hvis forceUpdate er true ELLER hvis url ikke er scraped før
+if (!forceUpdate && existingData.hasOwnProperty(url)) {
+//skip hvis url er scraped uden log
+return;
+}
+
 
   // start en ny browser
   const browser = await puppeteer.launch();
-    const page = await browser.newPage();
+  const page = await browser.newPage();
 
     // Åben linket, networkkidle0 hører under puppeteer, fungerer således at når "network har været idle i 500 ms", antag navigation som færdiggjort, sikrer at siden er loadet ordentligt
     await page.goto(url, { waitUntil: 'networkidle0' });
@@ -41,30 +47,27 @@ async function Webscraper(url) {
     // hent danske titel og ECTS point ved at finde <td> elementerne og nedhent teksten derimellem
     const data = await page.evaluate(() => {
       const tdElements = Array.from(document.querySelectorAll('td'));
-      const titleIndex = tdElements.findIndex(td => td.textContent.includes('Danish title'));
+      let titleIndex = tdElements.findIndex(td => td.textContent.includes('Danish title'));
+      if (titleIndex === -1) {
+        titleIndex = tdElements.findIndex(td => td.textContent.includes('English title'));
+      }
       const ectsIndex = tdElements.findIndex(td => td.textContent.includes('ECTS'));
 
-      const titleValue = titleIndex !== -1 ? tdElements[titleIndex + 1].textContent.trim() : 'Danish title not found';
+      const titleValue = titleIndex !== -1 ? tdElements[titleIndex + 1].textContent.trim() : 'title not found';
       const ectsValue = ectsIndex !== -1 ? tdElements[ectsIndex + 1].textContent.trim() : 'ECTS points not found';
 
       return { titleValue, ectsValue };
     });
 
-    // luk siden
+    // luk siden og browseren
     await page.close();
-
-    // opdater data i txt filen hvis ECTS point har ændret sig (indser nu dette er ret unødvendigt, hvis ECTS pointene ændrer sig, har faget nok også ændret sig og hører under en ny URL)
-    if (!existingData[url] || existingData[url].ects !== `ECTS Points: ${data.ectsValue}`) {
-      existingData[url] = { title: `Danish Title: ${data.titleValue}`, ects: `ECTS Points: ${data.ectsValue}` };
-    }
-
-  // luk browseren
   await browser.close();
 
-  // konverter opdateret data fra et objekt til et string format så det kan skrives ind i txt filen
+    // opdater data i txt filen hvis det er en ny URL eller hvis forceUpdate tages i brug.
+    existingData[url] = { title: `Title: ${data.titleValue}`, ects: `ECTS Points: ${data.ectsValue}` };
   const newDataArray = Object.entries(existingData).map(([url, { title, ects }]) => `${url}, ${title}, ${ects}`);
-  //skriv ny eller opdateret information ind i txt filen
   await fs.writeFile(filePath, newDataArray.join('\n'));
+    
   console.log(data.titleValue,'ECTS:', data.ectsValue);
   return Number(data.ectsValue);
 };
