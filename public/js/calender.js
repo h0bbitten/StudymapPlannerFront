@@ -115,10 +115,6 @@ function loadWeekView() {
     daySquare.innerText = weekDay.getDate(); // This sets the date number on the daySquare.
     dayInterval.appendChild(daySquare);
 
-    for (let hour = 8; hour <= 20; hour++) {
-      $('.day-interval').append(`<div class="hour" id="hour${hour}" style="height: 35px;"></div>`)
-    }
-
     if (lectures.length > 0) {
       const event = document.createElement('div');
       event.classList.add('event');
@@ -132,8 +128,10 @@ function loadWeekView() {
 
     calendar.appendChild(dayInterval);
   }
+  for (let hour = 8; hour <= 20; hour++) {
+    $('.day').append(`<div class="hour" id="hour${hour}" style="height: 35px;"></div>`)
+  }
 }
-
 
 function initButtons() {
   document.getElementById('nextButton').addEventListener('click', () => {
