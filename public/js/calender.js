@@ -6,8 +6,6 @@ const weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Satur
 const storedLectureNames = localStorage.getItem('lectureNames'); // Henter lectureNames fra local storage som er gemt i schedule.js
 let lectures = storedLectureNames ? JSON.parse(storedLectureNames) : [];
 
-let lectureIndex = 0;
-
 function load() {
   if (view === 'week') {
     loadWeekView();
@@ -114,27 +112,26 @@ function loadWeekView() {
     if (weekDay.toDateString() === new Date().toDateString()) {
       daySquare.classList.add('current-day');
     }
-
+    daySquare.innerText = weekDay.getDate(); // This sets the date number on the daySquare.
     dayInterval.appendChild(daySquare);
 
     for (let hour = 8; hour <= 20; hour++) {
       const hourSlot = document.createElement('div');
       hourSlot.classList.add('hour');
       hourSlot.style.height = '35px';
-      daySquare.appendChild(hourSlot);
+      dayInterval.appendChild(hourSlot); // Append hourSlot to dayInterval instead of daySquare.
     }
 
-    //lectures.forEach(lecture => {
-      //let testLectures = ['You', 'are', 'a', 'mother', 'fucker'];
-      //const event = document.createElement('div');
-      //event.classList.add('event');
-      //for(let i = 0; i < testLectures.length; i++){
-      //  event.textContent = testLectures;
-     // event.style.position = 'absolute';
-     // event.style.top = '120px'; //Hver hour er 30px. Hours starter fra 08:00 til 20:00, så hvis man vil placere en lecture kl. 08:00, så skal man skrive '30px'. Hvis den skal placeres kl. 14:00 er det 6 gange 30 fordi der er 6 timer fra kl. 08:00 til 14:00, og så skrive '360px'.
-     // daySquare.appendChild(event); 
-     // }
-    //});
+    if (lectures.length > 0) {
+      const event = document.createElement('div');
+      event.classList.add('event');
+      for(let i = 0; i < lectures.length; i++){
+      event.textContent = lectures;
+      event.style.position = 'absolute';
+      event.style.top = '120px'; //Hver hour er 30px. Hours starter fra 08:00 til 20:00, så hvis man vil placere en lecture kl. 08:00, så skal man skrive '30px'. Hvis den skal placeres kl. 14:00 er det 6 gange 30 fordi der er 6 timer fra kl. 08:00 til 14:00, og så skrive '360px'.
+      daySquare.appendChild(event); 
+      }
+    };
 
     calendar.appendChild(dayInterval);
   }
