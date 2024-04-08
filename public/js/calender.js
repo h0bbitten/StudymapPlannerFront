@@ -95,7 +95,7 @@ function loadWeekView() {
     $('.time-labels').append(`<div class="hour" style="height: 35px; display: flex; align-items: center; padding-left: 10px;">${hour}:00</div>`)
   }
 
-  for (let day = 0; day < 7; day++) {
+  for (let day = 1; day <= 7; day++) {
 
     $('#calendar').append(`<div class="day-interval-${day}"></div>`)
   
@@ -156,12 +156,13 @@ function addTimeBlock(startTime, endTime, title, description, color) {
 }
 function createTimeBlock(startTime, endTime, title, description, color) {
   // Calculate the height of the timeblock based on the duration
-  const duration = (endTime - startTime) / 3600; // Converting seconds to hours
-  const height = duration * 35; // Assuming each hour is 35px tall
+  const duration = (endTime - startTime) / 3600;
+  const height = duration * 35;
 
   console.log(startTime);
   // Create the HTML markup for the timeblock
-  const top = (new Date(startTime * 1000).getHours()) * 35;
+  const top = ((new Date(startTime * 1000).getHours()) * 35) + ((new Date(startTime * 1000).getMinutes()) * (35 / 60));
+
   const html = `
       <div class="timeblock" style="height: ${height}px; background-color: ${color}; position: absolute; top: ${top}px;">
           <div class="time">${new Date(startTime * 1000).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'})} - ${new Date(endTime * 1000).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'})}</div>
