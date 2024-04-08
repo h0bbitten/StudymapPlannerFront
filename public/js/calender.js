@@ -92,10 +92,11 @@ function loadWeekView() {
     const hourLabel = document.createElement('div');
     hourLabel.classList.add('hour');
     hourLabel.textContent = `${hour}:00`;
-    hourLabel.style.height = '35px'; // Set the height to match your hour slots.
-    hourLabel.style.display = 'flex'; // Use flex display to align text vertically.
-    hourLabel.style.alignItems = 'center'; // Align text in the center of the div.
-    hourLabel.style.paddingLeft = '10px'; // Adjust padding as needed.
+    // CSS stuff for hourLabel for at få det til at passe med daySquares.
+    hourLabel.style.height = '35px'; 
+    hourLabel.style.display = 'flex'; 
+    hourLabel.style.alignItems = 'center';
+    hourLabel.style.paddingLeft = '10px'; 
     timeLabelContainer.appendChild(hourLabel);
   }
   calendar.appendChild(timeLabelContainer);
@@ -112,7 +113,7 @@ function loadWeekView() {
     if (weekDay.toDateString() === new Date().toDateString()) {
       daySquare.classList.add('current-day');
     }
-    daySquare.innerText = weekDay.getDate(); // This sets the date number on the daySquare.
+    daySquare.innerText = weekDay.getDate();
     dayInterval.appendChild(daySquare);
 
     if (lectures.length > 0) {
