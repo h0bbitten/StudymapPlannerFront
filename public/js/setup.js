@@ -89,16 +89,16 @@ function resetForm() {
 }
 
 function goToPreviousPage() {
-    console.log(`index is ${index}`);
-    if (index === amountOfCourses + 1) {
-        index--;
-        save.hideButton();
-        next.showButton();
-        $(`#form${index + 1}`).hide();
-    }
     if (index > 0) {
         index--;
         $(`#form${index + 1}`).hide();
+        $(`#form${index}`).show();
+    }
+    
+    if  (index === amountOfCourses + 1 || index === amountOfCourses) {
+        save.hideButton();
+        next.showButton();
+        $(`#form${index + 2}`).hide();
         $(`#form${index}`).show();
     }
     if (index === 0) {
@@ -106,7 +106,8 @@ function goToPreviousPage() {
         previous.hideButton();
         resetForm();
     }
-}
+    console.log(`index is ${index}`);
+} 
 
 
 function goToNextPage() {
@@ -198,7 +199,8 @@ function goToNextPage() {
         `);
         $(`#form${index}`).hide();
         $(`#form${index + 1}`).show();
-        $('#header').text('Choose Study Time');
+        
+        
         next.hideButton();
         save.showButton();
         return;
