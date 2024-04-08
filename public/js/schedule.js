@@ -49,7 +49,6 @@ function displayCalLectures(profile) {
     course.contents.forEach(lecture => {
       lectureNames.push(lecture.name);
     });
-
   });
   localStorage.setItem('lectureNames', JSON.stringify(lectureNames));
 

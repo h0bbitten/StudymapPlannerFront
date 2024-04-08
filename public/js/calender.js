@@ -116,10 +116,7 @@ function loadWeekView() {
     dayInterval.appendChild(daySquare);
 
     for (let hour = 8; hour <= 20; hour++) {
-      const hourSlot = document.createElement('div');
-      hourSlot.classList.add('hour');
-      hourSlot.style.height = '35px';
-      dayInterval.appendChild(hourSlot); // Append hourSlot to dayInterval instead of daySquare.
+      $('.day-interval').append(`<div class="hour" id="hour${hour}" style="height: 35px;"></div>`)
     }
 
     if (lectures.length > 0) {
