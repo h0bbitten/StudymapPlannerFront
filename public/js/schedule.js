@@ -1,4 +1,5 @@
 import {applyTheme, LoadingScreen, displayProfile} from './script.js';
+import {loadCalendar} from './calender.js';
 
 let userid = sessionStorage.getItem("userid");
 
@@ -42,28 +43,30 @@ async function scheduleInitialization() {
 }
 
 function displayCalLectures(profile) {
-
-
-  const lectureNames = [];
+  
+  let currentTime = Math.floor(Date.now() / 1000);
+  const lectures = [];
   profile.courses.forEach(course => {
     course.contents.forEach(lecture => {
-      lectureNames.push(lecture.name);
+      let startTime = currentTime;
+      let endTime = currentTime + (60 * 60);
+
+      let timeBlock = {
+        title: course.fullname,
+        description: lecture.name,
+        startTime: startTime,
+        endTime: endTime,
+        color: course.color
+      };
+
+      currentTime = endTime;
+
+      lectures.push(timeBlock);
     });
   });
-  localStorage.setItem('lectureNames', JSON.stringify(lectureNames));
+  localStorage.setItem('lectures', JSON.stringify(lectures));
 
- // if (profile.courses && profile.courses.length > 0) {
-  //  profile.courses.forEach(course => {
-  //    const courseLecturesList = $(`<div class="course-lectures"><h3>${course.fullname} Lectures:</h3><ul></ul></div>`);
-  //    course.contents.forEach(lecture => {
-  //      courseLecturesList.find("ul").append(`<li>${lecture.name}</li>`);
-   //   });
-      //$("#courses").append(courseLecturesList);
-     // $("#courses").append(courseLecturesList);
-    //});
-  //} else {
-  //  $("#courses").append("<p>You are not enrolled in any courses.</p>");
-  //}
+  loadCalendar();
 }
 
 applyTheme();
