@@ -4,11 +4,11 @@ import mysql from 'mysql2/promise';
 const pool = mysql.createPool({
     host: 'localhost',
     user: 'root',
-    password: 'yourpassword',
-    database: 'yourdatabase'
-});
+    password: 'studymaproot',
+    database: 'users'
+}).promise;
 
-// Ensure user exists or create a new one
+// Checker om userID allerede er der - update istedet for at klaske ny ind. 
 async function ensureUserExists(externalUserID) {
     const [user] = await pool.query('SELECT id FROM users WHERE userID = ?', [externalUserID]);
     if (user.length === 0) {
@@ -18,7 +18,7 @@ async function ensureUserExists(externalUserID) {
     return user[0].id;
 }
 
-// Save or update course data for a user
+// Gemmer ellere opdatere course
 async function saveOrUpdateCourse(userID, courseName, ects) {
     const [course] = await pool.query('SELECT id FROM courses WHERE userID = ? AND courseName = ?', [userID, courseName]);
     if (course.length === 0) {
