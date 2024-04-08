@@ -171,6 +171,9 @@ function goToNextPage() {
     }
     
     console.log(amountOfCourses);
+    const startStudyTime = $('#startStudyTime').val();
+    const endStudyTime = $('#endStudyTime').val();
+    
     if (index === amountOfCourses + 1) {
         $('#forms').append(`
             <div id="form${index + 1}div">
@@ -179,28 +182,67 @@ function goToNextPage() {
                         <div class="form-group">
                         <label for="startStudyTime">Select Starting Study Time: </label>
                         <select class="form-control" id="startStudyTime" name="startStudyTime">
-                            <option value="08:00">08:00</option>
-                            <option value="09:00">09:00</option>
-                            <option value="10:00">10:00</option>
+                            <option value=00>00:00</option>
+                            <option value=01>01:00</option>
+                            <option value=02>02:00</option>
+                            <option value=03>03:00</option>
+                            <option value=04>04:00</option>
+                            <option value=05>05:00</option>
+                            <option value=06>06:00</option>
+                            <option value=07>07:00</option>
+                            <option value=08>08:00</option>
+                            <option value=09>09:00</option>
+                            <option value=10>10:00</option>
+                            <option value=11>11:00</option>
+                            <option value=12>12:00</option>
+                            <option value=13>13:00</option>
+                            <option value=14>14:00</option>
+                            <option value=15>15:00</option>
+                            <option value=16>16:00</option>
+                            <option value=17>17:00</option>
+                            <option value=18>18:00</option>
+                            <option value=19>19:00</option>
+                            <option value=20>20:00</option>
+                            <option value=21>21:00</option>
+                            <option value=22>22:00</option>
+                            <option value=23>23:00</option>
                             <!-- Add more options as needed -->
                         </select>
                     </div>
                     <div class="form-group">
                         <label for="endStudyTime">Select Ending Study Time: </label>
                         <select class="form-control" id="endStudyTime" name="endStudyTime">
-                            <option value="16:00">16:00</option>
-                            <option value="17:00">17:00</option>
-                            <option value="18:00">18:00</option>
-                            <!-- Add more options as needed -->
+                            <option value=00>00:00</option>
+                            <option value=01>01:00</option>
+                            <option value=02>02:00</option>
+                            <option value=03>03:00</option>
+                            <option value=04>04:00</option>
+                            <option value=05>05:00</option>
+                            <option value=06>06:00</option>
+                            <option value=07>07:00</option>
+                            <option value=08>08:00</option>
+                            <option value=09>09:00</option>
+                            <option value=10>10:00</option>
+                            <option value=11>11:00</option>
+                            <option value=12>12:00</option>
+                            <option value=13>13:00</option>
+                            <option value=14>14:00</option>
+                            <option value=15>15:00</option>
+                            <option value=16>16:00</option>
+                            <option value=17>17:00</option>
+                            <option value=18>18:00</option>
+                            <option value=19>19:00</option>
+                            <option value=20>20:00</option>
+                            <option value=21>21:00</option>
+                            <option value=22>22:00</option>
+                            <option value=23>23:00</option>
                         </select>
                     </div>
                 </form>
             </div>
         `);
         $(`#form${index}`).hide();
-        $(`#form${index + 1}`).show();
-        
-        
+        $(`#form${index + 1}`).show();      
         next.hideButton();
         save.showButton();
         return;
@@ -211,6 +253,22 @@ async function saveOptions() {
     console.log('Saving options');
     console.log(User);
     let index = 0;
+    const startStudyTime = $('#startStudyTime').val();
+    const endStudyTime = $('#endStudyTime').val();
+    
+    if (startStudyTime === endStudyTime || startStudyTime > endStudyTime) {
+        Toastify({
+            text: "Invalid.",
+            duration: 1500,
+            close: false,
+            gravity: "top",
+            position: "center",
+            style: {
+                background: "linear-gradient(to right, #ff416c, #ff4b2b)",
+            }
+        }).showToast();
+            return;
+    }
     checkboxes.each(( i, checkbox) => {
         checkbox.checked ? User.courses[i].chosen = true : User.courses[i].chosen = false;
         if (User.courses[i].chosen === false) {
@@ -227,6 +285,12 @@ async function saveOptions() {
         }
 
     });
+    
+    // Gemmer start / end study time.
+    User.startStudyTime = startStudyTime;
+    User.endStudyTime = endStudyTime;
+    console.log(User.startStudyTime, User.endStudyTime);
+
     await saveOptionsToDB(User);
     
     window.location.href = "schedule";
