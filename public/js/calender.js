@@ -4,6 +4,9 @@ let nav = 0;
 let view = 'week';
 const calendar = document.getElementById('calendar');
 const weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+const dayPX = 1500;
+const hourPX = 1500 / 24;
+const minutePX = hourPX / 60;
 
 const storedLectures = localStorage.getItem('lectures'); // Henter lectureNames fra local storage som er gemt i schedule.js
 let lectures = storedLectures ? JSON.parse(storedLectures) : [];
@@ -92,7 +95,7 @@ function loadWeekView() {
   $('#calendar').append(`<div class="time-labels"></div>`)
 
   for (let hour = 1; hour <= 24; hour++) {
-    $('.time-labels').append(`<div class="hour" style="height: 35px; display: flex; align-items: center; padding-left: 10px;">${hour}:00</div>`)
+    $('.time-labels').append(`<div class="hour" style="height: ${hourPX}px; display: flex; align-items: center; padding-left: 10px;">${hour}:00</div>`)
   }
 
   for (let day = 1; day <= 7; day++) {
@@ -112,23 +115,9 @@ function loadWeekView() {
 
     for (let hour = 1; hour <= 24; hour++) {
 
-      $(`.day-interval-${day}`).append(`<div class="hour" id="hour${hour}" style="height: 35px;"></div>`)
+      $(`.day-interval-${day}`).append(`<div class="hour" id="hour${hour}" style="height: ${hourPX}px;"></div>`)
     }
 
-
-
-/*     if (lectures.length > 0) {
-      const event = document.createElement('div');
-      event.classList.add('event');
-      for(let i = 0; i < lectures.length; i++){
-      event.textContent = lectures;
-      event.style.position = 'absolute';
-      event.style.top = '120px'; //Hver hour er 30px. Hours starter fra 08:00 til 20:00, så hvis man vil placere en lecture kl. 08:00, så skal man skrive '30px'. Hvis den skal placeres kl. 14:00 er det 6 gange 30 fordi der er 6 timer fra kl. 08:00 til 14:00, og så skrive '360px'.
-      daySquare.appendChild(event); 
-      }
-    };
-
-    calendar.appendChild(dayInterval); */
   }
     //console.log(lectures);
     lectures.forEach(lecture => {
@@ -157,17 +146,16 @@ function addTimeBlock(startTime, endTime, title, description, color) {
 function createTimeBlock(startTime, endTime, title, description, color) {
   // Calculate the height of the timeblock based on the duration
   const duration = (endTime - startTime) / 3600;
-  const height = duration * 35;
+  const height = duration * hourPX;
 
   console.log(startTime);
   // Create the HTML markup for the timeblock
-  const top = ((new Date(startTime * 1000).getHours()) * 35) + ((new Date(startTime * 1000).getMinutes()) * (35 / 60));
-
+  const top = ((new Date(startTime * 1000).getHours()) * hourPX) + ((new Date(startTime * 1000).getMinutes()) * minutePX);
   const html = `
       <div class="timeblock" style="height: ${height}px; background-color: ${color}; position: absolute; top: ${top}px;">
           <div class="time">${new Date(startTime * 1000).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'})} - ${new Date(endTime * 1000).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'})}</div>
           <div class="title">${title}</div>
-          <div class="description">${description}</div>
+          <div class="description" style="display: none;">${description}</div>
       </div>
   `;
   return html;

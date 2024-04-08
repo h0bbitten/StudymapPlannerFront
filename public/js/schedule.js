@@ -59,7 +59,7 @@ function displayCalLectures(profile) {
         color: course.color
       };
 
-      currentTime = endTime;
+      currentTime = endTime + (15 * 60);
 
       lectures.push(timeBlock);
     });
