@@ -1,40 +1,31 @@
-import mysql from 'mysql2';
+import mysql from 'mysql2/promise';
 
+// Database connection pool
 const pool = mysql.createPool({
     host: 'localhost',
     user: 'root',
-    password: 'studymaproot',
-    database: 'users'
-}).promise();
+    password: 'yourpassword',
+    database: 'yourdatabase'
+});
 
-// Ensures the user exists in the database based on external userID.
-// It either finds an existing user or inserts a new record.
-export async function ensureUserExists(externalUserID) {
-    try {
-        let [results] = await pool.query(`SELECT id FROM users WHERE userID = ?`, [externalUserID]);
-        if (results.length === 0) {
-            // User does not exist, insert them
-            const [insertResult] = await pool.query(`INSERT INTO users (userID) VALUES (?)`, [externalUserID]);
-            console.log(`New user inserted with ID: ${insertResult.insertId}`);
-            return insertResult.insertId; // Returning internal DB ID for further operations
-        } else {
-            // User exists
-            console.log(`User already exists with ID: ${results[0].id}`);
-            return results[0].id; // Returning internal DB ID for further operations
-        }
-    } catch (error) {
-        console.error('Error ensuring user exists:', error);
-        throw error;
+// Ensure user exists or create a new one
+async function ensureUserExists(externalUserID) {
+    const [user] = await pool.query('SELECT id FROM users WHERE userID = ?', [externalUserID]);
+    if (user.length === 0) {
+        const [result] = await pool.query('INSERT INTO users (userID) VALUES (?)', [externalUserID]);
+        return result.insertId;
+    }
+    return user[0].id;
+}
+
+// Save or update course data for a user
+async function saveOrUpdateCourse(userID, courseName, ects) {
+    const [course] = await pool.query('SELECT id FROM courses WHERE userID = ? AND courseName = ?', [userID, courseName]);
+    if (course.length === 0) {
+        await pool.query('INSERT INTO courses (userID, courseName, ects) VALUES (?, ?, ?)', [userID, courseName, ects]);
+    } else {
+        await pool.query('UPDATE courses SET ects = ? WHERE id = ?', [ects, course[0].id]);
     }
 }
 
-// Inserts course data linked to a specific internal user ID.
-export async function saveCourseData(internalUserID, courseName, ects) {
-    try {
-        await pool.query(`INSERT INTO courses (userID, courseName, ects) VALUES (?, ?, ?)`, [internalUserID, courseName, ects]);
-        console.log(`Course data saved for userID: ${internalUserID}`);
-    } catch (error) {
-        console.error('Error saving course data:', error);
-        throw error;
-    }
-}
+export { ensureUserExists, saveOrUpdateCourse };
