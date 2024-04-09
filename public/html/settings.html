@@ -18,6 +18,23 @@
             <h2>Reset schedule</h2>
                 <button id="reset">Reset</button>
         </div>
+            </head>
+            <body>
+            <div class="dropdown">
+              <span>Click on me</span>
+              <script>
+                document.querySelector('.dropdown').addEventListener('click', function() {
+                  var dropdownContent = this.querySelector('.dropdown-content');
+                  dropdownContent.classList.toggle('show');
+                });
+                </script>
+              <div class="dropdown-content">
+              <p>Hello World!</p>
+            <button>Button 1</button>
+            <button>Button 2</button>
+            <button>Button 3</button>
+              </div>
+            </div>
     </div>
 </body>
 </html>

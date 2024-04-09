@@ -65,3 +65,11 @@ body {
 .reset button:hover {
     background-color: #45a049;
 }
+
+.dropdown-content {
+    display: none;
+  }
+  
+  .dropdown-content.show {
+    display: block;
+  }
