@@ -174,7 +174,7 @@ function initButtons() {
   document.getElementById('backButton').addEventListener('click', () => {
     if(view === 'month') {
       nav--;
-      load();
+      loadCalendar();
     } else {
       nav -= 7;
       loadWeekView();
@@ -184,12 +184,12 @@ function initButtons() {
   document.getElementById('weekButton').addEventListener('click', () => {
     view = 'week';
     nav = 0;
-    load();
+    loadCalendar();
   });
 
   document.getElementById('monthButton').addEventListener('click', () => {
     view = 'month';
     nav = 0;
-    load();
+    loadCalendar();
   });
 }
