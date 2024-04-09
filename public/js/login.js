@@ -1,19 +1,20 @@
 import {applyTheme} from './script.js';
 
-
 //Login function
 function handleLogin() {
     let loginBtn = document.getElementById("tokenButn");
     
     loginBtn.addEventListener("click", async () => {
+        //Get token from input field
         let token = document.getElementById("tokenInput").value;
         let isValid = await validToken(token);
+        console.log(isValid);
         if (isValid) {
-            window.location.href = "schedule";
+            //sessionStorage.setItem("token", token);
+            window.location.href = "setup";
         };
     });
 }
-
 
 async function validToken(token) {
     console.log(`Checking token: ${token}`);
@@ -72,7 +73,5 @@ async function testToken(token) {
         throw error;
     }
 }
-
-
 applyTheme();
 handleLogin();

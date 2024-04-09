@@ -1,12 +1,13 @@
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import path from 'path';
-import {getMoodleInfo, testToken} from "./app.js";
+import {getMoodleInfo, testToken, saveOptions, getUserData} from "./app.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const routing = function(app) {
+    //Gets
     app.get('/', async (req, res) => {
         console.log(req.session.loggedIn);
         if (req.session.loggedIn === true) {
@@ -19,6 +20,15 @@ const routing = function(app) {
     app.get('/login', (req, res) => {
         // Send the /html/login.html file when /login is accessed
         res.sendFile(path.join(__dirname, 'public', 'html', 'login.html'));
+    });
+    app.get('/setup', (req, res) => {
+        // Send the /html/setup.html file when /setup is accessed
+        if (req.session.loggedIn === true) {
+            res.sendFile(path.join(__dirname, 'public', 'html', 'setup.html'));
+        }
+        else {
+            res.redirect('/login');
+        }  
     });
     app.get('/schedule', (req, res) => {
         // Send the /html/schedule.html file when /schedule is accessed
@@ -49,23 +59,23 @@ const routing = function(app) {
             res.status(500).send("Internal Server Error");
         });
     });
+    app.get('/getUserData', async (req, res) => {
+        await getUserData(req, res).catch(error => {
+            console.error("Error in getting user:", error);
+            res.status(500).send("Internal Server Error");
+        });
+    });
     app.get('*', (req, res) => {
         res.status(404);
         res.sendFile(path.join(__dirname, 'public', 'html', 'default.html'));
     });
-
-    app.post('/database/token', async (req, res) => {
-        const { token } = req.body;
-        try {
-            const tokenId = await getToken(token);
-            res.status(200).json({ id: tokenId, message: 'Token inserted successfully' });
-        } catch (error) {
-            console.error('Error inserting token to the database:', error);
-            res.status(500).json({ error: 'Internal server error' });
-        }
+    //Posts
+    app.post('/saveOptions', async (req, res) => {
+        await saveOptions(req, res).catch(error => {
+            console.error("Error in saving user options:", error);
+            res.status(500).send("Internal Server Error");
+        });
     });
-    
 };
-
 
 export default routing;

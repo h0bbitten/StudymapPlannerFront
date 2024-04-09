@@ -1,4 +1,4 @@
-export {applyTheme, setCookie, getCookie};
+export {applyTheme, setCookie, getCookie, LoadingScreen, displayProfile};
 
 //Dark mode toggle
 async function applyTheme() {
@@ -47,3 +47,27 @@ function getCookie(name) {
   return null;
 }
 
+//Loading screen
+class LoadingScreen {
+  add() {
+      $("body").append(`
+      <div id="loading-overlay"></div>
+      <div id="loading">
+        <img src="../img/XOsX.gif" alt="Loading">
+      </div>
+      `);
+  }
+  show() {
+    $("#loading").show();
+    $("#loading-overlay").show();
+  }
+
+  hide() {
+    $("#loading").hide();
+    $("#loading-overlay").hide();
+  }
+}
+
+function displayProfile(profile) {
+  $("#user_profile").html(`<p>Welcome back ${profile.fullname}</p><img src="${profile.userpictureurl}" alt="Profile pic">`);
+}

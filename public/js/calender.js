@@ -1,14 +1,18 @@
+export { loadCalendar};
+
 let nav = 0;
-let view = 'month';
+let view = 'week';
 const calendar = document.getElementById('calendar');
 const weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+const dayPX = 1500;
+const hourPX = 1500 / 24;
+const minutePX = hourPX / 60;
 
-const storedLectureNames = localStorage.getItem('lectureNames'); // Henter lectureNames fra local storage som er gemt i schedule.js
-let lectures = storedLectureNames ? JSON.parse(storedLectureNames) : [];
+const storedLectures = localStorage.getItem('lectures'); // Henter lectureNames fra local storage som er gemt i schedule.js
+let lectures = storedLectures ? JSON.parse(storedLectures) : [];
 
-let lectureIndex = 0;
-
-function load() {
+function loadCalendar() {
+  initButtons();
   if (view === 'week') {
     loadWeekView();
   } else {
@@ -82,42 +86,80 @@ function loadWeekView() {
   const dayOfWeek = today.getDay();
   const startOfWeek = new Date(today.setDate(today.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1)));
 
-  document.getElementById('monthDisplay').innerText = 
+  document.getElementById('monthDisplay').innerText =
     `Week of ${startOfWeek.toLocaleDateString('en-us', { month: 'long', day: 'numeric' })}`;
 
   calendar.innerHTML = '';
-  let times = ['08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00'];
-  const timeTest = document.createElement('div');
-  timeTest.classList.add('times');
 
-  for (let i = 0; i < times.length; i++) {
-    const timeItem = document.createElement('div');
-    timeItem.classList.add('time');
-    timeItem.textContent = times[i];
-    timeTest.appendChild(timeItem);
+
+  $('#calendar').append(`<div class="time-labels"></div>`)
+
+  for (let hour = 1; hour <= 24; hour++) {
+    $('.time-labels').append(`<div class="hour" style="height: ${hourPX}px; display: flex; align-items: center; padding-left: 10px;">${hour}:00</div>`)
   }
-  calendar.appendChild(timeTest);
 
-  for(let i = 0; i < 7; i++) {
-    const daySquare = document.createElement('div');
-    daySquare.classList.add('day');
-    let weekDay = new Date(startOfWeek.setDate(startOfWeek.getDate() + (i === 0 ? 0 : 1)));
-    daySquare.innerText = weekDay.getDate();
+  for (let day = 1; day <= 7; day++) {
+
+    $('#calendar').append(`<div class="day-interval-${day}"></div>`)
+  
+
+
+    let weekDay = new Date(startOfWeek.getFullYear(), startOfWeek.getMonth(), startOfWeek.getDate() + day);
+
+
+    $(`.day-interval-${day}`).append(`<div class="day" id="day${day}" style="flex: 1;">${weekDay.getDate()}</div>`);
+
     if (weekDay.toDateString() === new Date().toDateString()) {
-      daySquare.classList.add('current-day');
+      $(`#day${day}`).addClass('current-day');
     }
 
-    if (lectures.length > 0) {
-      const eventPara = document.createElement('p');
-      eventPara.classList.add('event');
-      eventPara.textContent = lectures[(lectureIndex + i) % lectures.length];
-      daySquare.appendChild(eventPara);
+    for (let hour = 1; hour <= 24; hour++) {
+
+      $(`.day-interval-${day}`).append(`<div class="hour" id="hour${hour}" style="height: ${hourPX}px;"></div>`)
     }
 
-    calendar.appendChild(daySquare);
+  }
+    //console.log(lectures);
+    lectures.forEach(lecture => {
+      //console.log(lecture.startTime, lecture.endTime, lecture.title, lecture.description, lecture.color);
+      addTimeBlock(lecture.startTime, lecture.endTime, lecture.title, lecture.description, lecture.color);
+    })
+}
+function addTimeBlock(startTime, endTime, title, description, color) {
+  let currentDate = new Date();
+  let currentWeekStart = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() - currentDate.getDay());
+  let currentWeekEnd = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() + (6 - currentDate.getDay()));
+
+  let startDate = new Date(startTime * 1000);
+
+  if (startDate >= currentWeekStart && startDate <= currentWeekEnd) {
+    // Calculate the day of the week (Monday = 0, Tuesday = 1, ...)
+    let dayOfWeek = startDate.getDay();
+    // Adjust to start from 1 (Monday = 1, Tuesday = 2, ...)
+    if (dayOfWeek === 0) {
+      dayOfWeek = 7; // Sunday
+    }
+    // Append the time block to the appropriate day and hour
+    $(`#day${dayOfWeek}`).append(createTimeBlock(startTime, endTime, title, description, color));
   }
 }
+function createTimeBlock(startTime, endTime, title, description, color) {
+  // Calculate the height of the timeblock based on the duration
+  const duration = (endTime - startTime) / 3600;
+  const height = duration * hourPX;
 
+  console.log(startTime);
+  // Create the HTML markup for the timeblock
+  const top = ((new Date(startTime * 1000).getHours()) * hourPX) + ((new Date(startTime * 1000).getMinutes()) * minutePX);
+  const html = `
+      <div class="timeblock" style="height: ${height}px; background-color: ${color}; position: absolute; top: ${top}px;">
+          <div class="time">${new Date(startTime * 1000).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'})} - ${new Date(endTime * 1000).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'})}</div>
+          <div class="title">${title}</div>
+          <div class="description" style="display: none;">${description}</div>
+      </div>
+  `;
+  return html;
+}
 function initButtons() {
   document.getElementById('nextButton').addEventListener('click', () => {
     if(view === 'month') {
@@ -132,7 +174,7 @@ function initButtons() {
   document.getElementById('backButton').addEventListener('click', () => {
     if(view === 'month') {
       nav--;
-      load();
+      loadCalendar();
     } else {
       nav -= 7;
       loadWeekView();
@@ -142,15 +184,12 @@ function initButtons() {
   document.getElementById('weekButton').addEventListener('click', () => {
     view = 'week';
     nav = 0;
-    load();
+    loadCalendar();
   });
 
   document.getElementById('monthButton').addEventListener('click', () => {
     view = 'month';
     nav = 0;
-    load();
+    loadCalendar();
   });
 }
-
-initButtons();
-load();
