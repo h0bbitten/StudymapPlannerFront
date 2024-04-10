@@ -2,6 +2,8 @@ export {getMoodleInfo, testToken, saveOptions, getUserData};
 import {Webscraper} from "./scraping.js";
 import axios from 'axios';
 import fs from 'fs';
+import { ensureUserExists } from './database.js';
+
 
 class WSfunctions {
   constructor(token) {
@@ -115,6 +117,17 @@ async function saveOptions(req, res) {
   try {
     console.log('Saving options');
     let user = req.body;
+
+    const useridInt = parseInt(req.body.userid, 10);
+    if (isNaN(useridInt)) {
+    return res.status(400).send("userid must be an integer");
+}
+    console.log(`Parsed userid: ${useridInt}`);
+
+    // Ensure user exists in the database or insert them
+    const userId = await ensureUserExists(user.userid);
+
+    // Continue with filesystem saving as before
     fs.writeFile(`./database/${user.userid}.json`, JSON.stringify(user), (err) => {
       if (err) {
         console.error('Error saving user data:', err);
@@ -125,9 +138,11 @@ async function saveOptions(req, res) {
       }
     });
   } catch (err) {
+    console.error('Error in saveOptions:', err);
     res.status(500).send('Internal Server Error');
   }
 }
+
 
 async function getUserData(req, res) {
   try {
