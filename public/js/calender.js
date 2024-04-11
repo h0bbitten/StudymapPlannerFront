@@ -11,6 +11,14 @@ const minutePX = hourPX / 60;
 const storedLectures = localStorage.getItem('lectures'); // Henter lectureNames fra local storage som er gemt i schedule.js
 let lectures = storedLectures ? JSON.parse(storedLectures) : [];
 
+const savedStartStudyTime = localStorage.getItem('startStudyTime');
+let startStudyTime = savedStartStudyTime;
+console.log(startStudyTime);
+
+const savedEndStudyTime = localStorage.getItem('endStudyTime');
+let endStudyTime = savedEndStudyTime;
+console.log(endStudyTime);
+
 function loadCalendar() {
   initButtons();
   if (view === 'week') {
