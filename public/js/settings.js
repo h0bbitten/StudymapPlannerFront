@@ -63,13 +63,3 @@ for (i = 0; i < coll.length; i++) {
         }
     });
 }
-
-/* User.courses.forEach((course, index) => {
-        $('#form0').append(`
-        <div class="checkbox checkbox-container">
-        <label class="checkbox-label" for="checkbox${index}">
-             <input type="checkbox" id="checkbox${index}" name="type" value="${index}" checked/>
-                 <span id="checkbox${index}Text">${course.fullnamedisplay}</span>              
-         </label>
-    </div>`);
-}); */
