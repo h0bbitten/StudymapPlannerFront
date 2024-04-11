@@ -343,4 +343,3 @@ setupInitialization();
 $(document).on('click', '#goToNextPage', goToNextPage);
 $(document).on('click', '#goToPreviousPage', goToPreviousPage);
 $(document).on('click', '#save', saveOptions);
-

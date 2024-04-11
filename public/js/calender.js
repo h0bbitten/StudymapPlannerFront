@@ -5,19 +5,26 @@ let view = 'week';
 const calendar = document.getElementById('calendar');
 const weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 const dayPX = 1500;
-const hourPX = 1500 / 24;
+
+const startStudyTime = parseInt(localStorage.getItem('startStudyTime') || "8", 10);
+const endStudyTime = parseInt(localStorage.getItem('endStudyTime') || "20", 10);
+
+// Calculate hourPX based on the new range of hours
+const hourPX = dayPX / (endStudyTime - startStudyTime);
 const minutePX = hourPX / 60;
+
+//Kan ikke få det til at virke med local storage, så har hardcoded det for nu.
+//localStorage.setItem('startStudyTime', '8');
+//localStorage.setItem('endStudyTime', '20');
 
 const storedLectures = localStorage.getItem('lectures'); // Henter lectureNames fra local storage som er gemt i schedule.js
 let lectures = storedLectures ? JSON.parse(storedLectures) : [];
 
-const savedStartStudyTime = localStorage.getItem('startStudyTime');
-let startStudyTime = savedStartStudyTime;
-console.log(startStudyTime);
+//const savedStartStudyTime = localStorage.getItem('startStudyTime');
+//let startStudyTime = savedStartStudyTime;
 
-const savedEndStudyTime = localStorage.getItem('endStudyTime');
-let endStudyTime = savedEndStudyTime;
-console.log(endStudyTime);
+//const savedEndStudyTime = localStorage.getItem('endStudyTime');
+//let endStudyTime = savedEndStudyTime;
 
 function loadCalendar() {
   initButtons();
@@ -102,8 +109,8 @@ function loadWeekView() {
 
   $('#calendar').append(`<div class="time-labels"></div>`)
 
-  for (let hour = 1; hour <= 24; hour++) {
-    $('.time-labels').append(`<div class="hour" style="height: ${hourPX}px; display: flex; align-items: center; padding-left: 10px;">${hour}:00</div>`)
+  for (let hour = startStudyTime; hour <= endStudyTime; hour++) {
+    $('.time-labels').append(`<div class="hour" style="height: ${hourPX}px; display: flex; align-items: center; padding-left: 10px;">${hour}:00</div>`);
   }
 
   for (let day = 1; day <= 7; day++) {
@@ -132,6 +139,8 @@ function loadWeekView() {
       //console.log(lecture.startTime, lecture.endTime, lecture.title, lecture.description, lecture.color);
       addTimeBlock(lecture.startTime, lecture.endTime, lecture.title, lecture.description, lecture.color);
     })
+
+    console.log(startStudyTime, endStudyTime);
 }
 function addTimeBlock(startTime, endTime, title, description, color) {
   let currentDate = new Date();
@@ -153,12 +162,14 @@ function addTimeBlock(startTime, endTime, title, description, color) {
 }
 function createTimeBlock(startTime, endTime, title, description, color) {
   // Calculate the height of the timeblock based on the duration
+  const startHour = new Date(startTime * 1000).getHours() - startStudyTime;
+  const startMinutes = new Date(startTime * 1000).getMinutes();
   const duration = (endTime - startTime) / 3600;
   const height = duration * hourPX;
+  const top = (startHour * hourPX) + (startMinutes * minutePX);
 
   console.log(startTime);
   // Create the HTML markup for the timeblock
-  const top = ((new Date(startTime * 1000).getHours()) * hourPX) + ((new Date(startTime * 1000).getMinutes()) * minutePX);
   const html = `
       <div class="timeblock" style="height: ${height}px; background-color: ${color}; position: absolute; top: ${top}px;">
           <div class="time">${new Date(startTime * 1000).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'})} - ${new Date(endTime * 1000).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'})}</div>
