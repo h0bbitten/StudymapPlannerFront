@@ -118,17 +118,28 @@ async function saveOptions(req, res) {
     console.log('Saving options');
     let user = req.body;
 
-    const useridInt = parseInt(req.body.userid, 10);
+    const useridInt = parseInt(user.userid, 10);
     if (isNaN(useridInt)) {
-    return res.status(400).send("userid must be an integer");
-}
+      return res.status(400).send("userid must be an integer");
+    }
     console.log(`Parsed userid: ${useridInt}`);
 
     // Ensure user exists in the database or insert them
-    const userId = await ensureUserExists(user.userid);
+    await ensureUserExists(user.userid);
 
-    // Continue with filesystem saving as before
-    fs.writeFile(`./database/${user.userid}.json`, JSON.stringify(user), (err) => {
+    // Filter the user object to keep only the required information
+    const userDataToSave = {
+      userid: useridInt,
+      courses: user.courses.map(course => ({
+        id: course.id,
+        fullname: course.fullname,
+        contents: course.contents, // Assuming you want to keep all contents as is
+        pages: course.pages // Assuming you want to keep all page info as is
+      }))
+    };
+
+    // Continue with filesystem saving, now with filtered data
+    fs.writeFile(`./database/${useridInt}.json`, JSON.stringify(userDataToSave, null, 2), (err) => {
       if (err) {
         console.error('Error saving user data:', err);
         res.status(500).send('Error saving user data');
@@ -142,6 +153,7 @@ async function saveOptions(req, res) {
     res.status(500).send('Internal Server Error');
   }
 }
+
 
 
 async function getUserData(req, res) {
