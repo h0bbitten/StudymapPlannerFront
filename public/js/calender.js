@@ -5,25 +5,18 @@ let view = 'week';
 const calendar = document.getElementById('calendar');
 const weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
-const startStudyTime = 8; //parseInt(localStorage.getItem('startStudyTime') || "8", 10);
-const endStudyTime = 18; //parseInt(localStorage.getItem('endStudyTime') || "16", 10);
+const startStudyTimeValue = sessionStorage.getItem('startStudyTime');
+const startStudyTime = parseInt(startStudyTimeValue, 10);
+
+const endStudyTimeValue = sessionStorage.getItem('endStudyTime');
+const endStudyTime = parseInt(endStudyTimeValue, 10);
 
 const dayPX = (1500 / 24) * (endStudyTime - startStudyTime);
 const hourPX = dayPX / (endStudyTime - startStudyTime);
 const minutePX = hourPX / 60;
 
-//Kan ikke få det til at virke med local storage, så har hardcoded det for nu.
-//localStorage.setItem('startStudyTime', '8');
-//localStorage.setItem('endStudyTime', '20');
-
 const storedLectures = localStorage.getItem('lectures'); // Henter lectureNames fra local storage som er gemt i schedule.js
 let lectures = storedLectures ? JSON.parse(storedLectures) : [];
-
-//const savedStartStudyTime = localStorage.getItem('startStudyTime');
-//let startStudyTime = savedStartStudyTime;
-
-//const savedEndStudyTime = localStorage.getItem('endStudyTime');
-//let endStudyTime = savedEndStudyTime;
 
 function loadCalendar() {
   initButtons();

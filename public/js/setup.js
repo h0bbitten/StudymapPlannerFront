@@ -294,8 +294,8 @@ async function saveOptions() {
     
     window.location.href = "schedule";
 
-    //localStorage.SetItem('startStudyTime', startStudyTime);
-   // localStorage.SetItem('endStudyTime', endStudyTime);
+    sessionStorage.setItem('startStudyTime', startStudyTime);
+    sessionStorage.setItem('endStudyTime', endStudyTime);
 }
 
 async function saveOptionsToDB(User) {
