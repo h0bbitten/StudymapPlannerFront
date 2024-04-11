@@ -1,6 +1,5 @@
 # StudymapPlannerFront
-Front end of the Studymap Planner for our P2 project
-hej
+Studymap Planner for our P2 project
 
 to use:
     type node server.js in terminal
