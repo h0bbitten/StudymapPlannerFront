@@ -49,7 +49,7 @@ function displayCalLectures(profile) {
   profile.courses.forEach(course => {
     course.contents.forEach(lecture => {
       let startTime = currentTime;
-      let endTime = currentTime + (60 * 60);
+      let endTime = currentTime + (120 * 60);
 
       let timeBlock = {
         title: course.fullname,

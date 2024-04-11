@@ -6,7 +6,7 @@ const calendar = document.getElementById('calendar');
 const weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
 const startStudyTime = 8; //parseInt(localStorage.getItem('startStudyTime') || "8", 10);
-const endStudyTime = 16; //parseInt(localStorage.getItem('endStudyTime') || "16", 10);
+const endStudyTime = 18; //parseInt(localStorage.getItem('endStudyTime') || "16", 10);
 
 const dayPX = (1500 / 24) * (endStudyTime - startStudyTime);
 const hourPX = dayPX / (endStudyTime - startStudyTime);
@@ -78,7 +78,7 @@ function loadMonthView() {
       const dayNumber = i - paddingDays;
       daySquare.innerText = dayNumber;
 
-      if (month === 2 && lectureIndex < lectures.length) { // Lige nu er der hardcoded til at vise lectures i marts siden der ikke kan hentes rigtige datoer fra moodle. Tænker vi stadig kan bruge den her metode til algoritmen.
+      if (month === 2 && lectureIndex < lectures.length) { 
         const eventPara = document.createElement('p');
         eventPara.classList.add('event');
         eventPara.textContent = lectures[lectureIndex++];
@@ -147,6 +147,7 @@ function addTimeBlock(startTime, endTime, title, description, color) {
   let currentDate = new Date();
   let currentWeekStart = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() - currentDate.getDay());
   let currentWeekEnd = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() + (6 - currentDate.getDay()));
+  $('.timeblock').css('font-size', '13px');
 
   let startDate = new Date(startTime * 1000);
 

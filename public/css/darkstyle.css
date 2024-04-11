@@ -162,6 +162,10 @@
   flex-wrap: wrap;
 }
 
+#calendar .time-labels .hour{
+  height:40px !important;
+ }
+
 /* Day styling */
 .day {
   width: 100px;
