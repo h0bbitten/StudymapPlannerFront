@@ -1,4 +1,4 @@
-export {applyTheme, setCookie, getCookie, LoadingScreen, displayProfile};
+export {applyTheme, setCookie, getCookie, LoadingScreen, displayProfile, settingsBtn};
 
 //Dark mode toggle
 async function applyTheme() {
@@ -25,6 +25,14 @@ async function applyTheme() {
     // Save theme preference in a cookie
     setCookie("theme", newTheme, 365); // Cookie expires in a year
   }
+}
+
+$('#settingsBtn').click(function() {
+  settingsBtn();
+});
+
+function settingsBtn() {
+  window.location.href = 'settings';
 }
 
 //Cookies

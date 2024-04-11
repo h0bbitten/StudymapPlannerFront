@@ -1,5 +1,6 @@
 import {applyTheme, LoadingScreen, displayProfile} from './script.js';
 
+
 let token = sessionStorage.getItem("token");
 let index = 0;
 let User = {};
@@ -171,8 +172,6 @@ function goToNextPage() {
     }
     
     console.log(amountOfCourses);
-    const startStudyTime = $('#startStudyTime').val();
-    const endStudyTime = $('#endStudyTime').val();
     
     if (index === amountOfCourses + 1) {
         $('#forms').append(`
