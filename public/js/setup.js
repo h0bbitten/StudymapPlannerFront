@@ -284,10 +284,11 @@ async function saveOptions() {
         }
 
     });
-    
+    User.settings = {};
+
     // Gemmer start / end study time.
-    User.startStudyTime = startStudyTime;
-    User.endStudyTime = endStudyTime;
+    User.settings.startStudyTime = startStudyTime;
+    User.settings.endStudyTime = endStudyTime;
     console.log(User.startStudyTime, User.endStudyTime);
 
     await saveOptionsToDB(User);
