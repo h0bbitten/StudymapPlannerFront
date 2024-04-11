@@ -193,7 +193,6 @@
 
 /* Week view specific styles */
 .week-view .day {
-  height: 1500px;
   width: 150px;
   position: relative;
 }

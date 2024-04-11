@@ -4,12 +4,11 @@ let nav = 0;
 let view = 'week';
 const calendar = document.getElementById('calendar');
 const weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-const dayPX = 1500;
 
-const startStudyTime = parseInt(localStorage.getItem('startStudyTime') || "8", 10);
-const endStudyTime = parseInt(localStorage.getItem('endStudyTime') || "20", 10);
+const startStudyTime = 8; //parseInt(localStorage.getItem('startStudyTime') || "8", 10);
+const endStudyTime = 16; //parseInt(localStorage.getItem('endStudyTime') || "16", 10);
 
-// Calculate hourPX based on the new range of hours
+const dayPX = (1500 / 24) * (endStudyTime - startStudyTime);
 const hourPX = dayPX / (endStudyTime - startStudyTime);
 const minutePX = hourPX / 60;
 
@@ -132,6 +131,8 @@ function loadWeekView() {
 
       $(`.day-interval-${day}`).append(`<div class="hour" id="hour${hour}" style="height: ${hourPX}px;"></div>`)
     }
+
+    $('.week-view .day').css('height', dayPX);
 
   }
     //console.log(lectures);
