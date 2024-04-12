@@ -54,11 +54,12 @@ User.courses.forEach((course, index) => {
     $('#formSetting').append(`
          <div class="collapsible-container">
             <button type="button" class="collapsible">${course.fullnamedisplay}</button>
-            <div class="lecturelist" id="course${index}">
-            
+                <div class="lecturelist" id="course${index}">
+
             <div class="buttons" ></div>
+                </div>
             </div>
-            </div>
+            
             `);
             
 
@@ -100,23 +101,25 @@ $(`#formSetting`).append(`
                     <span>End study time</span>              
                 </label>
             </div>
+            <div class="saveBtn"></div>
     `);
 
 
-for (i = 0; i < coll.length; i++) {
-    coll[i].addEventListener("click", function() {
-        this.classList.toggle("active");
-        var content = this.nextElementSibling;
-        if (content.style.display === "block") {
-            content.style.display = "none";
-        } else {
-            content.style.display = "block";
-        }
-    });
-}
-
-async function markAllChecks(){
-    let checkboxes = $('.checkbox-container input[type="checkbox"]');
+    for (i = 0; i < coll.length; i++) {
+        coll[i].addEventListener("click", function() {
+            this.classList.toggle("active");
+            var content = this.nextElementSibling;
+            if (content.style.display === "block") {
+                content.style.display = "none";
+            } else {
+                content.style.display = "block";
+            }
+        });
+    }
+    
+    
+    async function markAllChecks(){
+        let checkboxes = $('.checkbox-container input[type="checkbox"]');
     checkboxes.each((i, checkbox) => {
         checkbox.checked = true;
     });
