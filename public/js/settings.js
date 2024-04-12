@@ -39,17 +39,35 @@ User.courses.forEach((course, index) => {
         $(`#course${index}`).append(`
             <div class="checkbox checkbox-container">
                 <label class="checkbox-label" for="checkbox${k}">
-                    <input type="checkbox" id="checkbox${k}" name="type" value="${k}" checked/>
+                    <input type="checkbox" id="checkbox${k}" name="type" value="${k}" ${lecture.chosen ? "checked" : ""}/>
                     <span id="checkbox${k}Text">${lecture.name}</span>              
                 </label>
             </div>
         `);
     });
     index++;
+    
     // Read each course within the data
     console.log(course);
     // Add your code here to process each course
 });
+$(`#form0`).append(`
+    <div class="collapsible-container">
+        <button type="button" class="collapsible">Study Time</button>
+        <div class=lecturelist" id="studyTime" style="display: none">
+            <div class="checkbox checkbox-container">
+                <label class="checkbox-label" for="startStudyTime">
+                    <input type="time" id="startStudyTime" name="startStudyTime" value="${User.settings.startStudyTime}"/>
+                    <span>Start study time</span>              
+                </label>
+            </div>
+            <div class="checkbox checkbox-container">
+                <label class="checkbox-label" for="endStudyTime">
+                    <input type="time" id="endStudyTime" name="endStudyTime" value="${User.settings.endStudyTime}"/>
+                    <span>End study time</span>              
+                </label>
+            </div>
+    `);
 
 
 for (i = 0; i < coll.length; i++) {
@@ -63,3 +81,4 @@ for (i = 0; i < coll.length; i++) {
         }
     });
 }
+
