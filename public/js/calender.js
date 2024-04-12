@@ -141,6 +141,7 @@ function addTimeBlock(startTime, endTime, title, description, color) {
   let currentWeekStart = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() - currentDate.getDay());
   let currentWeekEnd = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() + (6 - currentDate.getDay()));
   $('.timeblock').css('font-size', '13px');
+  $('.timeblock').css('width', '130px');
 
   let startDate = new Date(startTime * 1000);
 

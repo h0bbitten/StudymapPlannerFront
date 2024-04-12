@@ -47,25 +47,30 @@ function displayCalLectures(profile) {
   let currentTime = 1712730500;//= Math.floor(Date.now() / 1000);
   const lectures = [];
   profile.courses.forEach(course => {
-    course.contents.forEach(lecture => {
-      let startTime = currentTime;
-      let min = 1;
-      let max = 7;
-      let endTime = currentTime + (Math.random() * (max - min) + min) * 60 * 60;
-      console.log(currentTime);
-
-      let timeBlock = {
-        title: course.fullname,
-        description: lecture.name,
-        startTime: startTime,
-        endTime: endTime,
-        color: course.color
-      };
-
-      currentTime = endTime + (15 * 60);
-
-      lectures.push(timeBlock);
-    });
+    if (course.chosen === true) {
+      course.contents.forEach(lecture => {
+        if (lecture.chosen === true) {
+          let startTime = currentTime;
+          let min = 1;
+          let max = 7;
+          let endTime = currentTime + (Math.random() * (max - min) + min) * 60 * 60;
+          console.log(currentTime);
+    
+          let timeBlock = {
+            title: course.fullname,
+            description: lecture.name,
+            startTime: startTime,
+            endTime: endTime,
+            color: course.color
+          };
+    
+          currentTime = endTime + (15 * 60);
+    
+          lectures.push(timeBlock);
+        }
+      });
+    }
+    
   });
   sessionStorage.setItem('lectures', JSON.stringify(lectures));
 
