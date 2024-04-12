@@ -1,4 +1,4 @@
-export {applyTheme, setCookie, getCookie, LoadingScreen, displayProfile, settingsBtn, saveOptionsToDB, Button};
+export {applyTheme, setCookie, getCookie, LoadingScreen, displayProfile, settingsBtn, saveUserDataToDB, Button, APIgetCall};
 
 //Dark mode toggle
 async function applyTheme() {
@@ -81,7 +81,7 @@ function displayProfile(profile) {
 }
 
 
-async function saveOptionsToDB(User) {
+async function saveUserDataToDB(User) {
   console.log(User);
   try {
       let response = await fetch(`http://localhost:3000/saveOptions`, {
@@ -99,6 +99,20 @@ async function saveOptionsToDB(User) {
   catch (error) {
       console.error('Error saving setup data:', error);
       throw error;
+  }
+}
+
+async function APIgetCall(url, errorCallback){
+  try {
+    const response = await fetch(`http://localhost:3000/${url}`);
+    if (!response.ok) {
+      throw new Error('Network response error');
+    }
+    return response.json();
+  } 
+  catch (error) {
+    console.error(errorCallback, error);
+    throw error;
   }
 }
 

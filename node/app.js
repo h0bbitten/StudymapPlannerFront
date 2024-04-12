@@ -1,7 +1,8 @@
-export {getMoodleInfo, testToken, saveOptions, getUserData};
+export {getMoodleInfo, testToken, saveOptions, getUserData, calculateSchedule};
 import {Webscraper} from "./scraping.js";
 import axios from 'axios';
 import fs from 'fs';
+import {mockAlgorithm} from "./Algorithm.js";
 
 class WSfunctions {
   constructor(token) {
@@ -53,6 +54,9 @@ async function testToken(req, res) {
     }
     else {
       req.session.token = req.query.token;
+      req.session.userid = tokenTry.userid;
+      req.session.fullname = tokenTry.fullname;
+      req.session.userpictureurl = tokenTry.userpictureurl;
       req.session.loggedIn = true;
       validity = "Valid Token";
     }
@@ -111,7 +115,7 @@ async function saveOptions(req, res) {
 
 async function getUserData(req, res) {
   try {
-    let User = await retrieveAndParseUserdData(req.query.userid);
+    let User = await retrieveAndParseUserData(req.session.userid);
     res.send(User);
   } catch (error) {
     console.error('Failed to get User data:', error);
@@ -119,7 +123,7 @@ async function getUserData(req, res) {
   }
 
 }
-function retrieveAndParseUserdData(userid){
+function retrieveAndParseUserData(userid){
   return new Promise((resolve, reject) => {
     fs.readFile(`./database/${userid}.json`, (err, data) => {
       if (err) {
@@ -131,6 +135,16 @@ function retrieveAndParseUserdData(userid){
   });
 }
 
+async function calculateSchedule(req, res) {
+  try {
+    let User = await retrieveAndParseUserData(req.session.userid);
+    let Timeblocks = await mockAlgorithm(User); // await Algorithm(User);
+    res.send(JSON.stringify(Timeblocks));
+  } catch (error) {
+    console.error('Failed to calculate schedule:', error);
+    res.status(500).send('Internal Server Error');
+  }
+}
 
 async function assignColor(integer){
   return new Promise((resolve, reject) => {

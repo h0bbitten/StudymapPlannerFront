@@ -1,7 +1,6 @@
-import {applyTheme, LoadingScreen, displayProfile, Button} from './script.js';
+import {applyTheme, LoadingScreen, displayProfile, Button, APIgetCall, saveUserDataToDB} from './script.js';
 
 
-let token = sessionStorage.getItem("token");
 let index = 0;
 let User = {};
 let amountOfCourses = 1;
@@ -11,22 +10,6 @@ let previous = new Button('goToPreviousPage', 'Previous');
 let next = new Button('goToNextPage', 'Next');
 let save = new Button('save', 'Save');
 
-async function getMoodleInfo(token){
-  try {
-    const response = await fetch(`http://localhost:3000/getMoodleInfo?token=${token}`);
-    if (!response.ok) {
-      throw new Error('Network response error');
-    }
-    return response.json();
-  } 
-  catch (error) {
-    console.error('Error fetching course pages:', error);
-    throw error;
-  }
-
-}
-
-
 async function setupInitialization() {
 
     let Loading = new LoadingScreen();
@@ -34,12 +17,11 @@ async function setupInitialization() {
     Loading.show();
 
     try {
-        User = await getMoodleInfo(token);
+        User = await APIgetCall('getMoodleInfo', 'Error retrieving Moodle info');
         console.log(User);
-        sessionStorage.setItem("userid", User.userid);
+
         displayProfile(User);
         showCourses(User);
-
 
         previous.addButton();
         next.addButton();
@@ -206,43 +188,17 @@ async function saveOptions() {
         }
 
     });
-    User.settings = {};
-
+    
     // Gemmer start / end study time.
+    User.settings = {};
     User.settings.startStudyTime = startStudyTime;
     User.settings.endStudyTime = endStudyTime;
     console.log(User.startStudyTime, User.endStudyTime);
 
-    await saveOptionsToDB(User);
+    await saveUserDataToDB(User);
     
     window.location.href = "schedule";
-
-    sessionStorage.setItem('startStudyTime', startStudyTime);
-    sessionStorage.setItem('endStudyTime', endStudyTime);
 }
-
-async function saveOptionsToDB(User) {
-    console.log(User);
-    try {
-        let response = await fetch(`http://localhost:3000/saveOptions`, {
-            method: 'POST',
-            cache: 'no-cache',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(User)
-        });
-        if (!response.ok) {
-            throw new Error('Network response error');
-        }
-    } 
-    catch (error) {
-        console.error('Error saving setup data:', error);
-        throw error;
-    }
-}
-
-
 
 function showCourses(User) { 
 

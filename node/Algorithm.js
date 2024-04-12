@@ -1,6 +1,36 @@
-export {Algorithm}; // Export the Algorithm function to be used in other files
-import {User} from './schedule.js'; // Import the User object from schedule.js
+export {Algorithm, mockAlgorithm};
 
+async function mockAlgorithm(User) {
+    console.log('Calculating schedule for:', User.fullname);
+    let currentTime = 1712730500;//Math.floor(Date.now() / 1000);
+    const lectures = [];
+    User.courses.forEach(course => {
+      if (course.chosen === true) {
+        course.contents.forEach(lecture => {
+          if (lecture.chosen === true) {
+            let startTime = currentTime;
+            let min = 1;
+            let max = 7;
+            let endTime = currentTime + (Math.random() * (max - min) + min) * 60 * 60;
+      
+            let timeBlock = {
+              title: course.fullname,
+              description: lecture.name,
+              startTime: startTime,
+              endTime: endTime,
+              color: course.color
+            };
+      
+            currentTime = endTime + (15 * 60);
+      
+            lectures.push(timeBlock);
+          }
+        });
+      }
+      
+    });
+    return lectures;  
+}
 
 class Course {
     constructor(queue, size, name, examDate, ECTS, subjects) {

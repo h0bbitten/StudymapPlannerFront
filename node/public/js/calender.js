@@ -15,10 +15,9 @@ const dayPX = (1000 / 24) * (endStudyTime - startStudyTime);
 const hourPX = dayPX / (endStudyTime - startStudyTime);
 const minutePX = hourPX / 60;
 
-const storedLectures = sessionStorage.getItem('lectures'); // Henter lectureNames fra local storage som er gemt i schedule.js
-let lectures = storedLectures ? JSON.parse(storedLectures) : [];
-
-function loadCalendar() {
+let Timeblocks = [];
+function loadCalendar(inputTimeblocks) {
+  Timeblocks = inputTimeblocks;
   initButtons();
   if (view === 'week') {
     loadWeekView();
@@ -71,10 +70,10 @@ function loadMonthView() {
       const dayNumber = i - paddingDays;
       daySquare.innerText = dayNumber;
 
-      if (month === 2 && lectureIndex < lectures.length) { 
+      if (month === 2 && lectureIndex < Timeblocks.length) { 
         const eventPara = document.createElement('p');
         eventPara.classList.add('event');
-        eventPara.textContent = lectures[lectureIndex++];
+        eventPara.textContent = Timeblocks[lectureIndex++];
         daySquare.appendChild(eventPara);
       }
     } else {
@@ -128,8 +127,8 @@ function loadWeekView() {
     $('.week-view .day').css('height', dayPX);
 
   }
-    //console.log(lectures);
-    lectures.forEach(lecture => {
+    //console.log(Timeblocks);
+    Timeblocks.forEach(lecture => {
       //console.log(lecture.startTime, lecture.endTime, lecture.title, lecture.description, lecture.color);
       addTimeBlock(lecture.startTime, lecture.endTime, lecture.title, lecture.description, lecture.color);
     })

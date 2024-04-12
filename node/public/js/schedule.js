@@ -1,22 +1,5 @@
-import {applyTheme, LoadingScreen, displayProfile} from './script.js';
+import {applyTheme, LoadingScreen, displayProfile, APIgetCall} from './script.js';
 import {loadCalendar} from './calender.js';
-
-let userid = sessionStorage.getItem("userid");
-
-async function getUserData(userid){
-  try {
-    const response = await fetch(`http://localhost:3000/getUserData?userid=${userid}`);
-    if (!response.ok) {
-      throw new Error('Network response error');
-    }
-    return response.json();
-  } 
-  catch (error) {
-    console.error('Error fetching user data:', error);
-    throw error;
-  }
-
-}
 
 async function scheduleInitialization() {
 
@@ -25,13 +8,13 @@ async function scheduleInitialization() {
   loading.show();
 
   try {
-    let User = await getUserData(userid);
+    let User = await APIgetCall(`getUserData`, 'Error fetching user data');
     console.log(User);
+
     displayProfile(User);
-    displayCalLectures(User);
+    displayCal(User);
 
     loading.hide();
-
   }
   catch (error) {
 
@@ -42,39 +25,11 @@ async function scheduleInitialization() {
   
 }
 
-function displayCalLectures(profile) {
+async function displayCal(profile) {
   
-  let currentTime = 1712730500;//= Math.floor(Date.now() / 1000);
-  const lectures = [];
-  profile.courses.forEach(course => {
-    if (course.chosen === true) {
-      course.contents.forEach(lecture => {
-        if (lecture.chosen === true) {
-          let startTime = currentTime;
-          let min = 1;
-          let max = 7;
-          let endTime = currentTime + (Math.random() * (max - min) + min) * 60 * 60;
-          console.log(currentTime);
-    
-          let timeBlock = {
-            title: course.fullname,
-            description: lecture.name,
-            startTime: startTime,
-            endTime: endTime,
-            color: course.color
-          };
-    
-          currentTime = endTime + (15 * 60);
-    
-          lectures.push(timeBlock);
-        }
-      });
-    }
-    
-  });
-  sessionStorage.setItem('lectures', JSON.stringify(lectures));
-
-  loadCalendar();
+  let Timeblocks = await APIgetCall('calculateSchedule', 'Error calculating schedule');
+  console.log(Timeblocks);
+  loadCalendar(Timeblocks);
 }
 
 applyTheme();
