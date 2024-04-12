@@ -1,5 +1,8 @@
 import {applyTheme} from './script.js';
+import {Algorithm} from './Algorithm.js';
+export {User};
 
+let User = {};
 let token = sessionStorage.getItem("token");
 
 async function getMoodleInfo(token){
@@ -22,7 +25,7 @@ async function scheduleInitialization() {
   LoadingScreen('show');
 
   try {
-    let User = await getMoodleInfo(token);
+    User = await getMoodleInfo(token);
     console.log(User);
     displayProfile(User);
 
