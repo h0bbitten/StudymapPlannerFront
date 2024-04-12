@@ -348,5 +348,58 @@
       padding: 0 18px;
       display: none;
       overflow: hidden;
-      background-color: #6695e8;
+      background-color: #315697;
     }
+
+    #buttons {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      
+    }
+  
+    .btn {
+      background-color: #385280;
+      border: none;
+      color: white;
+      padding: 10px 25px;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 16px;
+      margin-top: 10px;
+      margin-left: 10px;
+      transition-duration: 0.4s;
+      position: center;
+          
+    }
+  
+    .btn:hover {
+        background-color: #2b3e60;
+        color: white;
+    }
+  
+    .forms {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+  
+    #form0div {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      
+    }
+  
+    #header {
+      text-align: center;
+      justify-content: center;
+    }
+  
+    .studyTime {
+      margin-top: 20px;
+      margin-left: 20px;
+    }
+    
