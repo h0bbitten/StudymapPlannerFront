@@ -1,44 +1,35 @@
-function Algorithm(User) {
+export {Algorithm}; // Export the Algorithm function to be used in other files
+import {User} from './schedule.js'; // Import the User object from schedule.js
+
+
 class Course {
     constructor(queue, size, name, examDate, ECTS, subjects) {
         //Course info skal fetches her
         this.queue = [];
-        this.size = -1;
         this.name = User.name;
         this.examDate = examDate;
-        this.ECTS = ECTS;
-        this.subjects = subjects;
-        console.log(this.name);
+        this.ECTS = User.ECTS;
+        this.subjects = User.subjects;
+        console.log(this.queue);
+        console.log(this.ECTS);
     }
 }
 
-class CourseItem {
-    constructor()
-    {
-        //Course info skal fetches her
-    this.name;
-    this.subjects;
-    this.priority;
+class studyBlock {
+    constructor(date, duration) {
+        this.date = date;
+        this.duration = duration;
     }
 }
 
-for (var i = 0; i < 1000; i++)
+function enqueue(value, priority, size)
 {
-    this.queue.push(new CourseItem);
-}
+    size++;
 
-let size = -1;
-
-function enqueue(value, priority)
-{
-    this.size++;
-
-    this.queue[size] = new CourseItem();
     this.queue[size].value = value;
     this.queue[size].priority = priority;
 
 }
-
 function peek(value, priority)
 {
     let highestPriority = Number.MIN_SAFE_INTEGER;
@@ -79,24 +70,17 @@ function dequeue()
     this.size--;
 }
 
-function studyBlock(date, duration)
-{
-    //Her skal empty timeslots indsættes når det er indhentet fra brugerens skema
-    this.date = date;
-    this.duration = duration;
-}
+function Algorithm(User) {
 
-function createSchedule(courses, availableTimes, Queues)
-{
-    const schedule = [];
+User.courses.forEach(course => {
+    let courseSomething = new Course(course.queue, course.size, course.name, course.examDate, course.ECTS, course.subjects);
 
-    return schedule;
-}
-
-function sortExamsByDates()
-{
-    Course.examDate.sort();
-}
-
-return Course
+    course.contents.forEach((lecture, i) => {
+        courseSomething.queue.push( {name: lecture.name, priority: i} );
+    } );
+    
+    enqueue(courseSomething, courseSomething.priority, courseSomething.length);
+});
+console.log(User.queue);
+return User.queue;
 }
