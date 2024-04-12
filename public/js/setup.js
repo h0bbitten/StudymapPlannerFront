@@ -1,4 +1,4 @@
-import {applyTheme, LoadingScreen, displayProfile} from './script.js';
+import {applyTheme, LoadingScreen, displayProfile, Button} from './script.js';
 
 
 let token = sessionStorage.getItem("token");
@@ -6,27 +6,6 @@ let index = 0;
 let User = {};
 let amountOfCourses = 1;
 let checkboxes = null;
-
-class Button {
-    constructor(id, text) {
-        this.id = id;
-        this.text = text;
-    }
-    addButton() {
-        $("#buttons").append(`
-        <button id="${this.id}" class="btn btn-primary" style="display: none;">${this.text}</button>
-        `);
-    }
-    showButton() {
-        $(`#${this.id}`).show();
-    }
-    hideButton() {
-        $(`#${this.id}`).hide();
-    }
-    removeButton() {
-        $(`#${this.id}`).remove();
-    }
-}
 
 let previous = new Button('goToPreviousPage', 'Previous');
 let next = new Button('goToNextPage', 'Next');

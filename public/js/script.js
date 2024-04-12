@@ -1,4 +1,4 @@
-export {applyTheme, setCookie, getCookie, LoadingScreen, displayProfile, settingsBtn};
+export {applyTheme, setCookie, getCookie, LoadingScreen, displayProfile, settingsBtn, saveOptionsToDB, Button};
 
 //Dark mode toggle
 async function applyTheme() {
@@ -78,4 +78,47 @@ class LoadingScreen {
 
 function displayProfile(profile) {
   $("#user_profile").html(`<p>Welcome back ${profile.fullname}</p><img src="${profile.userpictureurl}" alt="Profile pic">`);
+}
+
+
+async function saveOptionsToDB(User) {
+  console.log(User);
+  try {
+      let response = await fetch(`http://localhost:3000/saveOptions`, {
+          method: 'POST',
+          cache: 'no-cache',
+          headers: {
+              'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(User)
+      });
+      if (!response.ok) {
+          throw new Error('Network response error');
+      }
+  } 
+  catch (error) {
+      console.error('Error saving setup data:', error);
+      throw error;
+  }
+}
+
+class Button {
+  constructor(id, text) {
+      this.id = id;
+      this.text = text;
+  }
+  addButton() {
+      $("#buttons").append(`
+      <button id="${this.id}" class="btn btn-primary" style="display: none;">${this.text}</button>
+      `);
+  }
+  showButton() {
+      $(`#${this.id}`).show();
+  }
+  hideButton() {
+      $(`#${this.id}`).hide();
+  }
+  removeButton() {
+      $(`#${this.id}`).remove();
+  }
 }

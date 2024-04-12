@@ -1,6 +1,31 @@
-import {applyTheme, setCookie, getCookie, LoadingScreen, displayProfile, settingsBtn} from './script.js';
+import {applyTheme, setCookie, getCookie, LoadingScreen, displayProfile, settingsBtn, saveOptionsToDB} from './script.js';
 let userid = sessionStorage.getItem("userid");
 let index = 0;
+
+class Button {
+    constructor(id, text) {
+        this.id = id;
+        this.text = text;
+    }
+    addButton() {
+        $(".buttons").append(`
+        <button id="${this.id}" class="btn btn-primary" style="display: none;">${this.text}</button>
+        `);
+    }
+    showButton() {
+        $(`#${this.id}`).show();
+    }
+    hideButton() {
+        $(`#${this.id}`).hide();
+    }
+    removeButton() {
+        $(`#${this.id}`).remove();
+    }
+  }
+let markAll = new Button("markAll", "Mark all");
+let clearAll = new Button("clearAll", "Clear all");
+let save = new Button("save", "Save");
+
 
 async function getUserData(userid){
         try {
@@ -30,10 +55,12 @@ User.courses.forEach((course, index) => {
          <div class="collapsible-container">
             <button type="button" class="collapsible">${course.fullnamedisplay}</button>
             <div class="lecturelist" id="course${index}">
-                        
-                    </div>
-                </div>
-        `);
+            
+            <div class="buttons" ></div>
+            </div>
+            </div>
+            `);
+            
 
     course.contents.forEach((lecture, k) => {
         $(`#course${index}`).append(`
@@ -51,6 +78,12 @@ User.courses.forEach((course, index) => {
     console.log(course);
     // Add your code here to process each course
 });
+
+markAll.addButton();
+clearAll.addButton();
+markAll.showButton();
+clearAll.showButton();
+
 $(`#form0`).append(`
     <div class="collapsible-container">
         <button type="button" class="collapsible">Study Time</button>
@@ -82,3 +115,24 @@ for (i = 0; i < coll.length; i++) {
     });
 }
 
+async function markAllChecks(){
+    let checkboxes = $('.checkbox-container input[type="checkbox"]');
+    checkboxes.each((i, checkbox) => {
+        checkbox.checked = true;
+    });
+}
+
+async function clearAllChecks(){
+    let checkboxes = $('.checkbox-container input[type="checkbox"]');
+    checkboxes.each((i, checkbox) => {
+        checkbox.checked = false;
+    });
+}
+
+async function saveOptions(User){
+
+
+}
+
+displayProfile(User);
+applyTheme();
