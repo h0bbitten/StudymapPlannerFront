@@ -105,6 +105,10 @@
       margin-left: auto;
       margin-right: auto;
     }
+
+    #container #header div{
+      width:75% !important;
+     }
     
     #header > div{
       display: flex;
@@ -121,6 +125,7 @@
   font-size: 22px;
   color: #edad4e;
   line-height: 41px;
+  padding-left:51px;
 }
 
 /* Header buttons */
@@ -149,9 +154,11 @@
 #weekdays {
   background-color: #385280;
   color: #ffffff;
-  width: 750px;
+  width: 1101px;
   display: flex;
   justify-content: space-between; /* Evenly distribute weekdays */
+  transform:translatex(0px) translatey(0px);
+  padding-left:51px;
 }
 
 /* Calendar container */
