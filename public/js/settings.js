@@ -56,7 +56,7 @@ User.courses.forEach((course, index) => {
             <button type="button" class="collapsible">${course.fullnamedisplay}</button>
                 <div class="lecturelist" id="course${index}">
 
-            <div class="buttons" ></div>
+                <div class="buttons" ></div>
                 </div>
             </div>
             
@@ -101,7 +101,7 @@ $(`#formSetting`).append(`
                     <span>End study time</span>              
                 </label>
             </div>
-            <div class="saveBtn"></div>
+
     `);
 
 
@@ -118,7 +118,7 @@ $(`#formSetting`).append(`
     }
     
     
-    async function markAllChecks(){
+async function markAllChecks(){
         let checkboxes = $('.checkbox-container input[type="checkbox"]');
     checkboxes.each((i, checkbox) => {
         checkbox.checked = true;
@@ -137,5 +137,7 @@ async function saveOptions(User){
 
 }
 
+$(document).on('click', '#markAll', markAllChecks);
+$(document).on('click', '#clearAll', clearAllChecks);
 displayProfile(User);
 applyTheme();
