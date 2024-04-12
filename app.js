@@ -6,64 +6,45 @@ import fs from 'fs';
 class WSfunctions {
   constructor(token) {
     this.token = token;
+    this.urlStart = `https://www.moodle.aau.dk/webservice/rest/server.php?wstoken=${this.token}&moodlewsrestformat=json&wsfunction=`;
+  }
+
+  async fetchMoodleData(url, errorCallback) {
+    try {
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error('Network response error');
+      }
+      return response.json();
+    } 
+    catch (error) {
+      console.error(errorCallback, error);
+      throw error;
+    }
   }
 
   async core_course_get_enrolled_courses_by_timeline_classification() {
-    try {
-      const response = await fetch(`https://www.moodle.aau.dk/webservice/rest/server.php?wstoken=${this.token}&moodlewsrestformat=json&wsfunction=core_course_get_enrolled_courses_by_timeline_classification&classification=inprogress`);
-      if (!response.ok) {
-        throw new Error('Network response error');
-      }
-      return response.json();
-    } 
-    catch (error) {
-      console.error('Error fetching enrolled courses:', error);
-      throw error;
-    }
+    const url = this.urlStart + `core_course_get_enrolled_courses_by_timeline_classification&classification=inprogress`;
+    return this.fetchMoodleData(url, 'Error fetching enrolled courses:');
   }
+
   async core_webservice_get_site_info() {
-    try {
-      const response = await fetch(`https://www.moodle.aau.dk/webservice/rest/server.php?wstoken=${this.token}&moodlewsrestformat=json&wsfunction=core_webservice_get_site_info`);
-      if (!response.ok) {
-        throw new Error('Network response error');
-      }
-      return response.json();
-    } 
-    catch (error) {
-      console.error('Error fetching user info:', error);
-      throw error;
-    }
+    const url = this.urlStart + `core_webservice_get_site_info`;
+    return this.fetchMoodleData(url, 'Error fetching User info:');
   }
+
   async core_course_get_contents(course_id) {
-    try {
-      const response = await fetch(`https://www.moodle.aau.dk/webservice/rest/server.php?wstoken=${this.token}&moodlewsrestformat=json&wsfunction=core_course_get_contents&courseid=${course_id}`);
-      if (!response.ok) {
-        throw new Error('Network response error');
-      }
-      return response.json();
-    } 
-    catch (error) {
-      console.error('Error fetching course contents:', error);
-      throw error;
-    }
+    const url = this.urlStart +  `core_course_get_contents&courseid=${course_id}`;
+    return this.fetchMoodleData(url, 'Error fetching course contents:');
   }
+
   async mod_page_get_pages_by_courses(course_id) {
-    try {
-      const response = await fetch(`https://www.moodle.aau.dk/webservice/rest/server.php?wstoken=${this.token}&moodlewsrestformat=json&wsfunction=mod_page_get_pages_by_courses&courseids[0]=${course_id}`);
-      if (!response.ok) {
-        throw new Error('Network response error');
-      }
-      return response.json();
-    } 
-    catch (error) {
-      console.error('Error fetching course pages:', error);
-      throw error;
-    }
+    const url = this.urlStart +  `mod_page_get_pages_by_courses&courseids[0]=${course_id}`;
+    return this.fetchMoodleData(url, 'Error fetching course pages:');
   }
 }
 async function testToken(req, res) {
-  let token = req.query.token;
-  let test = new WSfunctions(token)
+  let test = new WSfunctions(req.query.token)
   let validity = "";
   try {
     let tokenTry = await test.core_webservice_get_site_info();
@@ -84,17 +65,16 @@ async function testToken(req, res) {
 }
 async function getMoodleInfo(req, res) {
   try {
-    let token = req.session.token;
-    let Moodle = new WSfunctions(token);
-    let user = {};
+    let Moodle = new WSfunctions(req.session.token);
+    let User = {};
 
     try {
-      user = await Moodle.core_webservice_get_site_info();
+      User = await Moodle.core_webservice_get_site_info();
       let courseresponse = await Moodle.core_course_get_enrolled_courses_by_timeline_classification();
-      user.courses = courseresponse.courses;
-      user.courses = user.courses.filter(course => course.enddate !== 2527282800); // We should come up with better filtering system, maybe on clint side, but works for now
+      User.courses = courseresponse.courses;
+      User.courses = User.courses.filter(course => course.enddate !== 2527282800); // We should come up with better filtering system, maybe on client side, but works for now
 
-      let coursePromises = user.courses.map(async course => {
+      let coursePromises = User.courses.map(async course => {
         course.contents = await Moodle.core_course_get_contents(course.id);
         course.pages = await Moodle.mod_page_get_pages_by_courses(course.id);
         course.color = await assignColor(course.id);
@@ -106,7 +86,7 @@ async function getMoodleInfo(req, res) {
     } catch (error) {
       console.error('Failed to get enrolled courses:', error);
     }
-    res.send(user);
+    res.send(User);
   } catch (error) {
     res.status(500).send(`Error getting Moodle info: ${error}`);
   }
@@ -114,11 +94,11 @@ async function getMoodleInfo(req, res) {
 async function saveOptions(req, res) {
   try {
     console.log('Saving options');
-    let user = req.body;
-    fs.writeFile(`./database/${user.userid}.json`, JSON.stringify(user), (err) => {
+    let User = req.body;
+    fs.writeFile(`./database/${User.userid}.json`, JSON.stringify(User), (err) => {
       if (err) {
-        console.error('Error saving user data:', err);
-        res.status(500).send('Error saving user data');
+        console.error('Error saving User data:', err);
+        res.status(500).send('Error saving User data');
       } else {
         console.log('User data saved successfully');
         res.status(200).send('User data saved successfully');
@@ -131,10 +111,10 @@ async function saveOptions(req, res) {
 
 async function getUserData(req, res) {
   try {
-    let user = await retrieveAndParseUserdData(req.query.userid);
-    res.send(user);
+    let User = await retrieveAndParseUserdData(req.query.userid);
+    res.send(User);
   } catch (error) {
-    console.error('Failed to get user data:', error);
+    console.error('Failed to get User data:', error);
     res.status(500).send('Internal Server Error');
   }
 
