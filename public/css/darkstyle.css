@@ -265,7 +265,7 @@
       padding: 0 18px;
       display: none;
       overflow: hidden;
-      background-color: #315697;
+      background-color: #7a8290;
     }
 
     #buttons {
@@ -318,6 +318,10 @@
     .studyTime {
       margin-top: 20px;
       margin-left: 20px;
+    }
+
+    .checkbox {
+      margin-top: 5px;
     }
     
 #calendar .time-labels .hour{

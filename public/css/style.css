@@ -259,6 +259,7 @@
     display: none;
     overflow: hidden;
     align-items: center;
+    background-color: rgb(219, 219, 219);
   }
 
   #buttons {
@@ -300,9 +301,9 @@
     justify-content: center;
     align-items: center;
     flex-direction: column;
-    
   }
 
+  
   #header {
     text-align: center;
     justify-content: center;
