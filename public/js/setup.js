@@ -126,7 +126,7 @@ function goToNextPage() {
             if (checkbox.checked) {
                 index2++;
                 $('#forms').append(`
-                    <div id="form${index2}div">
+                    <div id="form${index2}div" class="forms">
                     <form id="form${index2}" style="display: none;">
                     <h3 id="${User.courses[i].id}">${User.courses[i].fullnamedisplay}</h3>
                     </form>
@@ -154,13 +154,13 @@ function goToNextPage() {
     
     if (index === amountOfCourses + 1) {
         $('#forms').append(`
-            <div id="form${index + 1}div">
+            <div id="form${index + 1}div" class="forms">
                 <form id="form${index + 1}" style="display: none;">
                     <h2>Choose Study Time</h2>
                    
-                    <input type="time" id="startStudyTime" name="appt" min="01:00" max="00:00" value="08:00" required/>
+                    <input type="time" class="studyTime" id="startStudyTime" name="appt" min="01:00" max="00:00" value="08:00" required/>
                     
-                    <input type="time" id="endStudyTime" name="appt" min="01:00" max="00:00" value="16:00" required/>
+                    <input type="time" class="studyTime" id="endStudyTime" name="appt" min="01:00" max="00:00" value="16:00" required/>
         `);
         $(`#form${index}`).hide();
         $(`#form${index + 1}`).show();      
@@ -249,7 +249,7 @@ function showCourses(User) {
     else {
         User.courses.forEach((course, index) => {
             $('#form0').append(`
-            <div class="checkbox checkbox-container">
+            <div class="form0">
             <label class="checkbox-label" for="checkbox${index}">
                <input type="checkbox" id="checkbox${index}" name="type" value="${index}" checked/>
                  <span id="checkbox${index}Text">${course.fullnamedisplay}</span>              

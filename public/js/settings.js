@@ -51,7 +51,7 @@ let i;
 
 User.courses.forEach((course, index) => {
     let k = 0;
-    $('#form0').append(`
+    $('#formSetting').append(`
          <div class="collapsible-container">
             <button type="button" class="collapsible">${course.fullnamedisplay}</button>
             <div class="lecturelist" id="course${index}">
