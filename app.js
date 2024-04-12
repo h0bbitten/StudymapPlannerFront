@@ -124,8 +124,7 @@ async function saveOptions(req, res) {
     }
     console.log(`Parsed userid: ${useridInt}`);
 
-    // Ensure user exists in the database or insert them
-    await ensureUserExists(user.userid); //Det er gået op for mig, den her skal flyttes, fordi den gemmer før json blive manipuleret
+
 
     // Filter the user object to keep only the required information
     const userDataToSave = {
@@ -137,6 +136,8 @@ async function saveOptions(req, res) {
         pages: course.pages 
       }))
     };
+
+    await ensureUserExists(useridInt);
 
     // Continue with filesystem saving, now with filtered data
     fs.writeFile(`./database/${useridInt}.json`, JSON.stringify(userDataToSave, null, 2), (err) => {
