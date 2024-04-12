@@ -216,6 +216,9 @@ async function saveOptions() {
     await saveOptionsToDB(User);
     
     window.location.href = "schedule";
+
+    sessionStorage.setItem('startStudyTime', startStudyTime);
+    sessionStorage.setItem('endStudyTime', endStudyTime);
 }
 
 async function saveOptionsToDB(User) {
@@ -263,4 +266,3 @@ setupInitialization();
 $(document).on('click', '#goToNextPage', goToNextPage);
 $(document).on('click', '#goToPreviousPage', goToPreviousPage);
 $(document).on('click', '#save', saveOptions);
-

@@ -1,14 +1,25 @@
+export { loadCalendar};
+
 let nav = 0;
 let view = 'week';
 const calendar = document.getElementById('calendar');
 const weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
-const storedLectureNames = localStorage.getItem('lectureNames'); // Henter lectureNames fra local storage som er gemt i schedule.js
-let lectures = storedLectureNames ? JSON.parse(storedLectureNames) : [];
+//const startStudyTimeValue = sessionStorage.getItem('startStudyTime');
+const startStudyTime = 0;//= parseInt(startStudyTimeValue, 10);
 
-let lectureIndex = 0;
+//const endStudyTimeValue = sessionStorage.getItem('endStudyTime');
+const endStudyTime = 24;//= parseInt(endStudyTimeValue, 10);
 
-function load() {
+const dayPX = (1000 / 24) * (endStudyTime - startStudyTime);
+const hourPX = dayPX / (endStudyTime - startStudyTime);
+const minutePX = hourPX / 60;
+
+const storedLectures = sessionStorage.getItem('lectures'); // Henter lectureNames fra local storage som er gemt i schedule.js
+let lectures = storedLectures ? JSON.parse(storedLectures) : [];
+
+function loadCalendar() {
+  initButtons();
   if (view === 'week') {
     loadWeekView();
   } else {
@@ -60,7 +71,7 @@ function loadMonthView() {
       const dayNumber = i - paddingDays;
       daySquare.innerText = dayNumber;
 
-      if (month === 2 && lectureIndex < lectures.length) { // Lige nu er der hardcoded til at vise lectures i marts siden der ikke kan hentes rigtige datoer fra moodle. Tænker vi stadig kan bruge den her metode til algoritmen.
+      if (month === 2 && lectureIndex < lectures.length) { 
         const eventPara = document.createElement('p');
         eventPara.classList.add('event');
         eventPara.textContent = lectures[lectureIndex++];
@@ -82,57 +93,88 @@ function loadWeekView() {
   const dayOfWeek = today.getDay();
   const startOfWeek = new Date(today.setDate(today.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1)));
 
-  document.getElementById('monthDisplay').innerText = 
+  document.getElementById('monthDisplay').innerText =
     `Week of ${startOfWeek.toLocaleDateString('en-us', { month: 'long', day: 'numeric' })}`;
 
   calendar.innerHTML = '';
 
-  for (let i = 0; i < 7; i++) {
-    const dayInterval = document.createElement('div');
-    dayInterval.classList.add('day-interval');
 
-    const daySquare = document.createElement('div');
-    daySquare.classList.add('day');
+  $('#calendar').append(`<div class="time-labels"></div>`)
 
-    let weekDay = new Date(startOfWeek.getFullYear(), startOfWeek.getMonth(), startOfWeek.getDate() + i);
-    //daySquare.innerText = weekDay.toLocaleDateString('en-us', { weekday: 'long', month: 'numeric', day: 'numeric' });
+  for (let hour = startStudyTime; hour <= endStudyTime; hour++) {
+    $('.time-labels').append(`<div class="hour" style="height: ${hourPX}px; display: flex; align-items: center; padding-left: 10px;">${hour}:00</div>`);
+  }
+
+  for (let day = 1; day <= 7; day++) {
+
+    $('#calendar').append(`<div class="day-interval-${day}"></div>`)
+  
+
+
+    let weekDay = new Date(startOfWeek.getFullYear(), startOfWeek.getMonth(), startOfWeek.getDate() + day);
+
+
+    $(`.day-interval-${day}`).append(`<div class="day" id="day${day}" style="flex: 1;">${weekDay.getDate()}</div>`);
 
     if (weekDay.toDateString() === new Date().toDateString()) {
-      daySquare.classList.add('current-day');
+      $(`#day${day}`).addClass('current-day');
     }
 
-    dayInterval.appendChild(daySquare);
+    for (let hour = 1; hour <= 24; hour++) {
 
-    for (let hour = 7; hour <= 21; hour++) {
-      const hourSlot = document.createElement('div');
-      hourSlot.classList.add('hour');
-      hourSlot.style.height = '60px'; 
-    
-      const hourLabel = document.createElement('span');
-      hourLabel.classList.add('hour-label');
-      hourLabel.textContent = `${hour}:00`; 
-      hourSlot.appendChild(hourLabel); 
-
-    daySquare.appendChild(hourSlot);
+      $(`.day-interval-${day}`).append(`<div class="hour" id="hour${hour}" style="height: ${hourPX}px;"></div>`)
     }
 
+    $('.week-view .day').css('height', dayPX);
+
+  }
+    //console.log(lectures);
     lectures.forEach(lecture => {
-      let testLectures = ['You', 'are', 'a', 'mother', 'fucker'];
-      const event = document.createElement('div');
-      event.classList.add('event');
-      for(let i = 0; i < testLectures.length; i++){
-        event.textContent = testLectures;
-      event.style.position = 'absolute';
-      event.style.top = '120px'; //Hver hour er 30px. Hours starter fra 08:00 til 20:00, så hvis man vil placere en lecture kl. 08:00, så skal man skrive '30px'. Hvis den skal placeres kl. 14:00 er det 6 gange 30 fordi der er 6 timer fra kl. 08:00 til 14:00, og så skrive '360px'.
-      daySquare.appendChild(event); 
-      }
-    });
+      //console.log(lecture.startTime, lecture.endTime, lecture.title, lecture.description, lecture.color);
+      addTimeBlock(lecture.startTime, lecture.endTime, lecture.title, lecture.description, lecture.color);
+    })
 
-    calendar.appendChild(dayInterval);
+    console.log(startStudyTime, endStudyTime);
+}
+function addTimeBlock(startTime, endTime, title, description, color) {
+  let currentDate = new Date();
+  let currentWeekStart = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() - currentDate.getDay());
+  let currentWeekEnd = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() + (6 - currentDate.getDay()));
+  $('.timeblock').css('font-size', '13px');
+  $('.timeblock').css('width', '130px');
+
+  let startDate = new Date(startTime * 1000);
+
+  if (startDate >= currentWeekStart && startDate <= currentWeekEnd) {
+    // Calculate the day of the week (Monday = 0, Tuesday = 1, ...)
+    let dayOfWeek = startDate.getDay();
+    // Adjust to start from 1 (Monday = 1, Tuesday = 2, ...)
+    if (dayOfWeek === 0) {
+      dayOfWeek = 7; // Sunday
+    }
+    // Append the time block to the appropriate day and hour
+    $(`#day${dayOfWeek}`).append(createTimeBlock(startTime, endTime, title, description, color));
   }
 }
+function createTimeBlock(startTime, endTime, title, description, color) {
+  // Calculate the height of the timeblock based on the duration
+  const startHour = new Date(startTime * 1000).getHours() - startStudyTime;
+  const startMinutes = new Date(startTime * 1000).getMinutes();
+  const duration = (endTime - startTime) / 3600;
+  const height = duration * hourPX;
+  const top = (startHour * hourPX) + (startMinutes * minutePX);
 
-
+  console.log(startTime);
+  // Create the HTML markup for the timeblock
+  const html = `
+      <div class="timeblock" style="height: ${height}px; background-color: ${color}; position: absolute; top: ${top}px;">
+          <div class="time">${new Date(startTime * 1000).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'})} - ${new Date(endTime * 1000).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'})}</div>
+          <div class="title">${title}</div>
+          <div class="description" style="display: none;">${description}</div>
+      </div>
+  `;
+  return html;
+}
 function initButtons() {
   document.getElementById('nextButton').addEventListener('click', () => {
     if(view === 'month') {
@@ -147,7 +189,7 @@ function initButtons() {
   document.getElementById('backButton').addEventListener('click', () => {
     if(view === 'month') {
       nav--;
-      load();
+      loadCalendar();
     } else {
       nav -= 7;
       loadWeekView();
@@ -157,15 +199,12 @@ function initButtons() {
   document.getElementById('weekButton').addEventListener('click', () => {
     view = 'week';
     nav = 0;
-    load();
+    loadCalendar();
   });
 
   document.getElementById('monthButton').addEventListener('click', () => {
     view = 'month';
     nav = 0;
-    load();
+    loadCalendar();
   });
 }
-
-initButtons();
-load();

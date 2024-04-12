@@ -1,4 +1,5 @@
 import {applyTheme, LoadingScreen, displayProfile} from './script.js';
+import {loadCalendar} from './calender.js';
 
 let userid = sessionStorage.getItem("userid");
 
@@ -42,29 +43,38 @@ async function scheduleInitialization() {
 }
 
 function displayCalLectures(profile) {
-
-
-  const lectureNames = [];
+  
+  let currentTime = 1712730500;//= Math.floor(Date.now() / 1000);
+  const lectures = [];
   profile.courses.forEach(course => {
-    course.contents.forEach(lecture => {
-      lectureNames.push(lecture.name);
-    });
-
+    if (course.chosen === true) {
+      course.contents.forEach(lecture => {
+        if (lecture.chosen === true) {
+          let startTime = currentTime;
+          let min = 1;
+          let max = 7;
+          let endTime = currentTime + (Math.random() * (max - min) + min) * 60 * 60;
+          console.log(currentTime);
+    
+          let timeBlock = {
+            title: course.fullname,
+            description: lecture.name,
+            startTime: startTime,
+            endTime: endTime,
+            color: course.color
+          };
+    
+          currentTime = endTime + (15 * 60);
+    
+          lectures.push(timeBlock);
+        }
+      });
+    }
+    
   });
-  localStorage.setItem('lectureNames', JSON.stringify(lectureNames));
+  sessionStorage.setItem('lectures', JSON.stringify(lectures));
 
- // if (profile.courses && profile.courses.length > 0) {
-  //  profile.courses.forEach(course => {
-  //    const courseLecturesList = $(`<div class="course-lectures"><h3>${course.fullname} Lectures:</h3><ul></ul></div>`);
-  //    course.contents.forEach(lecture => {
-  //      courseLecturesList.find("ul").append(`<li>${lecture.name}</li>`);
-   //   });
-      //$("#courses").append(courseLecturesList);
-     // $("#courses").append(courseLecturesList);
-    //});
-  //} else {
-  //  $("#courses").append("<p>You are not enrolled in any courses.</p>");
-  //}
+  loadCalendar();
 }
 
 applyTheme();
