@@ -236,3 +236,80 @@
     background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black */
     z-index: 9998; /* Ensure it's above other elements but below the loading GIF */
   }
+  .collapsible {
+    background-color: #385280;
+    color: #ffffff;
+    cursor: pointer;
+    padding: 18px;
+    width: 100%;
+    border: none;
+    text-align: left;
+    outline: none;
+    font-size: 15px;
+  }
+  
+  /* Add a background color to the button if it is clicked on (add the .active class with JS), and when you move the mouse over it (hover) */
+  .active, .collapsible:hover {
+    background-color: #243554;
+  }
+  
+  /* Style the collapsible content. Note: hidden by default */
+  .lecturelist {
+    padding: 0 18px;
+    display: none;
+    overflow: hidden;
+    align-items: center;
+  }
+
+  #buttons {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+  }
+
+  .btn {
+    background-color: #385280;
+    border: none;
+    color: white;
+    padding: 10px 25px;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin-top: 10px;
+    margin-left: 10px;
+    transition-duration: 0.4s;
+    position: center;
+        
+  }
+
+  .btn:hover {
+      background-color: #2b3e60;
+      color: white;
+  }
+
+  .forms {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+  }
+
+  #form0div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    
+  }
+
+  #header {
+    text-align: center;
+    justify-content: center;
+  }
+
+  .studyTime {
+    margin-top: 20px;
+    margin-left: 20px;
+  }
+  

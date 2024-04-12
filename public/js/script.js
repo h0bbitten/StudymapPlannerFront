@@ -1,4 +1,4 @@
-export {applyTheme, setCookie, getCookie};
+export {applyTheme, setCookie, getCookie, LoadingScreen, displayProfile, settingsBtn, saveOptionsToDB, Button};
 
 //Dark mode toggle
 async function applyTheme() {
@@ -27,6 +27,14 @@ async function applyTheme() {
   }
 }
 
+$('#settingsBtn').click(function() {
+  settingsBtn();
+});
+
+function settingsBtn() {
+  window.location.href = 'settings';
+}
+
 //Cookies
 function setCookie(name, value, daysToLive){
   const date = new Date();
@@ -47,3 +55,70 @@ function getCookie(name) {
   return null;
 }
 
+//Loading screen
+class LoadingScreen {
+  add() {
+      $("body").append(`
+      <div id="loading-overlay"></div>
+      <div id="loading">
+        <img src="../img/XOsX.gif" alt="Loading">
+      </div>
+      `);
+  }
+  show() {
+    $("#loading").show();
+    $("#loading-overlay").show();
+  }
+
+  hide() {
+    $("#loading").hide();
+    $("#loading-overlay").hide();
+  }
+}
+
+function displayProfile(profile) {
+  $("#user_profile").html(`<p>Welcome back ${profile.fullname}</p><img src="${profile.userpictureurl}" alt="Profile pic">`);
+}
+
+
+async function saveOptionsToDB(User) {
+  console.log(User);
+  try {
+      let response = await fetch(`http://localhost:3000/saveOptions`, {
+          method: 'POST',
+          cache: 'no-cache',
+          headers: {
+              'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(User)
+      });
+      if (!response.ok) {
+          throw new Error('Network response error');
+      }
+  } 
+  catch (error) {
+      console.error('Error saving setup data:', error);
+      throw error;
+  }
+}
+
+class Button {
+  constructor(id, text) {
+      this.id = id;
+      this.text = text;
+  }
+  addButton() {
+      $("#buttons").append(`
+      <button id="${this.id}" class="btn btn-primary" style="display: none;">${this.text}</button>
+      `);
+  }
+  showButton() {
+      $(`#${this.id}`).show();
+  }
+  hideButton() {
+      $(`#${this.id}`).hide();
+  }
+  removeButton() {
+      $(`#${this.id}`).remove();
+  }
+}

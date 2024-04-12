@@ -1,20 +1,17 @@
-import {applyTheme} from './script.js';
-import {Algorithm} from './Algorithm.js';
-export {User};
+import {applyTheme, LoadingScreen, displayProfile} from './script.js';
 
-let User = {};
-let token = sessionStorage.getItem("token");
+let userid = sessionStorage.getItem("userid");
 
-async function getMoodleInfo(token){
+async function getUserData(userid){
   try {
-    const response = await fetch(`http://localhost:3000/getMoodleInfo?token=${token}`);
+    const response = await fetch(`http://localhost:3000/getUserData?userid=${userid}`);
     if (!response.ok) {
       throw new Error('Network response error');
     }
     return response.json();
   } 
   catch (error) {
-    console.error('Error fetching course pages:', error);
+    console.error('Error fetching user data:', error);
     throw error;
   }
 
@@ -22,39 +19,30 @@ async function getMoodleInfo(token){
 
 async function scheduleInitialization() {
 
-  LoadingScreen('show');
+  let loading = new LoadingScreen();
+  loading.add();
+  loading.show();
 
   try {
-    User = await getMoodleInfo(token);
+    let User = await getUserData(userid);
     console.log(User);
     displayProfile(User);
+    displayCalLectures(User);
 
-    console.log(Algorithm(User));
-    LoadingScreen('hide');
-    
+    loading.hide();
+
   }
   catch (error) {
 
-    LoadingScreen('hide');
+    loading.hide();
 
     console.error('Failed to display profile info:', error);
   }
   
 }
 
-function LoadingScreen(toggle){
-  if (toggle === 'show') {
-    $("#loading").show();
-    $("#loading-overlay").show();
-  }
-  if (toggle === 'hide') {
-    $("#loading").hide();
-    $("#loading-overlay").hide();
-  }
-}
+function displayCalLectures(profile) {
 
-function displayProfile(profile) {
-  $("#user_profile").html(`<p>Welcome back ${profile.fullname}</p><img src="${profile.userpictureurl}" alt="Profile pic">`);
 
   const lectureNames = [];
   profile.courses.forEach(course => {

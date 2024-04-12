@@ -1,6 +1,7 @@
-export {getMoodleInfo, testToken};
+export {getMoodleInfo, testToken, saveOptions, getUserData};
 import {Webscraper} from "./scraping.js";
 import axios from 'axios';
+import fs from 'fs';
 
 class WSfunctions {
   constructor(token) {
@@ -110,7 +111,45 @@ async function getMoodleInfo(req, res) {
     res.status(500).send(`Error getting Moodle info: ${error}`);
   }
 }
+async function saveOptions(req, res) {
+  try {
+    console.log('Saving options');
+    let user = req.body;
+    fs.writeFile(`./database/${user.userid}.json`, JSON.stringify(user), (err) => {
+      if (err) {
+        console.error('Error saving user data:', err);
+        res.status(500).send('Error saving user data');
+      } else {
+        console.log('User data saved successfully');
+        res.status(200).send('User data saved successfully');
+      }
+    });
+  } catch (err) {
+    res.status(500).send('Internal Server Error');
+  }
+}
 
+async function getUserData(req, res) {
+  try {
+    let user = await retrieveAndParseUserdData(req.query.userid);
+    res.send(user);
+  } catch (error) {
+    console.error('Failed to get user data:', error);
+    res.status(500).send('Internal Server Error');
+  }
+
+}
+function retrieveAndParseUserdData(userid){
+  return new Promise((resolve, reject) => {
+    fs.readFile(`./database/${userid}.json`, (err, data) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(JSON.parse(data));
+      }
+    });
+  });
+}
 const colors = [
   "#FF0000", // Red
   "#00FF00", // Lime
@@ -249,3 +288,6 @@ async function findModulelink(course) {
 
   return linkPart !== null ? `https://moduler.aau.dk/course/${linkPart}?lang=en-GB` : undefined;
 }
+
+
+

@@ -1,5 +1,5 @@
 let nav = 0;
-let view = 'month';
+let view = 'week';
 const calendar = document.getElementById('calendar');
 const weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
@@ -86,37 +86,52 @@ function loadWeekView() {
     `Week of ${startOfWeek.toLocaleDateString('en-us', { month: 'long', day: 'numeric' })}`;
 
   calendar.innerHTML = '';
-  let times = ['08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00'];
-  const timeTest = document.createElement('div');
-  timeTest.classList.add('times');
 
-  for (let i = 0; i < times.length; i++) {
-    const timeItem = document.createElement('div');
-    timeItem.classList.add('time');
-    timeItem.textContent = times[i];
-    timeTest.appendChild(timeItem);
-  }
-  calendar.appendChild(timeTest);
+  for (let i = 0; i < 7; i++) {
+    const dayInterval = document.createElement('div');
+    dayInterval.classList.add('day-interval');
 
-  for(let i = 0; i < 7; i++) {
     const daySquare = document.createElement('div');
     daySquare.classList.add('day');
-    let weekDay = new Date(startOfWeek.setDate(startOfWeek.getDate() + (i === 0 ? 0 : 1)));
-    daySquare.innerText = weekDay.getDate();
+
+    let weekDay = new Date(startOfWeek.getFullYear(), startOfWeek.getMonth(), startOfWeek.getDate() + i);
+    //daySquare.innerText = weekDay.toLocaleDateString('en-us', { weekday: 'long', month: 'numeric', day: 'numeric' });
+
     if (weekDay.toDateString() === new Date().toDateString()) {
       daySquare.classList.add('current-day');
     }
 
-    if (lectures.length > 0) {
-      const eventPara = document.createElement('p');
-      eventPara.classList.add('event');
-      eventPara.textContent = lectures[(lectureIndex + i) % lectures.length];
-      daySquare.appendChild(eventPara);
+    dayInterval.appendChild(daySquare);
+
+    for (let hour = 7; hour <= 21; hour++) {
+      const hourSlot = document.createElement('div');
+      hourSlot.classList.add('hour');
+      hourSlot.style.height = '60px'; 
+    
+      const hourLabel = document.createElement('span');
+      hourLabel.classList.add('hour-label');
+      hourLabel.textContent = `${hour}:00`; 
+      hourSlot.appendChild(hourLabel); 
+
+    daySquare.appendChild(hourSlot);
     }
 
-    calendar.appendChild(daySquare);
+    lectures.forEach(lecture => {
+      let testLectures = ['You', 'are', 'a', 'mother', 'fucker'];
+      const event = document.createElement('div');
+      event.classList.add('event');
+      for(let i = 0; i < testLectures.length; i++){
+        event.textContent = testLectures;
+      event.style.position = 'absolute';
+      event.style.top = '120px'; //Hver hour er 30px. Hours starter fra 08:00 til 20:00, så hvis man vil placere en lecture kl. 08:00, så skal man skrive '30px'. Hvis den skal placeres kl. 14:00 er det 6 gange 30 fordi der er 6 timer fra kl. 08:00 til 14:00, og så skrive '360px'.
+      daySquare.appendChild(event); 
+      }
+    });
+
+    calendar.appendChild(dayInterval);
   }
 }
+
 
 function initButtons() {
   document.getElementById('nextButton').addEventListener('click', () => {
