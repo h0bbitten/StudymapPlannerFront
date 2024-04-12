@@ -84,10 +84,10 @@ clearAll.addButton();
 markAll.showButton();
 clearAll.showButton();
 
-$(`#form0`).append(`
+$(`#formSetting`).append(`
     <div class="collapsible-container">
         <button type="button" class="collapsible">Study Time</button>
-        <div class=lecturelist" id="studyTime" style="display: none">
+        <div class="lecturelist" id="studyTime" style="display: none">
             <div class="checkbox checkbox-container">
                 <label class="checkbox-label" for="startStudyTime">
                     <input type="time" id="startStudyTime" name="startStudyTime" value="${User.settings.startStudyTime}"/>
