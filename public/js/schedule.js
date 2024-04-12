@@ -44,12 +44,15 @@ async function scheduleInitialization() {
 
 function displayCalLectures(profile) {
   
-  let currentTime = Math.floor(Date.now() / 1000);
+  let currentTime = 1712730500;//= Math.floor(Date.now() / 1000);
   const lectures = [];
   profile.courses.forEach(course => {
     course.contents.forEach(lecture => {
       let startTime = currentTime;
-      let endTime = currentTime + (120 * 60);
+      let min = 1;
+      let max = 7;
+      let endTime = currentTime + (Math.random() * (max - min) + min) * 60 * 60;
+      console.log(currentTime);
 
       let timeBlock = {
         title: course.fullname,
@@ -64,7 +67,7 @@ function displayCalLectures(profile) {
       lectures.push(timeBlock);
     });
   });
-  localStorage.setItem('lectures', JSON.stringify(lectures));
+  sessionStorage.setItem('lectures', JSON.stringify(lectures));
 
   loadCalendar();
 }
