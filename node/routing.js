@@ -39,7 +39,6 @@ const routing = function(app) {
     });
     app.get('/schedule', (req, res) => {
         // Send the /html/schedule.html file when /schedule is accessed
-        console.log('User is logged in: ',req.session.loggedIn)
         if (req.session.loggedIn === true) {
             res.sendFile(path.join(__dirname, 'public', 'html', 'schedule.html'));
         }
@@ -49,7 +48,13 @@ const routing = function(app) {
     });
     app.get('/settings', (req, res) => {
         // Send the /html/settings.html file when /settings is accessed
-        res.sendFile(path.join(__dirname, 'public', 'html', 'settings.html'));
+        console.log('User is logged in: ',req.session.loggedIn)
+        if (req.session.loggedIn === true) {
+            res.sendFile(path.join(__dirname, 'public', 'html', 'settings.html'));
+        }
+        else {
+            res.redirect('/login');
+        }  
     });
     app.get('/favicon.ico', (req, res) => {
         res.sendFile(path.join(__dirname, '/public/img/favicon.ico'))

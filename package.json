@@ -10,7 +10,7 @@
     "swagger-ui-express": "^5.0.0"
   },
   "scripts": {
-    "start": "node server.js"
+    "server": "node node/server.js"
   },
   "name": "studymapplannerfront",
   "description": "Front end of the Studymap Planner for our P2 project",

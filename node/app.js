@@ -9,7 +9,7 @@ class WSfunctions {
     this.urlStart = `https://www.moodle.aau.dk/webservice/rest/server.php?wstoken=${this.token}&moodlewsrestformat=json&wsfunction=`;
   }
 
-  async fetchMoodleData(url, errorCallback) {
+  async getMoodleData(url, errorCallback) {
     try {
       const response = await fetch(url);
       if (!response.ok) {
@@ -25,22 +25,22 @@ class WSfunctions {
 
   async core_course_get_enrolled_courses_by_timeline_classification() {
     const url = this.urlStart + `core_course_get_enrolled_courses_by_timeline_classification&classification=inprogress`;
-    return this.fetchMoodleData(url, 'Error fetching enrolled courses:');
+    return this.getMoodleData(url, 'Error fetching enrolled courses:');
   }
 
   async core_webservice_get_site_info() {
     const url = this.urlStart + `core_webservice_get_site_info`;
-    return this.fetchMoodleData(url, 'Error fetching User info:');
+    return this.getMoodleData(url, 'Error fetching User info:');
   }
 
   async core_course_get_contents(course_id) {
     const url = this.urlStart +  `core_course_get_contents&courseid=${course_id}`;
-    return this.fetchMoodleData(url, 'Error fetching course contents:');
+    return this.getMoodleData(url, 'Error fetching course contents:');
   }
 
   async mod_page_get_pages_by_courses(course_id) {
     const url = this.urlStart +  `mod_page_get_pages_by_courses&courseids[0]=${course_id}`;
-    return this.fetchMoodleData(url, 'Error fetching course pages:');
+    return this.getMoodleData(url, 'Error fetching course pages:');
   }
 }
 async function testToken(req, res) {
