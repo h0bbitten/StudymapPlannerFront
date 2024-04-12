@@ -125,7 +125,7 @@ async function saveOptions(req, res) {
     console.log(`Parsed userid: ${useridInt}`);
 
     // Ensure user exists in the database or insert them
-    await ensureUserExists(user.userid);
+    await ensureUserExists(user.userid); //Det er gået op for mig, den her skal flyttes, fordi den gemmer før json blive manipuleret
 
     // Filter the user object to keep only the required information
     const userDataToSave = {
@@ -133,8 +133,8 @@ async function saveOptions(req, res) {
       courses: user.courses.map(course => ({
         id: course.id,
         fullname: course.fullname,
-        contents: course.contents, // Assuming you want to keep all contents as is
-        pages: course.pages // Assuming you want to keep all page info as is
+        contents: course.contents, 
+        pages: course.pages 
       }))
     };
 
