@@ -130,6 +130,41 @@ function retrieveAndParseUserdData(userid){
     });
   });
 }
+
+
+async function assignColor(integer){
+  return new Promise((resolve, reject) => {
+    if (Number.isInteger(integer) && integer > 0) {
+        let index = integer % colors.length;
+        let color = colors[index];
+
+        colors.splice(index, 1);
+
+        resolve(color);
+    } else {
+        reject(new Error("Input must be a positive integer"));
+    }
+});}
+
+async function findModulelink(course) {
+  const regex = /https:\/\/moduler\.aau\.dk\/course\/([^?]+)/;
+  
+  let linkPart = null;
+
+  course.pages.pages.forEach(page => {
+      const content = page.content;
+      const match = regex.exec(content);
+      if (match && match[1]) {
+          linkPart = match[1];
+          return;
+      }
+  });
+
+  return linkPart !== null ? `https://moduler.aau.dk/course/${linkPart}?lang=en-GB` : undefined;
+}
+
+
+
 const colors = [
   "#FF0000", // Red
   "#00FF00", // Lime
@@ -237,37 +272,3 @@ const colors = [
   "#D3D3D3", // LightGray
   "#FFFFFF"  // White
 ];
-
-async function assignColor(integer){
-  return new Promise((resolve, reject) => {
-    if (Number.isInteger(integer) && integer > 0) {
-        let index = integer % colors.length;
-        let color = colors[index];
-
-        colors.splice(index, 1);
-
-        resolve(color);
-    } else {
-        reject(new Error("Input must be a positive integer"));
-    }
-});}
-
-async function findModulelink(course) {
-  const regex = /https:\/\/moduler\.aau\.dk\/course\/([^?]+)/;
-  
-  let linkPart = null;
-
-  course.pages.pages.forEach(page => {
-      const content = page.content;
-      const match = regex.exec(content);
-      if (match && match[1]) {
-          linkPart = match[1];
-          return;
-      }
-  });
-
-  return linkPart !== null ? `https://moduler.aau.dk/course/${linkPart}?lang=en-GB` : undefined;
-}
-
-
-
