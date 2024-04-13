@@ -1,4 +1,4 @@
-export {getMoodleInfo, testToken, saveOptions, getUserData, calculateSchedule};
+export {getMoodleInfo, logIn, saveOptions, getUserData, calculateSchedule};
 import {Webscraper} from "./scraping.js";
 import axios from 'axios';
 import fs from 'fs';
@@ -44,13 +44,13 @@ class WSfunctions {
     return this.getMoodleData(url, 'Error fetching course pages:');
   }
 }
-async function testToken(req, res) {
+async function logIn(req, res) {
   let test = new WSfunctions(req.query.token)
-  let validity = "";
+  let answer = {};
   try {
     let tokenTry = await test.core_webservice_get_site_info();
     if (tokenTry.errorcode === 'invalidtoken') {
-      validity = "Invalid Token";
+      answer.validity = "Invalid Token";
     }
     else {
       req.session.token = req.query.token;
@@ -58,10 +58,15 @@ async function testToken(req, res) {
       req.session.fullname = tokenTry.fullname;
       req.session.userpictureurl = tokenTry.userpictureurl;
       req.session.loggedIn = true;
-      validity = "Valid Token";
+
+      answer.validity = "Valid Token";
+
+      let User = await retrieveAndParseUserData(req.session.userid);
+      answer.redirect = User.settings.setupDone === true ? 'schedule' : 'setup';
     }
-    console.log(validity);
-    res.send(validity);
+    console.log('answer is:', answer);
+    console.log(answer.validity);
+    res.send(JSON.stringify(answer));
   }
   catch (error) {
     console.error('Failed to test token:', error);

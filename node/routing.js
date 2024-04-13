@@ -2,7 +2,7 @@ import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import path from 'path';
 import {swaggerDocs} from './swagger.js';
-import {getMoodleInfo, testToken, saveOptions, getUserData, calculateSchedule} from "./app.js";
+import {getMoodleInfo, logIn, saveOptions, getUserData, calculateSchedule} from "./app.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -89,9 +89,9 @@ const routing = function(app) {
      *       500:
      *         description: Internal server error
      */
-    app.get('/testToken', async (req, res) => {
-        await testToken(req, res).catch(error => {
-            console.error("Error in testToken:", error);
+    app.get('/getLogIn', async (req, res) => {
+        await logIn(req, res).catch(error => {
+            console.error("Error logging in:", error);
             res.status(500).send("Internal Server Error");
         });
     });
@@ -112,7 +112,15 @@ const routing = function(app) {
             res.status(500).send("Internal Server Error");
         });
     });
-    //app.get('/logout', (req, res) => {});
+    app.get('/logout', (req, res) => {
+        req.session.destroy(err => {
+            if (err) {
+                console.error('Error destroying session:', err);
+                return res.status(500).send('Internal Server Error');
+            }
+            res.redirect('/login');
+        });
+    });
     app.get('/calculateSchedule', async (req, res) => {
         await calculateSchedule(req, res).catch(error => {
             console.error("Error in getting calculating schedule:", error);

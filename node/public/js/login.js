@@ -1,4 +1,4 @@
-import {applyTheme} from './script.js';
+import {applyTheme, APIgetCall} from './script.js';
 
 //Login function
 function handleLogin() {
@@ -6,13 +6,11 @@ function handleLogin() {
     
     loginBtn.addEventListener("click", async () => {
         //Get token from input field
-        let token = document.getElementById("tokenInput").value;
-        let isValid = await validToken(token);
-        console.log(isValid);
-        if (isValid) {
-            //sessionStorage.setItem("token", token);
-            window.location.href = "setup";
-        };
+        let token = $('#tokenInput').val();
+        let answer = await validToken(token);
+        if (answer.validity) {
+            window.location.href = answer.redirect;
+        }
     });
 }
 
@@ -35,9 +33,9 @@ async function validToken(token) {
     // Check if token is valid
     try {
         token = token.trim(" ");
-        let response = await testToken(token);
-        console.log(response);
-        if (response === 'Invalid Token') {
+        let response = await APIgetCall(`getLogIn?token=${token}`, 'Error fetching token validity');
+        console.log(response.validity);
+        if (response.validity === 'Invalid Token') {
             Toastify({
                 text: "Invalid Token.",
                 duration: 1500,
@@ -51,7 +49,7 @@ async function validToken(token) {
             return false;
         }
         else {
-            return true;
+            return response;
         }
     } catch (error) {
         console.error('Error validating token:', error);
@@ -59,19 +57,5 @@ async function validToken(token) {
     }
 }
 
-async function testToken(token) {
-    try {
-        let response = await fetch(`http://localhost:3000/testToken?token=${token}`);
-        if (!response.ok) {
-          throw new Error('Network response error');
-        }
-        const data = await response.text();
-        return data;
-      } 
-      catch (error) {
-        console.error('Error fetching token validity:', error);
-        throw error;
-    }
-}
 applyTheme();
 handleLogin();

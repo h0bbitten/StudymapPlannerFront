@@ -195,6 +195,8 @@ async function saveOptions() {
     User.settings.endStudyTime = endStudyTime;
     console.log(User.startStudyTime, User.endStudyTime);
 
+    User.settings.setupDone = true;
+
     await saveUserDataToDB(User);
     
     window.location.href = "schedule";
