@@ -31,15 +31,3 @@ app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
   routing(app);
 });
-
-/*
- *
- * TODO:
- *      -We have two package.json files in the project,
- *          one in the root directory and one in the client directory.
- *      -Webscraper is not working correctly.
- *
- *
- *
- *
- */
