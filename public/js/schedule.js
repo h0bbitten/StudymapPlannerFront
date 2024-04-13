@@ -51,7 +51,7 @@ function displayCalLectures(profile) {
       course.contents.forEach(lecture => {
         if (lecture.chosen === true) {
           let startTime = currentTime;
-          let min = 1;
+          let min = 3;
           let max = 7;
           let endTime = currentTime + (Math.random() * (max - min) + min) * 60 * 60;
           console.log(currentTime);

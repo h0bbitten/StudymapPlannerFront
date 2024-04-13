@@ -7,11 +7,11 @@ let view = 'week';
 const calendar = document.getElementById('calendar');
 const weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
-//const startStudyTimeValue = sessionStorage.getItem('startStudyTime');
-const startStudyTime = 0;//= parseInt(startStudyTimeValue, 10);
+const startStudyTimeValue = sessionStorage.getItem('startStudyTime');
+const startStudyTime = parseInt(startStudyTimeValue, 10);
 
-//const endStudyTimeValue = sessionStorage.getItem('endStudyTime');
-const endStudyTime = 24;//= parseInt(endStudyTimeValue, 10);
+const endStudyTimeValue = sessionStorage.getItem('endStudyTime');
+const endStudyTime = parseInt(endStudyTimeValue, 10);
 
 const dayPX = (1000 / 24) * (endStudyTime - startStudyTime);
 const hourPX = dayPX / (endStudyTime - startStudyTime);
@@ -141,7 +141,9 @@ function loadWeekView() {
 function addTimeBlock(startTime, endTime, title, description, color) {
   let currentDate = new Date();
   let currentWeekStart = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() - currentDate.getDay());
+  let nextWeekStart = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() + (7 - currentDate.getDay()));
   let currentWeekEnd = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() + (6 - currentDate.getDay()));
+  let nextWeekEnd = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() + (13 - currentDate.getDay()));
 
   $('.timeblock').css('font-size', '13px');
   $('.timeblock').css('width', '130px');

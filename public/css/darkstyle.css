@@ -265,10 +265,35 @@
 }
 
 .timeblock {
-  height: 50px;
-  width: 100%;
-  border-bottom: 1px solid #000;
   display: flex;
+  flex-direction: column;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
+  padding: 8px;
+  font-size: 0.75rem; /* 14px */
+  font-weight: 500;
+  background-color: #f0f0f0; /* light grey background for contrast */
+  border: 1px solid #ccc; /* subtle border */
+  border-radius: 4px;
+  margin-bottom: 4px;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  overflow: auto;
+  line-height: 1.2;
+    transition: transform 0.3s ease, z-index 0s linear 0.3s; /* Smooth transition for transform and delayed z-index */
+  transform-origin: top; /* Ensures the block scales from the top edge */
+  z-index: 1; /* Keeps the block under others by default */
+}
+.timeblock .time {
+  font-weight: bold;
+  color: #333;
+}
+
+.timeblock .title {
+  color: #555;
+  font-size: clamp(0.75rem, 2.5vw, 0.875rem);
+}
+
+.timeblock .description {
+  display: block; /* show the description by default */
+  color: #777;
 }
