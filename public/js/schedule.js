@@ -44,7 +44,7 @@ async function scheduleInitialization() {
 
 function displayCalLectures(profile) {
   
-  let currentTime = 1712730500;//= Math.floor(Date.now() / 1000);
+  let currentTime = 1712556000;//= Math.floor(Date.now() / 1000);
   const lectures = [];
   profile.courses.forEach(course => {
     if (course.chosen === true) {

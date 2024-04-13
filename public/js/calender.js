@@ -1,3 +1,5 @@
+//import e from "cors";
+
 export { loadCalendar};
 
 let nav = 0;
@@ -140,21 +142,30 @@ function addTimeBlock(startTime, endTime, title, description, color) {
   let currentDate = new Date();
   let currentWeekStart = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() - currentDate.getDay());
   let currentWeekEnd = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() + (6 - currentDate.getDay()));
+
   $('.timeblock').css('font-size', '13px');
   $('.timeblock').css('width', '130px');
 
   let startDate = new Date(startTime * 1000);
+  let endDate = new Date(endTime * 1000);
 
-  if (startDate >= currentWeekStart && startDate <= currentWeekEnd) {
-    // Calculate the day of the week (Monday = 0, Tuesday = 1, ...)
-    let dayOfWeek = startDate.getDay();
-    // Adjust to start from 1 (Monday = 1, Tuesday = 2, ...)
-    if (dayOfWeek === 0) {
-      dayOfWeek = 7; // Sunday
-    }
-    // Append the time block to the appropriate day and hour
-    $(`#day${dayOfWeek}`).append(createTimeBlock(startTime, endTime, title, description, color));
+  // Hvis timeblok slutter efter kl 00:00, så skal den starte på næste dag
+  if (endDate.getDate() !== startDate.getDate()) {
+    let startOfNextDay = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate() + 1);
+    startTime = startOfNextDay.getTime() / 1000; 
+    startDate = new Date(startTime * 1000); 
   }
+
+  let startHour = startDate.getHours();
+  let endHour = new Date(endTime * 1000).getHours();
+
+  if (startHour >= startStudyTime && endHour <= endStudyTime && startDate >= currentWeekStart && startDate <= currentWeekEnd) { //
+    let dayOfWeek = startDate.getDay();
+    if (dayOfWeek === 0) {
+      dayOfWeek = 7; // Adjust Sunday to index 7
+    }
+    $(`#day${dayOfWeek}`).append(createTimeBlock(startTime, endTime, title, description, color));
+  } 
 }
 function createTimeBlock(startTime, endTime, title, description, color) {
   // Calculate the height of the timeblock based on the duration
@@ -163,18 +174,22 @@ function createTimeBlock(startTime, endTime, title, description, color) {
   const duration = (endTime - startTime) / 3600;
   const height = duration * hourPX;
   const top = (startHour * hourPX) + (startMinutes * minutePX);
+  
 
+  // Log the start time for debugging purposes
   console.log(startTime);
+
   // Create the HTML markup for the timeblock
   const html = `
       <div class="timeblock" style="height: ${height}px; background-color: ${color}; position: absolute; top: ${top}px;">
-          <div class="time">${new Date(startTime * 1000).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'})} - ${new Date(endTime * 1000).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'})}</div>
+          <div class="time">${new Date(startTime * 1000).toLocaleTimeString('en-GB', {hour: '2-digit', minute: '2-digit', hour12: false})} - ${new Date(endTime * 1000).toLocaleTimeString('en-GB', {hour: '2-digit', minute: '2-digit', hour12: false})}</div>
           <div class="title">${title}</div>
           <div class="description" style="display: none;">${description}</div>
       </div>
   `;
   return html;
 }
+
 function initButtons() {
   document.getElementById('nextButton').addEventListener('click', () => {
     if(view === 'month') {
