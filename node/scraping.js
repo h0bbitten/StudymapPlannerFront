@@ -4,7 +4,7 @@ import puppeteer from 'puppeteer';
 import { promises as fs } from 'fs';
 
 //path til filen hvor scrapet data vil blive gemt
-const filePath = 'courseDetails.txt';
+const filePath = 'database/courseDetails.txt';
 
 //async tillader brugen af await funktionen, hvormed vi kan afvente til en handling er udført med at fortsætte funktionen
 async function Webscraper(url, forceUpdate = false) {

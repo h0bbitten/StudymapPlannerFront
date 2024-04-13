@@ -29,4 +29,4 @@ FROM node:14
 EXPOSE 3000
 
 # Define the command to start the server
-CMD ["node", "server.js"]  # Assuming server.js is the entry point for your server code
+CMD ["npm", "run", "server"]

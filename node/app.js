@@ -61,15 +61,19 @@ async function logIn(req, res) {
 
       answer.validity = "Valid Token";
 
-      let User = await retrieveAndParseUserData(req.session.userid);
-      answer.redirect = User.settings.setupDone === true ? 'schedule' : 'setup';
+      try {
+        let User = await retrieveAndParseUserData(req.session.userid);
+        answer.redirect = User.settings.setupDone === true ? 'schedule' : 'setup';
+      } catch (error) {
+        console.log('User not found, redirecting to setup');
+        answer.redirect = 'setup';
+      }
     }
     console.log('answer is:', answer);
-    console.log(answer.validity);
     res.send(JSON.stringify(answer));
   }
   catch (error) {
-    console.error('Failed to test token:', error);
+    console.error('Failed loggin in:', error);
   }
 }
 async function getMoodleInfo(req, res) {
