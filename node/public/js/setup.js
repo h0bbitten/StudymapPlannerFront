@@ -12,9 +12,8 @@ const next = new Button('goToNextPage', 'Next');
 const save = new Button('save', 'Save');
 
 async function setupInitialization() {
-  const Loading = new LoadingScreen();
-  Loading.add();
-  Loading.show();
+  LoadingScreen.add();
+  LoadingScreen.show();
 
   try {
     User = await APIgetCall('getMoodleInfo', 'Error retrieving Moodle info');
@@ -27,9 +26,9 @@ async function setupInitialization() {
     next.addButton();
     save.addButton();
     next.showButton();
-    Loading.hide();
+    LoadingScreen.hide();
   } catch (error) {
-    Loading.hide();
+    LoadingScreen.hide();
 
     console.error('Failed to show enrolled courses options:', error);
   }
@@ -82,6 +81,7 @@ function goToNextPage() {
     checkboxes = $('input[type=checkbox]');
     amountOfCourses = $('input[type=checkbox]:checked').length;
     if (amountOfCourses === 0) {
+      // eslint-disable-next-line no-undef
       Toastify({
         text: 'Please select atleast one course.',
         duration: 1500,
@@ -152,6 +152,7 @@ async function saveOptions() {
   const endStudyTime = $('#endStudyTime').val();
 
   if (startStudyTime === endStudyTime || startStudyTime > endStudyTime) {
+    // eslint-disable-next-line no-undef
     Toastify({
       text: 'Invalid.',
       duration: 1500,

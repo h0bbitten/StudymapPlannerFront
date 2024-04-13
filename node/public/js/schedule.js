@@ -4,10 +4,8 @@ import {
 import loadCalendar from './calender.js';
 
 async function scheduleInitialization() {
-  const loading = new LoadingScreen();
-  loading.add();
-  loading.show();
-
+  LoadingScreen.add();
+  LoadingScreen.show();
   try {
     const User = await APIgetCall('getUserData', 'Error fetching user data');
     console.log(User);
@@ -15,9 +13,9 @@ async function scheduleInitialization() {
     displayProfile(User);
     displayCal();
 
-    loading.hide();
+    LoadingScreen.hide();
   } catch (error) {
-    loading.hide();
+    LoadingScreen.hide();
 
     console.error('Failed to display profile info:', error);
   }

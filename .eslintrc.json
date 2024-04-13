@@ -18,6 +18,7 @@
         "no-use-before-define": "off",
         "no-console": "off",
         "no-param-reassign": "off",
-        "no-plusplus": "off"
+        "no-plusplus": "off",
+        "linebreak-style": "off"
     }
 }

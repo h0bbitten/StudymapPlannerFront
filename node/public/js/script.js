@@ -41,18 +41,14 @@ function getCookie(name) {
   const cDecoded = decodeURIComponent(document.cookie);
   const cArray = cDecoded.split(';');
 
-  for (const element of cArray) {
-    const cookie = element.trim();
-    if (cookie.startsWith(`${name}=`)) {
-      return cookie.substring(name.length + 1);
-    }
-  }
-  return null;
+  const cookie = cArray.find((element) => element.trim().startsWith(`${name}=`));
+
+  return cookie ? cookie.substring(name.length + 1) : null;
 }
 
 // Loading screen
 class LoadingScreen {
-  add() {
+  static add() {
     $('body').append(`
       <div id="loading-overlay"></div>
       <div id="loading">
@@ -61,12 +57,12 @@ class LoadingScreen {
       `);
   }
 
-  show() {
+  static show() {
     $('#loading').show();
     $('#loading-overlay').show();
   }
 
-  hide() {
+  static hide() {
     $('#loading').hide();
     $('#loading-overlay').hide();
   }
