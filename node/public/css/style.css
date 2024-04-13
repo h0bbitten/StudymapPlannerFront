@@ -94,129 +94,338 @@
     text-decoration: underline;
   }
   
-  /* Adjustments for the calendar section for better readability in light theme */
-  #container {
-    padding: 20px;
-    width: 900px;
-  }
-  
-  #header {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 20px;
-  }
-  
-  #header div, #weekdays div {
-    width: 100px;
-    padding: 10px;
-    margin: auto;
-    border-right: 2px solid #ddd; /* Lighter border for a softer look */
-  }
-  
-  #weekdays {
-    background-color: #e9ecef; /* Lighter shade for header, improved contrast */
-    color: #333; /* Dark text for better readability */
-    width: 775px;
-    display: flex;
-  }
-  
-  #calendar {
-    width: 100%;
-    margin: auto;
-    display: flex;
-    flex-wrap: wrap;
-  }
-  
-  .day {
-    width: 100px;
-    padding: 10px;
-    height: 100px;
-    cursor: pointer;
-    box-sizing: border-box;
-    background-color: #ffffff; /* Light background for days */
-    margin: 5px;
-    box-shadow: 0px 0px 3px rgba(0, 0, 0, 0.1); /* Soft shadow for depth */
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-  }
-  
-  .day:hover {
-    background-color: #f8f9fa; /* Very light grey for hover, subtle effect */
-  }
-  
-  .event {
-    font-size: 10px;
-    padding: 3px;
-    background-color: #007bff; /* Bright blue for visibility */
-    color: white;
-    border-radius: 5px;
-    max-height: 55px;
-    overflow: hidden;
-  }
-  
-  .padding {
-    cursor: default !important;
-    background-color: #f0f0f0 !important; /* Matches body background for seamless look */
-    box-shadow: none
+    /* Container */
+    #container {
+      padding: 20px;
+      width: 1500px;
+      text-align: left;
+      margin-left: auto;
+      margin-right: auto;
     }
-  #backButton {
-    font-size: 1.15em;
-    background-color: #1c54b2;
-    color: #ffffff;
-    border: none;
-    padding: 10px 20px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    width: 35px;
-    cursor: pointer;
-    box-shadow: 0px 0px 2px gray;
-    border: none;
-    outline: none;
-    padding: 5px;
-    border-radius: 5px;
-    position: relative;
-    top:  15px;
-    right: 100px;
-  }
-  #nextButton {
-    font-size: 1.15em;
-    background-color: #1c54b2;
-    color: #ffffff;
-    border: none;
-    padding: 10px 20px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    width: 35px;
-    cursor: pointer;
-    box-shadow: 0px 0px 2px gray;
-    border: none;
-    outline: none;
-    padding: 5px;
-    border-radius: 5px;
-    position: relative;
-    top:  15px;
-    right: 30px;
-  }
-  #weekButton{
-    font-size: 1.15em;
-    background-color: #1c54b2;
-    color: #ffffff;
-    border: none;
-    padding: 10px 20px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    width: 60px;
-    cursor: pointer;
-    box-shadow: 0px 0px 2px gray;
-    border: none;
-    outline: none;
-    padding: 5px;
-    border-radius: 5px;
-    position: relative;
-    top:  15px;
-    right: 95px;
-  }
+
+    #container #header div{
+      width:75% !important;
+     }
+    
+    #header > div{
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      padding: 10px;
+      transform:translatex(0px) translatey(0px);
+      /*margin-bottom: 20px;*/
+      
+    }
+   /* Month display */
+#monthDisplay{
+  font-family:'Arial Black','Arial Bold',Gadget,sans-serif;
+  font-size:28px;
+ }
+ 
+    
+    #header div,
+    #weekdays div {
+      width: 100px;
+      padding: 10px;
+      margin: auto;
+      border-right: 2px solid #000000;
+    }
+    
+    #weekdays {
+      order: 2;
+      background-color: #385280;
+      color: #ffffff;
+      width: 700px;
+      display: flex;
+    }
+    
+    #calendar {
+      order: 2;
+      width: auto;
+      margin-left: auto;
+      display: flex;
+      flex-wrap: wrap;
+    }
+    .day {
+      width: 100px;
+      padding: 10px;
+      height: 100px;
+      cursor: pointer;
+      box-sizing: border-box;
+      background-color: rgb(63, 63, 63);
+      margin: 0;
+      box-shadow: 0px 0px 3px #CBD4C2;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .day:hover {
+      background-color: #233e6d;
+    }
+    
+    .day + #currentDay {
+      background-color:#385280;
+    }
+    .day + #currentDay:hover{
+      background-color: #385280;
+    }
+    
+/* Month display */
+#monthDisplay {
+  font-family: "Alata", sans-serif;
+  font-size: 22px;
+  color: #edad4e;
+  line-height: 41px;
+  padding-left:51px;
+}
+
+/* Header buttons */
+#header button {
+  font-family: "Allerta", sans-serif;
+  font-size: 1.15em;
+  background-color: #385280;
+  color: #ffffff;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  box-shadow: 0px 0px 2px gray;
+  border-radius: 5px;
+  outline: none;
+}
+
+/* Weekday headers */
+#weekdays div {
+  width: 150px;
+  padding: 10px;
+  margin: auto;
+  text-align: center;
+}
+
+#weekdays {
+  background-color: #385280;
+  color: #ffffff;
+  width: 1101px;
+  display: flex;
+  justify-content: space-between; /* Evenly distribute weekdays */
+  transform:translatex(0px) translatey(0px);
+  padding-left:51px;
+}
+
+/* Calendar container */
+#calendar {
+  width: auto;
+  margin-left: auto;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+    #loading {
+      display: none; /* Initially hidden */
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 9999;
+    }
+      /* Style for the loading overlay */
+    #loading-overlay {
+      display: none; /* Initially hidden */
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black */
+      z-index: 9998; /* Ensure it's above other elements but below the loading GIF */
+    }
+
+    .collapsible {
+      background-color: #385280;
+      color: #ffffff;
+      cursor: pointer;
+      padding: 18px;
+      width: 100%;
+      border: none;
+      text-align: left;
+      outline: none;
+      font-size: 15px;
+    }
+    
+    /* Add a background color to the button if it is clicked on (add the .active class with JS), and when you move the mouse over it (hover) */
+    .active, .collapsible:hover {
+      background-color: #243554;
+    }
+    
+    /* Style the collapsible content. Note: hidden by default */
+    .lecturelist {
+      padding: 0 18px;
+      display: none;
+      overflow: hidden;
+      background-color: #7a8290;
+    }
+
+    #buttons {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      
+    }
+  
+    .btn {
+      background-color: #385280;
+      border: none;
+      color: white;
+      padding: 10px 25px;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 16px;
+      margin-top: 10px;
+      margin-left: 10px;
+      transition-duration: 0.4s;
+      position: center;
+          
+    }
+  
+    .btn:hover {
+        background-color: #2b3e60;
+        color: white;
+    }
+  
+    .forms {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+  
+    #form0div {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      
+    }
+  
+    #header {
+      text-align: center;
+      justify-content: center;
+    }
+  
+    .studyTime {
+      margin-top: 20px;
+      margin-left: 20px;
+    }
+
+    .checkbox {
+      margin-top: 5px;
+    }
+    
+#calendar .time-labels .hour{
+  height:40px !important;
+ }
+
+/* Day styling */
+.day {
+  width: 100px;
+  padding: 10px;
+  height: 100px;
+  cursor: pointer;
+  box-sizing: border-box;
+  background-color: rgb(63, 63, 63);
+  margin: 0;
+  box-shadow: 0px 0px 3px #cbd4c2;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border: 1px solid #ccc;
+
+}
+
+.day:hover {
+  background-color: #233e6d;
+}
+
+.day + #currentDay {
+  background-color: #385280;
+}
+
+.day + #currentDay:hover {
+  background-color: #385280;
+}
+
+/* Week view specific styles */
+.week-view .day {
+  width: 150px;
+  position: relative;
+}
+
+.week-view .day:hover {
+  background-color: #385280;
+}
+
+.week-view .day + #currentDay {
+  background-color: #694d00;
+}
+
+.week-view .day + #currentDay:hover {
+  background-color: #385280;
+}
+
+/* Time labels */
+.hour-label {
+  display: block;
+  text-align: right;
+  padding-right: 5px;
+  color: #fff;
+  font-size: 0.8em;
+  height: 20px;
+  line-height: 20px;
+  border-bottom: 1px #000000 solid;
+}
+
+/* Event styling */
+.event {
+  font-size: 10px;
+  padding: 3px;
+  background-color: #385280;
+  color: white;
+  border-radius: 5px;
+  max-height: 55px;
+  overflow: hidden;
+}
+
+/* Padding styling (unused in your HTML) */
+.padding {
+  cursor: default !important;
+  background-color: rgb(63, 63, 63) !important;
+  box-shadow: none !important;
+}
+
+/* Times column (unused in your HTML) */
+.times {
+  order: 1;
+  width: 60px;
+  padding: 10px;
+  height: 450px;
+  cursor: pointer;
+  box-sizing: border-box;
+  background-color: rgb(63, 63, 63);
+  margin: 20px;
+  box-shadow: 0px 0px 3px #cbd4c2;
+  display: flex;
+}
+
+.timeblock {
+  height: 50px;
+  width: 100%;
+  border-bottom: 1px solid #000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+
   #loading {
     display: none; /* Initially hidden */
     position: fixed;
@@ -314,3 +523,28 @@
     margin-left: 20px;
   }
   
+
+  :root {
+    --text-color: #333;
+    --background-color: #fff;
+    --link-color: #007bff;
+  }
+
+  .dark-mode {
+    --text-color: #fff;
+    --background-color: #121212;
+    --link-color: #6c757d;
+  }
+
+  body {
+    color: var(--text-color);
+    background-color: var(--background-color);
+  }
+  .dark-mode nav {
+    background-color: #1f1f1f; /* Slightly lighter dark shade for navbar */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.5); /* Darker shadow for depth */
+  }
+
+  .dark-mode .navbar-icon img {
+    filter: invert(1);
+  }

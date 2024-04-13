@@ -1,11 +1,10 @@
 export {applyTheme, setCookie, getCookie, LoadingScreen, displayProfile, settingsBtn, saveUserDataToDB, Button, APIgetCall};
 
-//Dark mode toggle
 async function applyTheme() {
-  // Check for saved theme preference on page load
+
   const savedTheme = getCookie("theme");
-  if (savedTheme) {
-    $('#theme-style').attr('href', savedTheme);
+  if (savedTheme === "dark") {
+    $('body').addClass('dark-mode');
   }
 
   $('#dark-mode-btn').click(function() {
@@ -13,17 +12,12 @@ async function applyTheme() {
   });
 
   function toggleDarkMode() {
-    const themeStyle = $('#theme-style');
-    const currentTheme = themeStyle.attr('href');
-    const darkTheme = '../css/darkstyle.css';
-    const lightTheme = '../css/style.css';
-
-    // Switch between themes
-    const newTheme = currentTheme === lightTheme ? darkTheme : lightTheme;
-    themeStyle.attr('href', newTheme);
-
-    // Save theme preference in a cookie
-    setCookie("theme", newTheme, 365); // Cookie expires in a year
+    $('body').toggleClass('dark-mode');
+    if ($('body').hasClass('dark-mode')) {
+      setCookie("theme", "dark", 7);
+    } else {
+      setCookie("theme", "light", 7);
+    }
   }
 }
 
