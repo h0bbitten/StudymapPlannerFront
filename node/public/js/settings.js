@@ -1,40 +1,45 @@
-import {applyTheme, setCookie, getCookie, LoadingScreen, displayProfile, settingsBtn, saveUserDataToDB, APIgetCall} from './script.js';
-let index = 0;
+import {
+  applyTheme, setCookie, getCookie, LoadingScreen, displayProfile, settingsBtn, saveUserDataToDB, APIgetCall,
+} from './script.js';
+
+const index = 0;
 
 class Button {
-    constructor(id, text) {
-        this.id = id;
-        this.text = text;
-    }
-    addButton() {
-        $(".buttons").append(`
+  constructor(id, text) {
+    this.id = id;
+    this.text = text;
+  }
+
+  addButton() {
+    $('.buttons').append(`
         <button id="${this.id}" class="btn btn-primary" style="display: none;">${this.text}</button>
         `);
-    }
-    showButton() {
-        $(`#${this.id}`).show();
-    }
-    hideButton() {
-        $(`#${this.id}`).hide();
-    }
-    removeButton() {
-        $(`#${this.id}`).remove();
-    }
   }
-let markAll = new Button("markAll", "Mark all");
-let clearAll = new Button("clearAll", "Clear all");
-let save = new Button("save", "Save");
+
+  showButton() {
+    $(`#${this.id}`).show();
+  }
+
+  hideButton() {
+    $(`#${this.id}`).hide();
+  }
+
+  removeButton() {
+    $(`#${this.id}`).remove();
+  }
+}
+const markAll = new Button('markAll', 'Mark all');
+const clearAll = new Button('clearAll', 'Clear all');
+const save = new Button('save', 'Save');
 
 async function displaySettings(User) {
-        
-    console.log(User);
+  console.log(User);
 
-    let i;
-    
-    
-    User.courses.forEach((course, index) => {
-        let k = 0;
-        $('#formSetting').append(`
+  let i;
+
+  User.courses.forEach((course, index) => {
+    const k = 0;
+    $('#formSetting').append(`
         <div class="collapsible-container">
         <button type="button" class="collapsible">${course.fullnamedisplay}</button>
         <div class="lecturelist" id="course${index}">
@@ -43,31 +48,30 @@ async function displaySettings(User) {
         </div>
         </div>
         `);
-        
-        
-        course.contents.forEach((lecture, k) => {
-            $(`#course${index}`).append(`
+
+    course.contents.forEach((lecture, k) => {
+      $(`#course${index}`).append(`
             <div class="checkbox checkbox-container">
             <label class="checkbox-label" for="checkbox${k}">
-            <input type="checkbox" id="checkbox${k}" name="type" value="${k}" ${lecture.chosen ? "checked" : ""}/>
+            <input type="checkbox" id="checkbox${k}" name="type" value="${k}" ${lecture.chosen ? 'checked' : ''}/>
             <span id="checkbox${k}Text">${lecture.name}</span>              
             </label>
             </div>
             `);
-        });
-        index++;
-        
-        // Read each course within the data
-        console.log(course);
-        // Add your code here to process each course
     });
-    
-    markAll.addButton();
-    clearAll.addButton();
-    markAll.showButton();
-    clearAll.showButton();
-    
-    $(`#formSetting`).append(`
+    index++;
+
+    // Read each course within the data
+    console.log(course);
+    // Add your code here to process each course
+  });
+
+  markAll.addButton();
+  clearAll.addButton();
+  markAll.showButton();
+  clearAll.showButton();
+
+  $('#formSetting').append(`
     <div class="collapsible-container">
     <button type="button" class="collapsible">Study Time</button>
     <div class="lecturelist" id="studyTime" style="display: none">
@@ -84,42 +88,41 @@ async function displaySettings(User) {
     </label>
     </div>
     `);
-    
-    let coll = $(".collapsible");
-    
-    for (i = 0; i < coll.length; i++) {
-        coll[i].addEventListener("click", function() {
-            this.classList.toggle("active");
-            let content = this.nextElementSibling;
-            if (content.style.display === "block") {
-                content.style.display = "none";
-            } else {
-                content.style.display = "block";
-            }
-        });
-    }
-}
 
-async function markAllChecks(){
-    let checkboxes = $('.checkbox-container input[type="checkbox"]');
-    checkboxes.each((i, checkbox) => {
-        checkbox.checked = true;
+  const coll = $('.collapsible');
+
+  for (i = 0; i < coll.length; i++) {
+    coll[i].addEventListener('click', function () {
+      this.classList.toggle('active');
+      const content = this.nextElementSibling;
+      if (content.style.display === 'block') {
+        content.style.display = 'none';
+      } else {
+        content.style.display = 'block';
+      }
     });
+  }
 }
 
-async function clearAllChecks(){
-    let checkboxes = $('.checkbox-container input[type="checkbox"]');
-    checkboxes.each((i, checkbox) => {
-        checkbox.checked = false;
-    });
+async function markAllChecks() {
+  const checkboxes = $('.checkbox-container input[type="checkbox"]');
+  checkboxes.each((i, checkbox) => {
+    checkbox.checked = true;
+  });
 }
 
-async function saveOptions(User){
+async function clearAllChecks() {
+  const checkboxes = $('.checkbox-container input[type="checkbox"]');
+  checkboxes.each((i, checkbox) => {
+    checkbox.checked = false;
+  });
+}
 
+async function saveOptions(User) {
 
 }
 
-let User = await APIgetCall('getUserData', 'Error fetching user data');
+const User = await APIgetCall('getUserData', 'Error fetching user data');
 
 applyTheme();
 displayProfile(User);

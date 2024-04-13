@@ -1,8 +1,10 @@
-export {getMoodleInfo, logIn, saveOptions, getUserData, calculateSchedule};
-import {Webscraper} from "./scraping.js";
-import axios from 'axios';
 import fs from 'fs';
-import {mockAlgorithm} from "./Algorithm.js";
+import Webscraper from './scraping.js';
+import { mockAlgorithm } from './Algorithm.js';
+
+export {
+  getMoodleInfo, logIn, saveOptions, getUserData, calculateSchedule,
+};
 
 class WSfunctions {
   constructor(token) {
@@ -10,59 +12,57 @@ class WSfunctions {
     this.urlStart = `https://www.moodle.aau.dk/webservice/rest/server.php?wstoken=${this.token}&moodlewsrestformat=json&wsfunction=`;
   }
 
-  async getMoodleData(url, errorCallback) {
+  static async getMoodleData(url, errorCallback) {
     try {
       const response = await fetch(url);
       if (!response.ok) {
         throw new Error('Network response error');
       }
       return response.json();
-    } 
-    catch (error) {
+    } catch (error) {
       console.error(errorCallback, error);
       throw error;
     }
   }
 
   async core_course_get_enrolled_courses_by_timeline_classification() {
-    const url = this.urlStart + `core_course_get_enrolled_courses_by_timeline_classification&classification=inprogress`;
-    return this.getMoodleData(url, 'Error fetching enrolled courses:');
+    const url = `${this.urlStart}core_course_get_enrolled_courses_by_timeline_classification&classification=inprogress`;
+    return WSfunctions.getMoodleData(url, 'Error fetching enrolled courses:');
   }
 
   async core_webservice_get_site_info() {
-    const url = this.urlStart + `core_webservice_get_site_info`;
-    return this.getMoodleData(url, 'Error fetching User info:');
+    const url = `${this.urlStart}core_webservice_get_site_info`;
+    return WSfunctions.getMoodleData(url, 'Error fetching User info:');
   }
 
-  async core_course_get_contents(course_id) {
-    const url = this.urlStart +  `core_course_get_contents&courseid=${course_id}`;
-    return this.getMoodleData(url, 'Error fetching course contents:');
+  async core_course_get_contents(courseID) {
+    const url = `${this.urlStart}core_course_get_contents&courseid=${courseID}`;
+    return WSfunctions.getMoodleData(url, 'Error fetching course contents:');
   }
 
-  async mod_page_get_pages_by_courses(course_id) {
-    const url = this.urlStart +  `mod_page_get_pages_by_courses&courseids[0]=${course_id}`;
-    return this.getMoodleData(url, 'Error fetching course pages:');
+  async mod_page_get_pages_by_courses(courseID) {
+    const url = `${this.urlStart}mod_page_get_pages_by_courses&courseids[0]=${courseID}`;
+    return WSfunctions.getMoodleData(url, 'Error fetching course pages:');
   }
 }
 async function logIn(req, res) {
-  let test = new WSfunctions(req.query.token)
-  let answer = {};
+  const test = new WSfunctions(req.query.token);
+  const answer = {};
   try {
-    let tokenTry = await test.core_webservice_get_site_info();
+    const tokenTry = await test.core_webservice_get_site_info();
     if (tokenTry.errorcode === 'invalidtoken') {
-      answer.validity = "Invalid Token";
-    }
-    else {
+      answer.validity = 'Invalid Token';
+    } else {
       req.session.token = req.query.token;
       req.session.userid = tokenTry.userid;
       req.session.fullname = tokenTry.fullname;
       req.session.userpictureurl = tokenTry.userpictureurl;
       req.session.loggedIn = true;
 
-      answer.validity = "Valid Token";
+      answer.validity = 'Valid Token';
 
       try {
-        let User = await retrieveAndParseUserData(req.session.userid);
+        const User = await retrieveAndParseUserData(req.session.userid);
         answer.redirect = User.settings.setupDone === true ? 'schedule' : 'setup';
       } catch (error) {
         console.log('User not found, redirecting to setup');
@@ -71,33 +71,46 @@ async function logIn(req, res) {
     }
     console.log('answer is:', answer);
     res.send(JSON.stringify(answer));
-  }
-  catch (error) {
+  } catch (error) {
     console.error('Failed loggin in:', error);
   }
 }
 async function getMoodleInfo(req, res) {
   try {
-    let Moodle = new WSfunctions(req.session.token);
+    const Moodle = new WSfunctions(req.session.token);
     let User = {};
 
     try {
-      User = await Moodle.core_webservice_get_site_info();
-      let courseresponse = await Moodle.core_course_get_enrolled_courses_by_timeline_classification();
+      const webserviceeResponse = await Moodle.core_webservice_get_site_info();
+      User = {
+        userid: webserviceeResponse.userid,
+        fullname: webserviceeResponse.fullname,
+        userpictureurl: webserviceeResponse.userpictureurl,
+        sitename: webserviceeResponse.sitename,
+        siteurl: webserviceeResponse.siteurl,
+        lang: webserviceeResponse.lang,
+        courses: [],
+      };
+      const courseresponse = await Moodle.core_course_get_enrolled_courses_by_timeline_classification();
       User.courses = courseresponse.courses;
-      User.courses = User.courses.filter(course => course.enddate !== 2527282800); // We should come up with better filtering system, maybe on client side, but works for now
+      // We should come up with better filtering system, maybe on client side, but works for now
+      User.courses = User.courses.filter((course) => course.enddate !== 2527282800);
 
-      let coursePromises = User.courses.map(async course => {
-        course.contents = await Moodle.core_course_get_contents(course.id);
-        course.pages = await Moodle.mod_page_get_pages_by_courses(course.id);
-        course.color = await assignColor(course.id);
-        course.modulelink = await findModulelink(course);
-        if (course.modulelink) course.ECTS = await Webscraper(course.modulelink);
+      const coursePromises = User.courses.map(async (course) => {
+        const contents = await Moodle.core_course_get_contents(course.id);
+        const pages = await Moodle.mod_page_get_pages_by_courses(course.id);
+        const color = await assignColor(course.id);
+        const modulelink = await findModulelink(pages.pages);
+        const ECTS = modulelink ? await Webscraper(modulelink) : null;
+
+        return {
+          ...course, contents, pages: pages.pages, color, modulelink, ECTS,
+        };
       });
 
-      await Promise.all(coursePromises);
+      User.courses = await Promise.all(coursePromises);
     } catch (error) {
-      console.error('Failed to get enrolled courses:', error);
+      console.error('Failed to get MoodleAPI data:', error);
     }
     res.send(User);
   } catch (error) {
@@ -107,7 +120,7 @@ async function getMoodleInfo(req, res) {
 async function saveOptions(req, res) {
   try {
     console.log('Saving options');
-    let User = req.body;
+    const User = req.body;
     fs.writeFile(`./database/${User.userid}.json`, JSON.stringify(User), (err) => {
       if (err) {
         console.error('Error saving User data:', err);
@@ -122,17 +135,18 @@ async function saveOptions(req, res) {
   }
 }
 
-async function getUserData(req, res) {
+async function calculateSchedule(req, res) {
   try {
-    let User = await retrieveAndParseUserData(req.session.userid);
-    res.send(User);
+    const User = await retrieveAndParseUserData(req.session.userid);
+    const Timeblocks = await mockAlgorithm(User); // await Algorithm(User);
+    res.send(JSON.stringify(Timeblocks));
   } catch (error) {
-    console.error('Failed to get User data:', error);
+    console.error('Failed to calculate schedule:', error);
     res.status(500).send('Internal Server Error');
   }
-
 }
-function retrieveAndParseUserData(userid){
+
+function retrieveAndParseUserData(userid) {
   return new Promise((resolve, reject) => {
     fs.readFile(`./database/${userid}.json`, (err, data) => {
       if (err) {
@@ -144,154 +158,152 @@ function retrieveAndParseUserData(userid){
   });
 }
 
-async function calculateSchedule(req, res) {
+async function getUserData(req, res) {
   try {
-    let User = await retrieveAndParseUserData(req.session.userid);
-    let Timeblocks = await mockAlgorithm(User); // await Algorithm(User);
-    res.send(JSON.stringify(Timeblocks));
+    const User = await retrieveAndParseUserData(req.session.userid);
+    res.send(User);
   } catch (error) {
-    console.error('Failed to calculate schedule:', error);
+    console.error('Failed to get User data:', error);
     res.status(500).send('Internal Server Error');
   }
 }
 
-async function assignColor(integer){
-  return new Promise((resolve, reject) => {
-    if (Number.isInteger(integer) && integer > 0) {
-        let index = integer % colors.length;
-        let color = colors[index];
-
-        colors.splice(index, 1);
-
-        resolve(color);
-    } else {
-        reject(new Error("Input must be a positive integer"));
-    }
-});}
-
-async function findModulelink(course) {
+async function findModulelink(pages) {
   const regex = /https:\/\/moduler\.aau\.dk\/course\/([^?]+)/;
-  
+
   let linkPart = null;
 
-  course.pages.pages.forEach(page => {
-      const content = page.content;
-      const match = regex.exec(content);
-      if (match && match[1]) {
-          linkPart = match[1];
-          return;
-      }
+  pages.forEach((page) => {
+    const { content } = page;
+    const match = regex.exec(content);
+    if (match) {
+      const [, linkPartMatch] = match;
+      linkPart = linkPartMatch;
+    }
   });
 
   return linkPart !== null ? `https://moduler.aau.dk/course/${linkPart}?lang=en-GB` : undefined;
 }
 
-
-
 const colors = [
-  "#FF0000", // Red
-  "#00FF00", // Lime
-  "#0000FF", // Blue
-  "#FFFF00", // Yellow
-  "#FF00FF", // Magenta
-  "#00FFFF", // Cyan
-  "#800000", // Maroon
-  "#008000", // Green
-  "#000080", // Navy
-  "#808000", // Olive
-  "#800080", // Purple
-  "#008080", // Teal
-  "#C0C0C0", // Silver
-  "#808080", // Gray
-  "#FFA500", // Orange
-  "#A52A2A", // Brown
-  "#800000", // Maroon
-  "#FF4500", // OrangeRed
-  "#D2691E", // Chocolate
-  "#FF8C00", // DarkOrange
-  "#FF7F50", // Coral
-  "#DC143C", // Crimson
-  "#FF6347", // Tomato
-  "#FFD700", // Gold
-  "#B8860B", // DarkGoldenRod
-  "#DAA520", // GoldenRod
-  "#FF69B4", // HotPink
-  "#FF1493", // DeepPink
-  "#C71585", // MediumVioletRed
-  "#DB7093", // PaleVioletRed
-  "#00BFFF", // DeepSkyBlue
-  "#87CEEB", // SkyBlue
-  "#4682B4", // SteelBlue
-  "#B0C4DE", // LightSteelBlue
-  "#ADD8E6", // LightBlue
-  "#B0E0E6", // PowderBlue
-  "#AFEEEE", // PaleTurquoise
-  "#00CED1", // DarkTurquoise
-  "#48D1CC", // MediumTurquoise
-  "#40E0D0", // Turquoise
-  "#00FFFF", // Aqua
-  "#00FFFF", // Cyan
-  "#5F9EA0", // CadetBlue
-  "#66CDAA", // MediumAquaMarine
-  "#7FFFD4", // Aquamarine
-  "#7FFFD4", // AquaMarine
-  "#8A2BE2", // BlueViolet
-  "#9932CC", // DarkOrchid
-  "#8B008B", // DarkMagenta
-  "#9400D3", // DarkViolet
-  "#800080", // Purple
-  "#BA55D3", // MediumOrchid
-  "#9370DB", // MediumPurple
-  "#663399", // RebeccaPurple
-  "#4B0082", // Indigo
-  "#7B68EE", // MediumSlateBlue
-  "#6A5ACD", // SlateBlue
-  "#483D8B", // DarkSlateBlue
-  "#E6E6FA", // Lavender
-  "#D8BFD8", // Thistle
-  "#DDA0DD", // Plum
-  "#DA70D6", // Orchid
-  "#FF00FF", // Magenta
-  "#FF00FF", // Fuchsia
-  "#FFC0CB", // Pink
-  "#FFB6C1", // LightPink
-  "#FA8072", // Salmon
-  "#FFA07A", // LightSalmon
-  "#FF7F50", // Coral
-  "#FF4500", // OrangeRed
-  "#FF6347", // Tomato
-  "#FF8C00", // DarkOrange
-  "#FFA500", // Orange
-  "#FFD700", // Gold
-  "#FFFF00", // Yellow
-  "#FFFFE0", // LightYellow
-  "#FFFACD", // LemonChiffon
-  "#FAFAD2", // LightGoldenRodYellow
-  "#FFEFD5", // PapayaWhip
-  "#FFE4B5", // Moccasin
-  "#FFDAB9", // PeachPuff
-  "#EEE8AA", // PaleGoldenRod
-  "#F0E68C", // Khaki
-  "#BDB76B", // DarkKhaki
-  "#F5DEB3", // Wheat
-  "#DEB887", // BurlyWood
-  "#D2B48C", // Tan
-  "#BC8F8F", // RosyBrown
-  "#F4A460", // SandyBrown
-  "#D2691E", // Chocolate
-  "#CD853F", // Peru
-  "#8B4513", // SaddleBrown
-  "#A0522D", // Sienna
-  "#A52A2A", // Brown
-  "#800000", // Maroon
-  "#000000", // Black
-  "#2F4F4F", // DarkSlateGray
-  "#696969", // DimGray
-  "#708090", // SlateGray
-  "#778899", // LightSlateGray
-  "#808080", // Gray
-  "#A9A9A9", // DarkGray
-  "#C0C0C0", // Silver
-  "#D3D3D3", // LightGray
-  "#FFFFFF"  // White
+  '#FF0000', // Red
+  '#00FF00', // Lime
+  '#0000FF', // Blue
+  '#FFFF00', // Yellow
+  '#FF00FF', // Magenta
+  '#00FFFF', // Cyan
+  '#800000', // Maroon
+  '#008000', // Green
+  '#000080', // Navy
+  '#808000', // Olive
+  '#800080', // Purple
+  '#008080', // Teal
+  '#C0C0C0', // Silver
+  '#808080', // Gray
+  '#FFA500', // Orange
+  '#A52A2A', // Brown
+  '#800000', // Maroon
+  '#FF4500', // OrangeRed
+  '#D2691E', // Chocolate
+  '#FF8C00', // DarkOrange
+  '#FF7F50', // Coral
+  '#DC143C', // Crimson
+  '#FF6347', // Tomato
+  '#FFD700', // Gold
+  '#B8860B', // DarkGoldenRod
+  '#DAA520', // GoldenRod
+  '#FF69B4', // HotPink
+  '#FF1493', // DeepPink
+  '#C71585', // MediumVioletRed
+  '#DB7093', // PaleVioletRed
+  '#00BFFF', // DeepSkyBlue
+  '#87CEEB', // SkyBlue
+  '#4682B4', // SteelBlue
+  '#B0C4DE', // LightSteelBlue
+  '#ADD8E6', // LightBlue
+  '#B0E0E6', // PowderBlue
+  '#AFEEEE', // PaleTurquoise
+  '#00CED1', // DarkTurquoise
+  '#48D1CC', // MediumTurquoise
+  '#40E0D0', // Turquoise
+  '#00FFFF', // Aqua
+  '#00FFFF', // Cyan
+  '#5F9EA0', // CadetBlue
+  '#66CDAA', // MediumAquaMarine
+  '#7FFFD4', // Aquamarine
+  '#7FFFD4', // AquaMarine
+  '#8A2BE2', // BlueViolet
+  '#9932CC', // DarkOrchid
+  '#8B008B', // DarkMagenta
+  '#9400D3', // DarkViolet
+  '#800080', // Purple
+  '#BA55D3', // MediumOrchid
+  '#9370DB', // MediumPurple
+  '#663399', // RebeccaPurple
+  '#4B0082', // Indigo
+  '#7B68EE', // MediumSlateBlue
+  '#6A5ACD', // SlateBlue
+  '#483D8B', // DarkSlateBlue
+  '#E6E6FA', // Lavender
+  '#D8BFD8', // Thistle
+  '#DDA0DD', // Plum
+  '#DA70D6', // Orchid
+  '#FF00FF', // Magenta
+  '#FF00FF', // Fuchsia
+  '#FFC0CB', // Pink
+  '#FFB6C1', // LightPink
+  '#FA8072', // Salmon
+  '#FFA07A', // LightSalmon
+  '#FF7F50', // Coral
+  '#FF4500', // OrangeRed
+  '#FF6347', // Tomato
+  '#FF8C00', // DarkOrange
+  '#FFA500', // Orange
+  '#FFD700', // Gold
+  '#FFFF00', // Yellow
+  '#FFFFE0', // LightYellow
+  '#FFFACD', // LemonChiffon
+  '#FAFAD2', // LightGoldenRodYellow
+  '#FFEFD5', // PapayaWhip
+  '#FFE4B5', // Moccasin
+  '#FFDAB9', // PeachPuff
+  '#EEE8AA', // PaleGoldenRod
+  '#F0E68C', // Khaki
+  '#BDB76B', // DarkKhaki
+  '#F5DEB3', // Wheat
+  '#DEB887', // BurlyWood
+  '#D2B48C', // Tan
+  '#BC8F8F', // RosyBrown
+  '#F4A460', // SandyBrown
+  '#D2691E', // Chocolate
+  '#CD853F', // Peru
+  '#8B4513', // SaddleBrown
+  '#A0522D', // Sienna
+  '#A52A2A', // Brown
+  '#800000', // Maroon
+  '#000000', // Black
+  '#2F4F4F', // DarkSlateGray
+  '#696969', // DimGray
+  '#708090', // SlateGray
+  '#778899', // LightSlateGray
+  '#808080', // Gray
+  '#A9A9A9', // DarkGray
+  '#C0C0C0', // Silver
+  '#D3D3D3', // LightGray
+  '#FFFFFF', // White
 ];
+
+async function assignColor(integer) {
+  return new Promise((resolve, reject) => {
+    if (Number.isInteger(integer) && integer > 0) {
+      const index = integer % colors.length;
+      const color = colors[index];
+
+      colors.splice(index, 1);
+
+      resolve(color);
+    } else {
+      reject(new Error('Input must be a positive integer'));
+    }
+  });
+}
