@@ -9,22 +9,25 @@ async function mockAlgorithm(User) {
   let currentTime = moment().valueOf();
   const lectures = [];
   User.courses.forEach((course) => {
-    course.contents.forEach((lecture) => {
-      let startTime = currentTime;
-      let endTime = currentTime + (getRandomInt(1, 5) * 3600000);
+    if (course.chosen === true) {
+      course.contents.forEach((lecture) => {
+        if (lecture.chosen === true) {
+          const startTime = currentTime;
+          const endTime = currentTime + (getRandomInt(1, 5) * 3600000);
 
-      let timeBlock = {
-        title: course.fullname,
-        description: lecture.name,
-        startTime: startTime,
-        endTime: endTime,
-        color: course.color,
-      };
+          let timeBlock = {
+            title: course.fullname,
+            description: lecture.name,
+            startTime: startTime,
+            endTime: endTime,
+            color: course.color,
+          };
 
-      currentTime = endTime + (15 * 60000);
-
-      lectures.push(timeBlock);
-    });
+          currentTime = endTime + (15 * 60000);
+          lectures.push(timeBlock);
+        }
+      });
+    }
   });
 
   return lectures;
