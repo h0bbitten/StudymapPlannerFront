@@ -146,12 +146,26 @@ function addTimeBlock(startTime, endTime, title, description, color) {
   const currentWeekStartTime = getStartOfWeek(weekNumber, yearNumber);
   const currentWeekEndTime = getEndOfWeek(weekNumber, yearNumber);
 
-  if (startTime >= currentWeekStartTime && startTime <= currentWeekEndTime) {
-    const dayOfWeek = moment(startTime).isoWeekday();
-    console.log('This time is on weekdayday number', dayOfWeek);
-    $(`#day${dayOfWeek}`).append(createTimeBlock(startTime, endTime, title, description, color));
+  if (startTime >= currentWeekStartTime && startTime < currentWeekEndTime) {
+    const endOfDay = moment(startTime).endOf('day').valueOf();
+
+    if (endTime <= endOfDay) {
+      const dayOfWeek = moment(startTime).isoWeekday();
+      $(`#day${dayOfWeek}`).append(createTimeBlock(startTime, endTime, title, description, color));
+    } else {
+      const nextDay = moment(startTime).add(1, 'days').startOf('day');
+      if (nextDay.valueOf() < currentWeekEndTime) {
+        const nextDayOfWeek = nextDay.isoWeekday();
+        const duration = endTime - startTime;
+        const newStartTime = nextDay.valueOf();
+        const newEndTime = newStartTime + duration;
+        $(`#day${nextDayOfWeek}`).append(createTimeBlock(newStartTime, newEndTime, title, description, color));
+      }
+    }
   }
 }
+
+
 function createTimeBlock(startTime, endTime, title, description, color) {
   const top = (minutesIntoDay(startTime) * (1000 / 24 / 60));
   const minuteDuration = (endTime - startTime) / 60000;
