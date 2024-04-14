@@ -1,34 +1,39 @@
+import moment from 'moment';
+
 export { Algorithm, mockAlgorithm };
+
+console.log('This time is on weekdayday number', moment(1712758261319).isoWeekday());
 
 async function mockAlgorithm(User) {
   console.log('Calculating schedule for:', User.fullname);
-  let currentTime = 1712730500;// Math.floor(Date.now() / 1000);
+  let currentTime = moment().valueOf();
   const lectures = [];
   User.courses.forEach((course) => {
-    if (course.chosen === true) {
-      course.contents.forEach((lecture) => {
-        if (lecture.chosen === true) {
-          const startTime = currentTime;
-          const min = 1;
-          const max = 7;
-          const endTime = currentTime + (Math.random() * (max - min) + min) * 60 * 60;
+    course.contents.forEach((lecture) => {
+      let startTime = currentTime;
+      let endTime = currentTime + (getRandomInt(1, 5) * 3600000);
 
-          const timeBlock = {
-            title: course.fullname,
-            description: lecture.name,
-            startTime,
-            endTime,
-            color: course.color,
-          };
+      let timeBlock = {
+        title: course.fullname,
+        description: lecture.name,
+        startTime: startTime,
+        endTime: endTime,
+        color: course.color,
+      };
 
-          currentTime = endTime + (15 * 60);
+      currentTime = endTime + (15 * 60000);
 
-          lectures.push(timeBlock);
-        }
-      });
-    }
+      lectures.push(timeBlock);
+    });
   });
+
   return lectures;
+}
+
+function getRandomInt(min, max) {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
 class Course {

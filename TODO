@@ -8,4 +8,3 @@ Webscraper is not working correctly.
     -Doesn't run when course already exists in file, but also doesn't return a ECTS value if it does
 
 Need to impliment logout option/button somewhere on page(s)
-

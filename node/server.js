@@ -12,7 +12,7 @@ app.use(session({
   saveUninitialized: false,
   rolling: true,
   cookie: {
-    maxAge: 360000, // 6 mins
+    maxAge: 3600000, // 60 mins
     // secure: true, breaks stuff, so guess we won't have it secure :shrug:
     httpOnly: true,
   },
