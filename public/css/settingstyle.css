@@ -7,6 +7,34 @@ body {
     padding: 0;
 }
 
+nav {
+    background-color: #ffffff; /* Unchanged, clean look for navbar */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Unchanged, subtle shadow */
+    padding: 10px 20px;
+    display: flex;
+    justify-content: flex-end;
+  }
+  
+  #navbar img {
+    width: 35px;
+    height: 35px;
+  }
+  
+  .navbar-icons {
+    display: flex;
+  }
+  
+  .navbar-icon {
+    margin-left: 20px;
+  }
+  
+  .navbar-icon img {
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    filter: none; /* Unchanged, normal icon appearance */
+  }
+
 /* Menu styles */
 .menu {
     background-color: #f1f1f1;
