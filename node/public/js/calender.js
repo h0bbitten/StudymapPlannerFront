@@ -98,7 +98,7 @@ function loadWeekView() {
   const date = moment(today);
   const weekNumber = date.isoWeek() + 1;
 
-  document.getElementById('monthDisplay').innerText = `Week: ${weekNumber}`;
+  document.getElementById('monthDisplay').innerText = `${date.format('MMMM')} ${date.format('YYYY')} \n Week: ${weekNumber}`;
 
   calendar.innerHTML = '';
 
