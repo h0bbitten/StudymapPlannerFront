@@ -93,9 +93,12 @@ function loadWeekView() {
   today.setDate(today.getDate() + nav);
 
   const dayOfWeek = today.getDay();
-  const startOfWeek = new Date(today.setDate(today.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1)));
+  const startOfWeek = new Date(today.setDate(today.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 0)));
+ 
+  const date = moment(today);
+  const weekNumber = date.isoWeek() + 1;
 
-  document.getElementById('monthDisplay').innerText = `Week of ${startOfWeek.toLocaleDateString('en-us', { month: 'long', day: 'numeric' })}`;
+  document.getElementById('monthDisplay').innerText = `Week number: ${weekNumber}`;
 
   calendar.innerHTML = '';
 
@@ -114,10 +117,6 @@ function loadWeekView() {
     const weekDay = new Date(startOfWeek.getFullYear(), startOfWeek.getMonth(), startOfWeek.getDate() + day);
 
     $(`.day-interval-${day}`).append(`<div class="day" id="day${day}" style="flex: 1;">${weekDay.getDate()}</div>`);
-
-/*  if (weekDay.toDateString() === new Date().toDateString()) {
-      $(`#day${day}`).addClass('current-day');
-    } */
 
     for (let hour = 1; hour <= 24; hour++) {
       $(`.day-interval-${day}`).append(`<div class="hour" id="hour${hour}" style="height: ${hourPX}px;"></div>`);

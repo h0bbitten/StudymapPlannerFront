@@ -2,7 +2,7 @@ import moment from 'moment';
 
 export { Algorithm, mockAlgorithm };
 
-console.log('This time is on weekdayday number', moment(1712758261319).isoWeekday());
+//console.log('This time is on weekdayday number', moment(1712758261319).isoWeekday());
 
 async function mockAlgorithm(User) {
   console.log('Calculating schedule for:', User.fullname);
