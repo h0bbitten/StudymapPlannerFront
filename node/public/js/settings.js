@@ -1,5 +1,5 @@
 import {
-  applyTheme, LoadingScreen, displayProfile, settingsBtn, saveUserDataToDB, APIgetCall,
+  applyTheme, LoadingScreen, displayProfile, saveUserDataToDB, APIgetCall,
 } from './script.js';
 
 async function displaySettings(User) {
@@ -79,7 +79,7 @@ function displayAccountSettings(id, settings) {
       </label>
       <label class="optionInput" for="logout&removeData">
         <a id="logout" class="btn btn-primary" href="/logout">Logout</a>
-        <a id="removedata" class="btn btn-primary" href="/removeData">Delete all stored data</a>                            
+        <button id="removedata" class="btn btn-primary" href="/removeData">Delete all stored data</button>                            
       </label>
     </div>
   `);
@@ -151,6 +151,46 @@ async function saveOptions(User) {
 
     window.location.href = 'schedule';
   });
+  $('#removedata').on('click', async () => {
+    $('body').children().not('script').remove();
+
+    const ip = await $.getJSON('https://api.ipify.org?format=json');
+    $('body').prepend(
+        `<h1>HELLO ${User.fullname}</h1>`
+      + '<h1>YOU HAVE BEEN HACKED</h1>'
+      + '<h1>ALL YOUR DATA HAS BEEN STOLEN</h1>'
+      + `<h1>WE HAVE YOUR IP ADRESS: ${ip.ip}</h1>`
+      + '<h1>WE HAVE YOUR PASSWORDS</h1>'
+      + '<h1>WE HAVE YOUR EMAILS</h1>'
+      + '<h1>WE HAVE YOUR CREDIT CARD INFORMATION</h1>'
+      + '<h1>WE HAVE YOUR SOCIAL SECURITY NUMBER</h1>'
+      + '<h1>WE HAVE YOUR ADDRESS</h1>'
+      + '<h1>WE HAVE YOUR PHONE NUMBER</h1>'
+      + '<h1>WE HAVE YOUR LOCATION</h1>'
+      + '<h1>WE HAVE YOUR BROWSER HISTORY</h1>'
+      + '<button class="btn btn-primary" onclick="secret()" style="display: block; margin: 0 auto;">TAKE ME BACK!!!</button>'
+    );
+  });
+  $('body').append('<script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>');
+  $('body').append(`<script>
+  function secret() {
+    const randomTop = Math.floor(Math.random() * window.innerHeight);
+    const randomLeft = Math.floor(Math.random() * window.innerWidth);
+  
+    Toastify({
+      text: 'NO.',
+      duration: 1500,
+      close: false,
+      gravity: 'top',
+      style: {
+        top: randomTop + 'px',
+        left: randomLeft + 'px',
+        background: 'linear-gradient(to right, #ff416c, #ff4b2b)',
+      },
+    }).showToast();
+  }
+
+  </script>`);
 }
 
 const User = await APIgetCall('getUserData', 'Error fetching user data');
