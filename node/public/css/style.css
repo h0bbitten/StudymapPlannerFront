@@ -462,6 +462,10 @@
     background-color: #243554;
   }
   
+  .checkbox-container {
+    padding-bottom: 10px;
+  }
+
   /* Style the collapsible content. Note: hidden by default */
   .lecturelist {
     padding: 0 18px;
