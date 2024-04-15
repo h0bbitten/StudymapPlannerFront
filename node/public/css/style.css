@@ -525,8 +525,13 @@
   .studyTime {
     margin-top: 20px;
     margin-left: 20px;
+    size: 50%;
   }
-  
+
+  #time{
+    size: 10%;
+  }
+
 
   :root {
     --text-color: #333;

@@ -76,13 +76,13 @@ async function displaySettings(User) {
     <button type="button" class="collapsible">Study Time</button>
     <div class="lecturelist" id="studyTime" style="display: none">
     <div class="checkbox checkbox-container">
-    <label class="checkbox-label" for="startStudyTime">
+    <label class="checkbox-label time" for="startStudyTime">
     <input type="time" id="startStudyTime" name="startStudyTime" value="${User.settings.startStudyTime}"/>
     <span>Start study time</span>              
     </label>
     </div>
     <div class="checkbox checkbox-container">
-    <label class="checkbox-label" for="endStudyTime">
+    <label class="checkbox-label time" for="endStudyTime">
     <input type="time" id="endStudyTime" name="endStudyTime" value="${User.settings.endStudyTime}"/>
     <span>End study time</span>              
     </label>
