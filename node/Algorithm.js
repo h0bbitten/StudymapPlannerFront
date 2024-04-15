@@ -2,7 +2,7 @@ import moment from 'moment';
 
 export { Algorithm, mockAlgorithm };
 
-console.log('This time is on weekdayday number', moment(1712758261319).isoWeekday());
+//console.log('This time is on weekdayday number', moment(1712758261319).isoWeekday());
 
 async function mockAlgorithm(User) {
   console.log('Calculating schedule for:', User.fullname);
@@ -13,7 +13,7 @@ async function mockAlgorithm(User) {
       course.contents.forEach((lecture) => {
         if (lecture.chosen === true) {
           const startTime = currentTime;
-          const endTime = currentTime + (getRandomInt(1, 5) * 3600000);
+          const endTime = currentTime + (getRandomInt(1, 5) * 3600000); 
 
           let timeBlock = {
             title: course.fullname,

@@ -93,9 +93,12 @@ function loadWeekView() {
   today.setDate(today.getDate() + nav);
 
   const dayOfWeek = today.getDay();
-  const startOfWeek = new Date(today.setDate(today.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1)));
+  const startOfWeek = new Date(today.setDate(today.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 0)));
+ 
+  const date = moment(today);
+  const weekNumber = date.isoWeek() + 1;
 
-  document.getElementById('monthDisplay').innerText = `Week of ${startOfWeek.toLocaleDateString('en-us', { month: 'long', day: 'numeric' })}`;
+  document.getElementById('monthDisplay').innerText = `${date.format('MMMM')} ${date.format('YYYY')} \n Week: ${weekNumber}`;
 
   calendar.innerHTML = '';
 
@@ -114,10 +117,6 @@ function loadWeekView() {
     const weekDay = new Date(startOfWeek.getFullYear(), startOfWeek.getMonth(), startOfWeek.getDate() + day);
 
     $(`.day-interval-${day}`).append(`<div class="day" id="day${day}" style="flex: 1;">${weekDay.getDate()}</div>`);
-
-/*  if (weekDay.toDateString() === new Date().toDateString()) {
-      $(`#day${day}`).addClass('current-day');
-    } */
 
     for (let hour = 1; hour <= 24; hour++) {
       $(`.day-interval-${day}`).append(`<div class="hour" id="hour${hour}" style="height: ${hourPX}px;"></div>`);
@@ -146,24 +145,33 @@ function addTimeBlock(startTime, endTime, title, description, color) {
   const currentWeekStartTime = getStartOfWeek(weekNumber, yearNumber);
   const currentWeekEndTime = getEndOfWeek(weekNumber, yearNumber);
 
-  if (startTime >= currentWeekStartTime && startTime < currentWeekEndTime) {
+  // Function to add a time block to a specific day.
+  function createTimeBlockSegment(start, end, dayOfWeek) {
+    if (startTime >= currentWeekStartTime && startTime < currentWeekEndTime) {
+      $(`#day${dayOfWeek}`).append(createTimeBlock(start, end, title, description, color));
+    }
+  }
+
+  // Iterate as long as startTime is within the current week and there is still time left in the block
+  while (startTime < endTime && startTime < currentWeekEndTime) {
     const endOfDay = moment(startTime).endOf('day').valueOf();
+    const dayOfWeek = moment(startTime).isoWeekday();
 
     if (endTime <= endOfDay) {
-      const dayOfWeek = moment(startTime).isoWeekday();
-      $(`#day${dayOfWeek}`).append(createTimeBlock(startTime, endTime, title, description, color));
+      createTimeBlockSegment(startTime, endTime, dayOfWeek);
+      break; 
     } else {
-      const nextDay = moment(startTime).add(1, 'days').startOf('day');
-      if (nextDay.valueOf() < currentWeekEndTime) {
-        const nextDayOfWeek = nextDay.isoWeekday();
-        const duration = endTime - startTime;
-        const newStartTime = nextDay.valueOf();
-        const newEndTime = newStartTime + duration;
-        $(`#day${nextDayOfWeek}`).append(createTimeBlock(newStartTime, newEndTime, title, description, color));
+      createTimeBlockSegment(startTime, endOfDay, dayOfWeek);
+      startTime = moment(endOfDay + 1); 
+
+      if (startTime.valueOf() >= currentWeekEndTime) {
+        break;
       }
     }
   }
 }
+
+
 
 
 function createTimeBlock(startTime, endTime, title, description, color) {
