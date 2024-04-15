@@ -136,6 +136,7 @@ function handleCheckboxChange() {
 async function saveOptions(User) {
   $('#saveBtn').on('click', async () => {
     User.settings = {
+      ...User.settings,
       startStudyTime: $('#startStudyTime').val(),
       endStudyTime: $('#endStudyTime').val(),
       email: $('#useremail').val(),
