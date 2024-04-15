@@ -602,7 +602,7 @@
   margin-right: 5px;
   transition: transform 0.3s;
 }
-#studyTimeInputs {
+.optionBlock {
   margin-bottom: 10px;
   max-height: 0;
   display: none;
@@ -610,16 +610,16 @@
   align-items: center;
   background-color: #385280;
 }
-#studyTimeInputs.active{
+.optionBlock.active{
   background-color: #546686;
   display: block;
-  transition: max-height 0.3s ease-out;
+  transition: max-height 0.3s ease-in-out;
 }
-#studyTimeInputs.active .timeInput{
+.optionBlock.active .optionInput{
   display: block;
 }
 .checkbox-label {
-  position: relative; /* Establishes a positioning context for absolute positioning */
+  position: relative;
 }
 
 .carot-collapsible {

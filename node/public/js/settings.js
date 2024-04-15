@@ -1,41 +1,15 @@
 import {
-  applyTheme, setCookie, getCookie, LoadingScreen, displayProfile, settingsBtn, saveUserDataToDB, APIgetCall,
+  applyTheme, LoadingScreen, displayProfile, settingsBtn, saveUserDataToDB, APIgetCall,
 } from './script.js';
 
-class Button {
-  constructor(id, text) {
-    this.id = id;
-    this.text = text;
-  }
-
-  addButton() {
-    $('.buttons').append(`
-        <button id="${this.id}" class="btn btn-primary" style="display: none;">${this.text}</button>
-        `);
-  }
-
-  showButton() {
-    $(`#${this.id}`).show();
-  }
-
-  hideButton() {
-    $(`#${this.id}`).hide();
-  }
-
-  removeButton() {
-    $(`#${this.id}`).remove();
-  }
-}
-const markAll = new Button('markAll', 'Mark all');
-const clearAll = new Button('clearAll', 'Clear all');
-const save = new Button('save', 'Save');
-
 async function displaySettings(User) {
+  LoadingScreen.add();
+  LoadingScreen.show();
   displayCourses(User.courses);
   displayStudyTime(User.settings);
-
-  collapseListener();
-  
+  displayAccountSettings(User.userid, User.settings);
+  $('input[type="checkbox"]').each(subCheckboxChange);
+  LoadingScreen.hide();
 }
 
 function createCollapsible(name, id) {
@@ -61,14 +35,15 @@ function createCollapsible(name, id) {
 function displayCourses(courses) {
   courses.forEach((course, index) => {
     $('#formSetting').append(createCollapsible(course.fullnamedisplay, course.id));
-    $(`#${course.id} .collapsible`).prepend('<input type="checkbox" id="checkboxtitle">');
+    $(`#${course.id} .collapsible`).prepend(`<input type="checkbox" id="checkboxTitle${index}" value=${index} class="checkboxTitle">`);
     $(`#${course.id} .checkbox-label`).append(`<div class="lecturelist" id="course${index}"></div>`);
 
     course.contents.forEach((lecture, k) => {
       $(`#course${index}`).append(`
             <div class="checkbox checkbox-container">
               <label class="checkbox-label" for="checkbox${k}">
-                <input type="checkbox" id="checkbox${k}" name="type" value="${k}" ${lecture.chosen ? 'checked' : ''}/>
+                <input type="checkbox" id="checkbox${k}-forList${index}"
+                  class="subCheckbox" name="type" value="${k}" ${lecture.chosen ? 'checked' : ''}/>
                 <span id="checkbox${k}Text">${lecture.name}</span>              
               </label>
             </div>
@@ -80,18 +55,36 @@ function displayCourses(courses) {
 function displayStudyTime(settings) {
   $('#formSetting').append(createCollapsible('Study Time', 'studyTime'));
   $('#studyTime .checkbox-label').append(`
-    <div id="studyTimeInputs">
-      <label class="timeInput" for="startStudyTime">
+    <div class="optionBlock">
+      <label class="optionInput" for="startStudyTime">
         <input type="time" id="startStudyTime" name="startStudyTime" value="${settings.startStudyTime}"/>
         <span>Start study time</span>              
       </label>
-      <label class="timeInput" for="endStudyTime">
+      <label class="optionInput" for="endStudyTime">
         <input type="time" id="endStudyTime" name="endStudyTime" value="${settings.endStudyTime}"/>
         <span>End study time</span>              
       </label>
     </div>
   `);
   console.log(settings);
+}
+function displayAccountSettings(id, settings) {
+  $('#formSetting').append(createCollapsible('Account', 'accountSettings'));
+  $('#accountSettings .checkbox-label').append(`
+    <div class="optionBlock" id="accountSettingsInputs">
+      <label class="optionInput" for="email">
+        <span>Change Email</span>              
+        <input type="email" id="useremail" name="email" placeholder"example@gmail.com"
+        value="${settings.email || ''}" ${!settings.email ? 'required="false"' : ''}/>
+      </label>
+      <label class="optionInput" for="logout&removeData">
+        <a id="logout" class="btn btn-primary" href="/logout">Logout</a>
+        <a id="removedata" class="btn btn-primary" href="/removeData">Delete all stored data</a>                            
+      </label>
+    </div>
+  `);
+  $('#logout').css({ 'background-color': 'orange', color: 'white' });
+  $('#removedata').css({ 'background-color': 'red', color: 'white' });
 }
 
 function collapseListener() {
@@ -110,24 +103,54 @@ function collapseListener() {
       }
     }
   });
-
 }
-async function markAllChecks() {
-  const checkboxes = $('.checkbox-container input[type="checkbox"]');
-  checkboxes.each((i, checkbox) => {
-    checkbox.checked = true;
-  });
+function titleCheckboxChange() {
+  const $checkbox = $(this);
+  if ($checkbox.hasClass('checkboxTitle')) {
+    const course = $checkbox.attr('value');
+    const $subCheckboxes = $(`#course${course} .subCheckbox`);
+
+    $subCheckboxes.prop('checked', $checkbox.prop('checked'));
+  }
 }
 
-async function clearAllChecks() {
-  const checkboxes = $('.checkbox-container input[type="checkbox"]');
-  checkboxes.each((i, checkbox) => {
-    checkbox.checked = false;
-  });
+function subCheckboxChange() {
+  const $checkbox = $(this);
+  if ($checkbox.hasClass('subCheckbox')) {
+    const id = $checkbox.attr('id');
+    const course = id.match(/\d+$/)[0];
+
+    const $subCheckboxes = $(`#course${course} input[type="checkbox"]`);
+    const isChecked = $subCheckboxes.is(':checked');
+    $(`#checkboxTitle${course}`).prop('checked', isChecked);
+  }
+}
+function checkboxListener() {
+  $(document).on('change', 'input[type="checkbox"]', handleCheckboxChange);
+}
+function handleCheckboxChange() {
+  subCheckboxChange.call(this);
+  titleCheckboxChange.call(this);
 }
 
 async function saveOptions(User) {
+  $('#saveBtn').on('click', async () => {
+    User.settings = {
+      startStudyTime: $('#startStudyTime').val(),
+      endStudyTime: $('#endStudyTime').val(),
+      email: $('#useremail').val(),
+    };
 
+    User.courses.forEach((course, index) => {
+      course.contents.forEach((lecture, k) => {
+        lecture.chosen = $(`#checkbox${k}-forList${index}`).is(':checked');
+      });
+    });
+
+    await saveUserDataToDB(User);
+
+    window.location.href = 'schedule';
+  });
 }
 
 const User = await APIgetCall('getUserData', 'Error fetching user data');
@@ -135,3 +158,6 @@ const User = await APIgetCall('getUserData', 'Error fetching user data');
 applyTheme();
 displayProfile(User);
 displaySettings(User);
+collapseListener();
+checkboxListener();
+saveOptions(User);
