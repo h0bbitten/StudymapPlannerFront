@@ -18,7 +18,7 @@ jobs:
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v1
       
-
+    #Mind mig om at lave det her om til en secret
     - name: Login to Docker Hub
       run: echo "dckr_pat_ujusRPRBe8NQDOurA7HN85G2K2E" | docker login -u YOUR_DOCKER_USERNAME --password-stdin
 
