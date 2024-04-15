@@ -2,8 +2,6 @@ import {
   applyTheme, setCookie, getCookie, LoadingScreen, displayProfile, settingsBtn, saveUserDataToDB, APIgetCall,
 } from './script.js';
 
-const index = 0;
-
 class Button {
   constructor(id, text) {
     this.id = id;
@@ -33,77 +31,87 @@ const clearAll = new Button('clearAll', 'Clear all');
 const save = new Button('save', 'Save');
 
 async function displaySettings(User) {
-  console.log(User);
+  displayCourses(User.courses);
+  displayStudyTime(User.settings);
 
-  let i;
+  collapseListener();
+  
+}
 
-  User.courses.forEach((course, index) => {
-    const k = 0;
-    $('#formSetting').append(`
-        <div class="collapsible-container">
-        <button type="button" class="collapsible">${course.fullnamedisplay}</button>
-        <div class="lecturelist" id="course${index}">
-        
-        <div class="buttons" ></div>
-        </div>
-        </div>
-        `);
+function createCollapsible(name, id) {
+  const HTML = `
+  <div class="collapsible-container" id="${id}">
+    <label class="checkbox-label" for="checkboxtitle">
+      <button type="button" class="collapsible">
+        ${name}
+        <span class="carot-collapsible">
+          <svg fill="#000000" width="20px" height="20px" viewBox="0 0 256 256" id="carot">
+            <path d="M128,188a11.96187,11.96187,0,0,1-8.48535-3.51465l-80-80a12.0001,12.0001,
+              0,0,1,16.9707-16.9707L128,159.0293l71.51465-71.51465a12.0001,12.0001,0,0,1,16.9707,16.9707l-80,
+              80A11.96187,11.96187,0,0,1,128,188Z">
+            </path>
+          </svg>
+        </span>
+      </button>
+    </label>  
+  </div>`;
+  return HTML;
+}
+
+function displayCourses(courses) {
+  courses.forEach((course, index) => {
+    $('#formSetting').append(createCollapsible(course.fullnamedisplay, course.id));
+    $(`#${course.id} .collapsible`).prepend('<input type="checkbox" id="checkboxtitle">');
+    $(`#${course.id} .checkbox-label`).append(`<div class="lecturelist" id="course${index}"></div>`);
 
     course.contents.forEach((lecture, k) => {
       $(`#course${index}`).append(`
             <div class="checkbox checkbox-container">
-            <label class="checkbox-label" for="checkbox${k}">
-            <input type="checkbox" id="checkbox${k}" name="type" value="${k}" ${lecture.chosen ? 'checked' : ''}/>
-            <span id="checkbox${k}Text">${lecture.name}</span>              
-            </label>
+              <label class="checkbox-label" for="checkbox${k}">
+                <input type="checkbox" id="checkbox${k}" name="type" value="${k}" ${lecture.chosen ? 'checked' : ''}/>
+                <span id="checkbox${k}Text">${lecture.name}</span>              
+              </label>
             </div>
-            `);
+        `);
     });
-    index++;
-
-    // Read each course within the data
-    console.log(course);
-    // Add your code here to process each course
   });
-
-  markAll.addButton();
-  clearAll.addButton();
-  markAll.showButton();
-  clearAll.showButton();
-
-  $('#formSetting').append(`
-    <div class="collapsible-container">
-    <button type="button" class="collapsible">Study Time</button>
-    <div class="lecturelist" id="studyTime" style="display: none">
-    <div class="checkbox checkbox-container">
-    <label class="checkbox-label" for="startStudyTime">
-    <input type="time" id="startStudyTime" name="startStudyTime" value="${User.settings.startStudyTime}"/>
-    <span>Start study time</span>              
-    </label>
-    </div>
-    <div class="checkbox checkbox-container">
-    <label class="checkbox-label" for="endStudyTime">
-    <input type="time" id="endStudyTime" name="endStudyTime" value="${User.settings.endStudyTime}"/>
-    <span>End study time</span>              
-    </label>
-    </div>
-    `);
-
-  const coll = $('.collapsible');
-
-  for (i = 0; i < coll.length; i++) {
-    coll[i].addEventListener('click', function () {
-      this.classList.toggle('active');
-      const content = this.nextElementSibling;
-      if (content.style.display === 'block') {
-        content.style.display = 'none';
-      } else {
-        content.style.display = 'block';
-      }
-    });
-  }
 }
 
+function displayStudyTime(settings) {
+  $('#formSetting').append(createCollapsible('Study Time', 'studyTime'));
+  $('#studyTime .checkbox-label').append(`
+    <div id="studyTimeInputs">
+      <label class="timeInput" for="startStudyTime">
+        <input type="time" id="startStudyTime" name="startStudyTime" value="${settings.startStudyTime}"/>
+        <span>Start study time</span>              
+      </label>
+      <label class="timeInput" for="endStudyTime">
+        <input type="time" id="endStudyTime" name="endStudyTime" value="${settings.endStudyTime}"/>
+        <span>End study time</span>              
+      </label>
+    </div>
+  `);
+  console.log(settings);
+}
+
+function collapseListener() {
+  $('.collapsible').on('click', function listener(event) {
+    if (!event.target.matches('input[type="checkbox"]')) {
+      this.classList.toggle('active');
+      const content = this.nextElementSibling;
+      content.classList.toggle('active');
+      const carot = this.querySelector('.carot-collapsible');
+      if (content.style.maxHeight) {
+        content.style.maxHeight = null;
+        carot.style.transform = 'rotate(0deg)';
+      } else {
+        content.style.maxHeight = `${content.scrollHeight}px`;
+        carot.style.transform = 'rotate(180deg)';
+      }
+    }
+  });
+
+}
 async function markAllChecks() {
   const checkboxes = $('.checkbox-container input[type="checkbox"]');
   checkboxes.each((i, checkbox) => {

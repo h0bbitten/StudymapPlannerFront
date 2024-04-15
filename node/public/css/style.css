@@ -256,14 +256,6 @@
     .active, .collapsible:hover {
       background-color: #243554;
     }
-    
-    /* Style the collapsible content. Note: hidden by default */
-    .lecturelist {
-      padding: 0 18px;
-      display: none;
-      overflow: hidden;
-      background-color: #7a8290;
-    }
 
     #buttons {
       display: flex;
@@ -444,32 +436,7 @@
     height: 100%;
     background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black */
     z-index: 9998; /* Ensure it's above other elements but below the loading GIF */
-  }
-  .collapsible {
-    background-color: #385280;
-    color: #ffffff;
-    cursor: pointer;
-    padding: 18px;
-    width: 100%;
-    border: none;
-    text-align: left;
-    outline: none;
-    font-size: 15px;
-  }
-  
-  /* Add a background color to the button if it is clicked on (add the .active class with JS), and when you move the mouse over it (hover) */
-  .active, .collapsible:hover {
-    background-color: #243554;
-  }
-  
-  /* Style the collapsible content. Note: hidden by default */
-  .lecturelist {
-    padding: 0 18px;
-    display: none;
-    overflow: hidden;
-    align-items: center;
-    background-color: rgb(219, 219, 219);
-  }
+  }  
 
   #buttons {
     display: flex;
@@ -592,5 +559,71 @@
     height: auto;
     width: auto; 
     max-width: 100%; 
-    position: absolute; 
+    position: absolute;
+  }
+  .collapsible {
+    background-color: #385280;
+    color: #ffffff;
+    cursor: pointer;
+    padding: 18px;
+    width: 100%;
+    border: none;
+    text-align: left;
+    outline: none;
+    font-size: 15px;
+  }
+/* Style the collapsible content. Note: hidden by default */
+.lecturelist {
+  padding: 0 18px;
+  max-height: 0;
+  display: none;
+  overflow: hidden;
+  align-items: center;
+  background-color: #385280;
 }
+.lecturelist.active {
+  background-color: #546686;
+  display: block;
+  transition: max-height 0.3s ease-out;
+}
+
+/* Add a background color to the button if it is clicked on (add the .active class with JS), and when you move the mouse over it (hover) */
+.active, .collapsible:hover {
+  background-color: #243554;
+}
+
+.carot-collapsible {
+  width: 24px; /* Adjust according to your design */
+  height: 24px; /* Adjust according to your design */
+  fill: #000; /* Adjust the fill color */
+}
+.collapsible .carot-collapsible {
+  display: inline-block;
+  margin-right: 5px;
+  transition: transform 0.3s;
+}
+#studyTimeInputs {
+  margin-bottom: 10px;
+  max-height: 0;
+  display: none;
+  overflow: hidden;
+  align-items: center;
+  background-color: #385280;
+}
+#studyTimeInputs.active{
+  background-color: #546686;
+  display: block;
+  transition: max-height 0.3s ease-out;
+}
+#studyTimeInputs.active .timeInput{
+  display: block;
+}
+.checkbox-label {
+  position: relative; /* Establishes a positioning context for absolute positioning */
+}
+
+.carot-collapsible {
+  float: right;
+  margin-left: 20px;
+}
+
