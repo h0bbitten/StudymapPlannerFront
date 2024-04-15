@@ -13,7 +13,7 @@ async function mockAlgorithm(User) {
       course.contents.forEach((lecture) => {
         if (lecture.chosen === true) {
           const startTime = currentTime;
-          const endTime = currentTime + (getRandomInt(1, 5) * 3600000);
+          const endTime = currentTime + (getRandomInt(1, 5) * 3600000); 
 
           let timeBlock = {
             title: course.fullname,
