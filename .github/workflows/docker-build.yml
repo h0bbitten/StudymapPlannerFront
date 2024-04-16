@@ -13,8 +13,8 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
       with:
-        repository: h0bbitten/StudymapPlannerFront  # Update repository URL if needed
-      
+        repository: 'h0bbitten/StudymapPlannerFront'  # Ensure this matches your actual repo
+
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v1
 
