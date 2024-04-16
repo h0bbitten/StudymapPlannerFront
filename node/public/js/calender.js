@@ -3,7 +3,7 @@ export default loadCalendar;
 let nav = 0;
 let view = 'week';
 const calendar = document.getElementById('calendar');
-const weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+const weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
 const now = moment();
 let weekNumber = now.isoWeek();
@@ -93,12 +93,26 @@ function loadWeekView() {
   today.setDate(today.getDate() + nav);
 
   const dayOfWeek = today.getDay();
-  const startOfWeek = new Date(today.setDate(today.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 0)));
- 
-  const date = moment(today);
-  const weekNumber = date.isoWeek() + 1;
+  const startOfWeek = new Date(today.setDate(today.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1)));  
+  const date = moment(startOfWeek);
+  const weekNumber = date.isoWeek();
 
-  document.getElementById('monthDisplay').innerText = `${date.format('MMMM')} ${date.format('YYYY')} \n Week: ${weekNumber}`;
+
+  document.getElementById('monthDisplay').innerText = `${date.format('MMMM')} ${date.format('D')} - ${date.add(6, 'days').format('D')}, ${date.format('YYYY')} \n`;
+
+  const weekDaysDiv = document.getElementById('weekdays');
+  if (weekDaysDiv) {
+    let dayNameAbbreviated, dateDisplay, dayHeader;
+    for (let i = 0; i < 7; i++) {
+      const weekDay = moment(startOfWeek).add(i, 'days');
+      dayNameAbbreviated = weekDay.format('ddd');
+      dateDisplay = weekDay.format('M/D');
+      dayHeader = weekDaysDiv.children[i];
+      if (dayHeader) {
+        dayHeader.textContent = `${dayNameAbbreviated} ${dateDisplay}`;
+      }
+    }
+  }
 
   calendar.innerHTML = '';
 
@@ -106,32 +120,32 @@ function loadWeekView() {
 
   for (let hour = startStudyTime; hour <= endStudyTime; hour++) {
     $('.time-labels').append(`
-                              <div class="hour"
-                              style="height: ${hourPX}px; display: flex; align-items: center; padding-left: 10px;">${hour}:00</div>
-                            `);
+      <div class="hour" style="height: ${hourPX}px; display: flex; align-items: center; padding-left: 10px;">
+        ${hour}:00
+      </div>
+    `);
   }
 
-  for (let day = 1; day <= 7; day++) {
-    $('#calendar').append(`<div class="day-interval-${day}"></div>`);
+  for (let day = 0; day < 7; day++) {
+    $('#calendar').append(`<div class="day-interval-${day + 1}"></div>`);
 
-    const weekDay = new Date(startOfWeek.getFullYear(), startOfWeek.getMonth(), startOfWeek.getDate() + day);
-
-    $(`.day-interval-${day}`).append(`<div class="day" id="day${day}" style="flex: 1;">${weekDay.getDate()}</div>`);
+    $(`.day-interval-${day + 1}`).append(`<div class="day" id="day${day + 1}" style="flex: 1;"></div>`);
 
     for (let hour = 1; hour <= 24; hour++) {
-      $(`.day-interval-${day}`).append(`<div class="hour" id="hour${hour}" style="height: ${hourPX}px;"></div>`);
+      $(`.day-interval-${day + 1}`).append(`<div class="hour" id="hour${hour}" style="height: ${hourPX}px;"></div>`);
     }
-
-    $('.week-view .day').css('height', dayPX);
   }
+
+  $('.week-view .day').css('height', dayPX);
+
   const currentWeekStartTime = getStartOfWeek(weekNumber, yearNumber);
   const currentWeekEndTime = getEndOfWeek(weekNumber, yearNumber);
-  console.log(currentWeekStartTime, currentWeekEndTime);
   Timeblocks.forEach((lecture) => {
     addTimeBlock(lecture.startTime, lecture.endTime, lecture.title, lecture.description, lecture.color);
   });
   console.log(startStudyTime, endStudyTime);
 }
+
 
 function getStartOfWeek(week, year) {
   return moment().year(year).isoWeek(weekNumber).startOf('isoWeek').valueOf();
@@ -152,7 +166,6 @@ function addTimeBlock(startTime, endTime, title, description, color) {
     }
   }
 
-  // Iterate as long as startTime is within the current week and there is still time left in the block
   while (startTime < endTime && startTime < currentWeekEndTime) {
     const endOfDay = moment(startTime).endOf('day').valueOf();
     const dayOfWeek = moment(startTime).isoWeekday();
@@ -171,16 +184,12 @@ function addTimeBlock(startTime, endTime, title, description, color) {
   }
 }
 
-
-
-
 function createTimeBlock(startTime, endTime, title, description, color) {
   const top = (minutesIntoDay(startTime) * (1000 / 24 / 60));
   const minuteDuration = (endTime - startTime) / 60000;
   const height = minuteDuration * (1000 / 24 / 60);
 
   console.log(startTime);
-  // Create the HTML markup for the timeblock
   const html = `
       <div class="timeblock" style="height: ${height}px; background-color: ${color}; position: absolute; top: ${top}px; width: 130px; font-size: 13px">
       <div class="time">${convertToTimeString(startTime)} - ${convertToTimeString(endTime)}</div>
