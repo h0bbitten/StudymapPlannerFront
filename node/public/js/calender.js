@@ -98,8 +98,8 @@ function loadWeekView() {
   const weekNumber = date.isoWeek();
 
 
-  document.getElementById('monthDisplay').innerText = `${date.format('MMMM')} ${date.format('D')} - 
-  ${date.add(6, 'days').format('D')}, ${date.format('YYYY')} \n`;
+  document.getElementById('monthDisplay')
+ .innerText = `${date.format('MMMM')} ${date.format('D')} - ${date.add(6, 'days').format('D')}, ${date.format('YYYY')} \n`;
 
   const weekDaysDiv = document.getElementById('weekdays');
   if (weekDaysDiv) {
