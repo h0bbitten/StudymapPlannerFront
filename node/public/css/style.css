@@ -24,6 +24,15 @@
     width: 35px;
     height: 35px;
   }
+
+  #user_profile img{
+    display:inline-block;
+    transform:translatex(-45px) translatey(-26px);
+   }
+
+   #user_profile{
+    transform:translatex(5px) translatey(11px);
+   }
   
   .navbar-icons {
     display: flex;
@@ -104,8 +113,9 @@
     }
 
     #container #header div{
-      width:75% !important;
+      width:742px !important;
      }
+     
     
     #header > div{
       display: flex;
@@ -120,6 +130,7 @@
 #monthDisplay{
   font-family:'Arial Black','Arial Bold',Gadget,sans-serif;
   font-size:28px;
+  transform:translatex(-3px) translatey(51px);
  }
  
     
