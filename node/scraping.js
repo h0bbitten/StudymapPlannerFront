@@ -22,50 +22,50 @@ async function Webscraper(url, forceUpdate = false) {
     });
     // fejlbesked i tilfælde af fejl urelateret til om filen eksisterer
   } catch (error) {
-    if (error.code !== 'Error') {
+    if (error.code !== 'ENOENT') {
       console.error('Error reading file:', error);
       return;
     }
   }
 
-  // scrape hvis forceUpdate er true ELLER hvis url ikke er scraped før
-  if (!forceUpdate && existingData.hasOwnProperty(url)) {
-    // skip hvis url er scraped uden log
-    return;
-  }
-
-  // start en ny browser
-  const browser = await puppeteer.launch();
-  const page = await browser.newPage();
-
-  // Åben linket, networkkidle0 hører under puppeteer, fungerer således at når "network har været idle i 500 ms",
-  // antag navigation som færdiggjort, sikrer at siden er loadet ordentligt
-  await page.goto(url, { waitUntil: 'networkidle0' });
-
-  // hent danske titel og ECTS point ved at finde <td> elementerne og nedhent teksten derimellem
-  const data = await page.evaluate(() => {
-    const tdElements = Array.from(document.querySelectorAll('td'));
-    let titleIndex = tdElements.findIndex((td) => td.textContent.includes('Danish title'));
-    if (titleIndex === -1) {
-      titleIndex = tdElements.findIndex((td) => td.textContent.includes('English title'));
+    // Initialize browser
+    const browser = await puppeteer.launch();
+    const page = await browser.newPage();
+  
+    for (let url of urls) {
+      if (!forceUpdate && existingData.hasOwnProperty(url)) {
+        console.log(`Skipping ${url}, already scraped.`);
+        continue;
+      }
+  
+      // Navigate to the URL
+      await page.goto(url, { waitUntil: 'networkidle0' });
+  
+      // Scrape the data
+      const data = await page.evaluate(() => {
+        const tdElements = Array.from(document.querySelectorAll('td'));
+        let titleIndex = tdElements.findIndex((td) => td.textContent.includes('Danish title'));
+        if (titleIndex === -1) {
+          titleIndex = tdElements.findIndex((td) => td.textContent.includes('English title'));
+        }
+        const ectsIndex = tdElements.findIndex((td) => td.textContent.includes('ECTS'));
+  
+        const titleValue = titleIndex !== -1 ? tdElements[titleIndex + 1].textContent.trim() : 'title not found';
+        const ectsValue = ectsIndex !== -1 ? tdElements[ectsIndex + 1].textContent.trim() : 'ECTS points not found';
+  
+        return { titleValue, ectsValue };
+      });
+  
+      // Store the new or updated data
+      existingData[url] = { title: `Title: ${data.titleValue}`, ects: `ECTS Points: ${data.ectsValue}` };
+      console.log(`Scraped ${url}: ${data.titleValue}, ECTS: ${data.ectsValue}`);
     }
-    const ectsIndex = tdElements.findIndex((td) => td.textContent.includes('ECTS'));
-
-    const titleValue = titleIndex !== -1 ? tdElements[titleIndex + 1].textContent.trim() : 'title not found';
-    const ectsValue = ectsIndex !== -1 ? tdElements[ectsIndex + 1].textContent.trim() : 'ECTS points not found';
-
-    return { titleValue, ectsValue };
-  });
-
-  // luk siden og browseren
-  await page.close();
-  await browser.close();
-
-  // opdater data i txt filen hvis det er en ny URL eller hvis forceUpdate tages i brug.
-  existingData[url] = { title: `Title: ${data.titleValue}`, ects: `ECTS Points: ${data.ectsValue}` };
-  const newDataArray = Object.entries(existingData).map(([url, { title, ects }]) => `${url}, ${title}, ${ects}`);
-  await fs.writeFile(filePath, newDataArray.join('\n'));
-
-  console.log(data.titleValue, 'ECTS:', data.ectsValue);
-  return Number(data.ectsValue);
-}
+  
+    // Close the page and browser
+    await page.close();
+    await browser.close();
+  
+    // Save the updated data to the file
+    const newDataArray = Object.entries(existingData).map(([url, { title, ects }]) => `${url}, ${title}, ${ects}`);
+    await fs.writeFile(filePath, newDataArray.join('\n'));
+  }
