@@ -1,16 +1,15 @@
 import { fileURLToPath } from 'url';
 import path, { dirname } from 'path';
-
 import swaggerDocs from './swagger.js';
 import {
-  getMoodleInfo, logIn, saveOptions, getUserData, calculateSchedule,
+  getMoodleInfo, logIn, saveOptions, getUserData, calculateSchedule, importIcalFile,
 } from './app.js';
 
 const currentFilename = fileURLToPath(import.meta.url);
 const currentDir = dirname(currentFilename);
 const PORT = process.env.PORT || 3000;
 
-const routing = function routes(app) {
+const routing = function routes(app, upload) {
   // Swagger setup
   swaggerDocs(app, PORT);
 
@@ -150,6 +149,12 @@ const routing = function routes(app) {
   app.post('/saveOptions', async (req, res) => {
     await saveOptions(req, res).catch((error) => {
       console.error('Error in saving user options:', error);
+      res.status(500).send('Internal Server Error');
+    });
+  });
+  app.post('/importIcalFile', upload.array('ics', 3), async (req, res) => {
+    await importIcalFile(req, res).catch((error) => {
+      console.error('Error in importing ICAL file:', error);
       res.status(500).send('Internal Server Error');
     });
   });

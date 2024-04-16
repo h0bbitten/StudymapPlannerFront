@@ -1,10 +1,16 @@
 import fs from 'fs';
+import { fileURLToPath } from 'url';
+import path, { dirname } from 'path';
 import Webscraper from './scraping.js';
 import { mockAlgorithm } from './Algorithm.js';
+import ICAL from 'ical.js';
 
 export {
-  getMoodleInfo, logIn, saveOptions, getUserData, calculateSchedule,
+  getMoodleInfo, logIn, saveOptions, getUserData, calculateSchedule, importIcalFile,
 };
+
+const currentFilename = fileURLToPath(import.meta.url);
+const currentDir = dirname(currentFilename);
 
 class WSfunctions {
   constructor(token) {
@@ -306,4 +312,26 @@ async function assignColor(integer) {
       reject(new Error('Input must be a positive integer'));
     }
   });
+}
+
+async function importIcalFile(req, res) {
+  try {
+    const { files } = req;
+    const id = req.session.userid;
+    const parentDir = path.resolve(currentDir, '..');
+    const directory = path.join(parentDir, 'database', 'icals', id.toString());
+    if (!fs.existsSync(directory)) {
+      fs.mkdirSync(directory, { recursive: true });
+    }
+
+    files.forEach((file) => {
+      const filePath = path.join(directory, file.originalname);
+      fs.renameSync(file.path, filePath);
+    });
+
+    res.status(200).send('Files uploaded successfully.');
+  } catch (error) {
+    console.error('Failed to import ICAL file:', error);
+    res.status(500).send('Internal Server Error');
+  }
 }

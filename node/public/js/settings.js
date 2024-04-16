@@ -1,5 +1,5 @@
 import {
-  applyTheme, LoadingScreen, displayProfile, saveUserDataToDB, APIgetCall,
+  applyTheme, LoadingScreen, displayProfile, saveUserDataToDB, APIgetCall, APIpostCall,
 } from './script.js';
 
 async function displaySettings(User) {
@@ -8,6 +8,7 @@ async function displaySettings(User) {
   displayCourses(User.courses);
   displayStudyTime(User.settings);
   displayAccountSettings(User.userid, User.settings);
+  displayImportExport(User.settings);
   $('input[type="checkbox"]').each(subCheckboxChange);
   LoadingScreen.hide();
 }
@@ -87,6 +88,21 @@ function displayAccountSettings(id, settings) {
   $('#removedata').css({ 'background-color': 'red', color: 'white' });
 }
 
+function displayImportExport(settings) {
+  $('#formSetting').append(createCollapsible('Import/Export ICAL', 'importExport'));
+  $('#importExport .checkbox-label').append(`
+    <div class="optionBlock" id="importExportInputs">
+      <div class="optionInput" for="importIcalFile">
+        <span id="importText">Import Data</span>
+        <input type="file" id="importIcalFile" name="importIcalFile" accept=".ics" multiple/>
+      </div>
+      <label class="optionInput" for="exportIcalFile">
+        <a id="exportIcalFile" class="btn btn-primary" href="/exportIcalFile">Export Data</a>                            
+      </label>
+    </div>
+  `);
+}
+
 function collapseListener() {
   $('.collapsible').on('click', function listener(event) {
     if (!event.target.matches('input[type="checkbox"]')) {
@@ -135,6 +151,22 @@ function handleCheckboxChange() {
 
 async function saveOptions(User) {
   $('#saveBtn').on('click', async () => {
+    User.courses.forEach((course, index) => {
+      course.contents.forEach((lecture, k) => {
+        lecture.chosen = $(`#checkbox${k}-forList${index}`).is(':checked');
+      });
+    });
+
+    const ICALfiles = $('#importIcalFile')[0].files;
+    if (ICALfiles.length > 0) {
+      const formData = new FormData();
+      Array.from(ICALfiles).forEach((file) => {
+        formData.append('ics', file);
+        console.log(file.name);
+      });
+      await APIpostCall('importIcalFile', formData, `Error importing ICAL file`, 'multipart/form-data');
+    }
+
     User.settings = {
       ...User.settings,
       startStudyTime: $('#startStudyTime').val(),
@@ -142,15 +174,9 @@ async function saveOptions(User) {
       email: $('#useremail').val(),
     };
 
-    User.courses.forEach((course, index) => {
-      course.contents.forEach((lecture, k) => {
-        lecture.chosen = $(`#checkbox${k}-forList${index}`).is(':checked');
-      });
-    });
-
     await saveUserDataToDB(User);
 
-    window.location.href = 'schedule';
+    // window.location.href = 'schedule';
   });
   $('#removedata').on('click', async () => {
     $('body').children().not('script').remove();
