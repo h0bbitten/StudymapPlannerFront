@@ -93,12 +93,13 @@ function loadWeekView() {
   today.setDate(today.getDate() + nav);
 
   const dayOfWeek = today.getDay();
-  const startOfWeek = new Date(today.setDate(today.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1)));  
+  const startOfWeek = new Date(today.setDate(today.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1)));
   const date = moment(startOfWeek);
   const weekNumber = date.isoWeek();
 
 
-  document.getElementById('monthDisplay').innerText = `${date.format('MMMM')} ${date.format('D')} - ${date.add(6, 'days').format('D')}, ${date.format('YYYY')} \n`;
+  document.getElementById('monthDisplay').innerText = `${date.format('MMMM')} ${date.format('D')} - 
+  ${date.add(6, 'days').format('D')}, ${date.format('YYYY')} \n`;
 
   const weekDaysDiv = document.getElementById('weekdays');
   if (weekDaysDiv) {
@@ -191,7 +192,9 @@ function createTimeBlock(startTime, endTime, title, description, color) {
 
   console.log(startTime);
   const html = `
-      <div class="timeblock" style="height: ${height}px; background-color: ${color}; position: absolute; top: ${top}px; width: 130px; font-size: 13px">
+      <div class="timeblock" style="height: ${height}px; background-color: ${color};
+      position: absolute; top: ${top}px; width: 130px; font-size: 13px">
+      
       <div class="time">${convertToTimeString(startTime)} - ${convertToTimeString(endTime)}</div>
       <div class="title">${title}</div>
           <div class="description" style="display: none;">${description}</div>
