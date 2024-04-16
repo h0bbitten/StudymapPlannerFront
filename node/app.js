@@ -164,7 +164,6 @@ async function saveOptions(req, res) {
   }
 }
 
-
 async function calculateSchedule(req, res) {
   try {
     const User = await retrieveAndParseUserData(req.session.userid);
