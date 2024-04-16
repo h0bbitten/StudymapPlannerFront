@@ -1,7 +1,6 @@
 import fs from 'fs';
 import Webscraper from './scraping.js';
 import { mockAlgorithm } from './Algorithm.js';
-import { ensureUserExists, saveUserDetails } from './database.js';
 
 export {
   getMoodleInfo, logIn, saveOptions, getUserData, calculateSchedule,
@@ -118,51 +117,40 @@ async function getMoodleInfo(req, res) {
     res.status(500).send(`Error getting Moodle info: ${error}`);
   }
 }
+
 async function saveOptions(req, res) {
   try {
     console.log('Saving options');
-    const user = req.body;
-
-    // Validate and parse the user ID
-    const useridInt = parseInt(user.userid, 10);
-    if (isNaN(useridInt)) {
-      return res.status(400).send("User ID must be an integer");
-    }
-    console.log(`Parsed user ID: ${useridInt}`);
-
-    // Ensure user exists in the database or insert them
-    const dbUserId = await ensureUserExists(useridInt);
+    const User = req.body;
 
     // Filter the user object to keep only the required information
     const userDataToSave = {
-      userid: useridInt,
-      courses: user.courses.map(course => ({
+      userid: User.userid,
+      courses: User.courses.map(course => ({
         id: course.id,
         fullname: course.fullname,
-        contents: course.contents, 
-        pages: course.pages 
+        contents: course.contents,
+        pages: course.pages
       }))
     };
 
     // Save the filtered user data to the filesystem
-    fs.writeFile(`./database/${useridInt}.json`, JSON.stringify(userDataToSave, null, 2), (err) => {
+    fs.writeFile(`./database/${User.userid}.json`, JSON.stringify(userDataToSave, null, 2), (err) => {
       if (err) {
         console.error('Error saving user data:', err);
-        return res.status(500).send('Error saving user data');
+        res.status(500).json({ message: 'Error saving user data' });
       } else {
         console.log('User data saved successfully');
+        res.status(200).json({ message: 'User data saved successfully' });
       }
     });
-
-    // Save or update user details in the database
-    await saveUserDetails(dbUserId, userDataToSave);
-
-    res.status(200).send('User data saved successfully');
   } catch (err) {
-    console.error('Error in saveOptions:', err);
-    res.status(500).send('Internal Server Error');
+    console.error('Server error:', err);
+    res.status(500).json({ message: 'Internal Server Error' });
   }
 }
+
+
 
 async function calculateSchedule(req, res) {
   try {
