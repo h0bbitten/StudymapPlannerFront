@@ -117,24 +117,43 @@ async function getMoodleInfo(req, res) {
     res.status(500).send(`Error getting Moodle info: ${error}`);
   }
 }
+
 async function saveOptions(req, res) {
   try {
     console.log('Saving options');
     const User = req.body;
+
+    // Construct user data for database saving
+    const userDataToSave = {
+      userid: User.userid,
+      courses: User.courses.map(course => ({
+        id: course.id,
+        fullname: course.fullname,
+        contents: course.contents,
+        pages: course.pages
+      }))
+    };
+
+    // First, ensure the user exists in the database or create a new entry
+    const userId = await ensureUserExists(User.userid);
+
+    // Save user details to the MySQL database
+    await saveUserDetails(userId, userDataToSave);
+
+    // Save the complete user data to the filesystem (keep this for backward compatibility or other uses)
     fs.writeFile(`./database/${User.userid}.json`, JSON.stringify(User), (err) => {
       if (err) {
         console.error('Error saving User data:', err);
-        res.status(500).send('Error saving User data');
-      } else {
-        console.log('User data saved successfully');
-        res.status(200).send('User data saved successfully');
+        return res.status(500).send('Error saving User data');
       }
+      console.log('User data saved successfully to both MySQL and JSON file');
+      res.status(200).send('User data saved successfully');
     });
   } catch (err) {
+    console.error('Server error:', err);
     res.status(500).send('Internal Server Error');
   }
 }
-
 async function calculateSchedule(req, res) {
   try {
     const User = await retrieveAndParseUserData(req.session.userid);
