@@ -83,15 +83,16 @@ async function saveUserDataToDB(User) {
       body: JSON.stringify(User),
     });
     if (!response.ok) {
-      throw new Error(`Network response was not ok: ${response.status}`);
+      throw new Error(`Network response error: ${response.statusText}`);
     }
-    const responseBody = await response.json();  // Ensure the server sends back JSON
+    const responseBody = await response.json();
     console.log("Server response:", responseBody);
   } catch (error) {
     console.error('Error saving setup data:', error);
     throw error;
   }
 }
+
 
 
 async function APIgetCall(url, errorCallback) {
