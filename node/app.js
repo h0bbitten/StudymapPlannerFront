@@ -1,6 +1,7 @@
 import fs from 'fs';
 import Webscraper from './scraping.js';
 import { mockAlgorithm } from './Algorithm.js';
+import { ensureUserExists, saveOrUpdateCourse, saveUserDetails } from './database.js';
 
 export {
   getMoodleInfo, logIn, saveOptions, getUserData, calculateSchedule,
@@ -118,42 +119,54 @@ async function getMoodleInfo(req, res) {
   }
 }
 
+// Improved saveOptions with better error handling and logging
 async function saveOptions(req, res) {
+  console.log('Received saveOptions request:', req.body);
+  const User = req.body;
+
+  const userDataToSave = {
+    userid: User.userid,
+    courses: User.courses.map(course => ({
+      id: course.id,
+      fullname: course.fullname,
+      contents: course.contents,
+      pages: course.pages
+    }))
+  };
+
   try {
-    console.log('Saving options');
-    const User = req.body;
-
-    // Construct user data for database saving
-    const userDataToSave = {
-      userid: User.userid,
-      courses: User.courses.map(course => ({
-        id: course.id,
-        fullname: course.fullname,
-        contents: course.contents,
-        pages: course.pages
-      }))
-    };
-
-    // First, ensure the user exists in the database or create a new entry
+    // Ensure the user exists in the database or create a new entry
     const userId = await ensureUserExists(User.userid);
+    console.log(`User verified in database with ID: ${userId}`);
 
     // Save user details to the MySQL database
     await saveUserDetails(userId, userDataToSave);
+    console.log('User details saved to MySQL');
 
-    // Save the complete user data to the filesystem (keep this for backward compatibility or other uses)
-    fs.writeFile(`./database/${User.userid}.json`, JSON.stringify(User), (err) => {
-      if (err) {
-        console.error('Error saving User data:', err);
-        return res.status(500).send('Error saving User data');
-      }
-      console.log('User data saved successfully to both MySQL and JSON file');
-      res.status(200).send('User data saved successfully');
+    // Optional: Save the complete user data to the filesystem
+    const fsWriteResult = await new Promise((resolve, reject) => {
+      fs.writeFile(`./database/${User.userid}.json`, JSON.stringify(userDataToSave), (err) => {
+        if (err) {
+          console.error('Error saving User data to file system:', err);
+          reject(err);
+        } else {
+          console.log('User data saved successfully to JSON file');
+          resolve('File written successfully');
+        }
+      });
     });
+    
+    console.log('File system write result:', fsWriteResult);
+    res.status(200).json({ message: 'User data saved successfully' });
   } catch (err) {
-    console.error('Server error:', err);
-    res.status(500).send('Internal Server Error');
+    console.error('Server error during saveOptions:', err);
+    res.status(500).json({ message: 'Internal Server Error', error: err.toString() });
   }
 }
+
+
+
+
 async function calculateSchedule(req, res) {
   try {
     const User = await retrieveAndParseUserData(req.session.userid);
