@@ -292,13 +292,21 @@
         color: white;
     }
   
+
+    .formsList {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      background-color: grey;
+    } 
+
     .forms {
       display: flex;
       justify-content: center;
       align-items: center;
       flex-direction: column;
-    }
-  
+    } 
     #form0div {
       display: flex;
       justify-content: center;

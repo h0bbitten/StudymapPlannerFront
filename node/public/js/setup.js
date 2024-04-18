@@ -71,6 +71,22 @@ function goToNextPage() {
     console.log(`index is ${index}`);
     $(`#form${index - 1}`).hide();
     $(`#form${index}`).show();
+    const examDate = $(`#datepicker${index - 2}`).val();
+    if (examDate === '') {
+      // eslint-disable-next-line no-undef
+      // Displays error message if no exam date is selected
+      Toastify({
+        text: 'Please select an exam date for each course.',
+        duration: 1500,
+        close: false,
+        gravity: 'top',
+        position: 'center',
+        style: {
+          background: 'linear-gradient(to right, #ff416c, #ff4b2b)',
+        },
+      }).showToast();
+      return;
+    }
     if (index === amountOfCourses + 2) {
       next.hideButton();
       save.showButton();
@@ -115,7 +131,7 @@ function goToNextPage() {
           $(`#form${index2}`).append(`
             <div class="datepicker-container">
               <label for="datepicker${i}">Exam date:</label>
-              <input type="text" id="datepicker${i}" class="datepicker" name="datepicker" required>
+              <input type="date" id="datepicker${i}" class="datepicker" name="datepicker" required>
             </div>
             `);
 
@@ -126,7 +142,7 @@ function goToNextPage() {
             });
 
           // Initialize datepicker
-          $(`#datepicker${i}`).datepicker();
+          
        
           // Appends a checkbox for each lecture
         User.courses[i].contents.forEach((lecture, j) => {
@@ -149,6 +165,7 @@ function goToNextPage() {
     $('#form1').show();
     $('#header').text('Which lectures do you want to study for the exam?');
     previous.showButton();
+  
   }
 
   console.log(amountOfCourses);
