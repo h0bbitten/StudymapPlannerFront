@@ -77,23 +77,20 @@ async function saveUserDataToDB(User) {
   try {
     const response = await fetch('http://localhost:3000/saveOptions', {
       method: 'POST',
+      cache: 'no-cache',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(User),
     });
     if (!response.ok) {
-      throw new Error(`Network response error: ${response.statusText}`);
+      throw new Error('Network response error');
     }
-    const responseBody = await response.json();
-    console.log("Server response:", responseBody);
   } catch (error) {
     console.error('Error saving setup data:', error);
     throw error;
   }
 }
-
-
 
 async function APIgetCall(url, errorCallback) {
   try {

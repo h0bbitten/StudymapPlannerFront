@@ -2,9 +2,9 @@ import mysql from 'mysql2/promise';
 
 // Database connection pool
 const pool = mysql.createPool({
-  host: 'localhost',
+  host: 'mysql',
   user: 'root',
-  password: 'studymaproot',
+  password: 'rootyroot',
   database: 'users',
 });
 
@@ -50,4 +50,4 @@ async function saveUserDetails(userID, userData) {
 }
 
 
-export { ensureUserExists, saveOrUpdateCourse, saveUserDetails };
+export { ensureUserExists, saveOrUpdateCourse, saveUserDetails, pool};

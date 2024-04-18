@@ -1,7 +1,7 @@
 import fs from 'fs';
 import Webscraper from './scraping.js';
 import { mockAlgorithm } from './Algorithm.js';
-import { ensureUserExists, saveOrUpdateCourse, saveUserDetails } from './database.js';
+import { ensureUserExists, saveOrUpdateCourse, saveUserDetails, pool} from './database.js';
 
 export {
   getMoodleInfo, logIn, saveOptions, getUserData, calculateSchedule,
@@ -118,53 +118,24 @@ async function getMoodleInfo(req, res) {
     res.status(500).send(`Error getting Moodle info: ${error}`);
   }
 }
-
-// Improved saveOptions with better error handling and logging
 async function saveOptions(req, res) {
-  console.log('Received saveOptions request:', req.body);
-  const User = req.body;
-
-  const userDataToSave = {
-    userid: User.userid,
-    courses: User.courses.map(course => ({
-      id: course.id,
-      fullname: course.fullname,
-      contents: course.contents,
-      pages: course.pages
-    }))
-  };
-
   try {
-    // Ensure the user exists in the database or create a new entry
+    console.log('Saving options');
+    const User = req.body;
+
+    // Ensure user exists in the database or create a new entry
     const userId = await ensureUserExists(User.userid);
-    console.log(`User verified in database with ID: ${userId}`);
 
-    // Save user details to the MySQL database
-    await saveUserDetails(userId, userDataToSave);
-    console.log('User details saved to MySQL');
+    // Save user details to the database
+    await saveUserDetails(userId, User);
+    console.log('User data saved successfully to MySQL');
 
-    // Optional: Save the complete user data to the filesystem
-    const fsWriteResult = await new Promise((resolve, reject) => {
-      fs.writeFile(`./database/${User.userid}.json`, JSON.stringify(userDataToSave), (err) => {
-        if (err) {
-          console.error('Error saving User data to file system:', err);
-          reject(err);
-        } else {
-          console.log('User data saved successfully to JSON file');
-          resolve('File written successfully');
-        }
-      });
-    });
-    
-    console.log('File system write result:', fsWriteResult);
-    res.status(200).json({ message: 'User data saved successfully' });
+    res.status(200).send('User data saved successfully');
   } catch (err) {
-    console.error('Server error during saveOptions:', err);
-    res.status(500).json({ message: 'Internal Server Error', error: err.toString() });
+    console.error('Server error:', err);
+    res.status(500).send('Internal Server Error');
   }
 }
-
-
 
 
 async function calculateSchedule(req, res) {
@@ -178,17 +149,20 @@ async function calculateSchedule(req, res) {
   }
 }
 
-function retrieveAndParseUserData(userid) {
-  return new Promise((resolve, reject) => {
-    fs.readFile(`./database/${userid}.json`, (err, data) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(JSON.parse(data));
-      }
-    });
-  });
+async function retrieveAndParseUserData(userid) {
+  try {
+    const [rows] = await pool.query('SELECT details FROM users WHERE userID = ?', [userid]);
+    if (rows.length > 0) {
+      return JSON.parse(rows[0].details); // Assuming 'details' are stored as a JSON string
+    } else {
+      throw new Error('No user found with the given ID');
+    }
+  } catch (error) {
+    console.error('Failed to retrieve user data from database:', error);
+    throw error;
+  }
 }
+
 
 async function getUserData(req, res) {
   try {
