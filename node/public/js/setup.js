@@ -188,6 +188,8 @@ async function saveOptions() {
 
   User.settings.setupDone = true;
 
+  User.settings.syncCalendars = [];
+
   await saveUserDataToDB(User);
 
   window.location.href = 'schedule';

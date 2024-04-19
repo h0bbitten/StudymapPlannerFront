@@ -7,8 +7,9 @@ async function displaySettings(User) {
   LoadingScreen.show();
   displayCourses(User.courses);
   displayStudyTime(User.settings);
+  displaySyncCalendar(User.userid, User.settings);
+  displayImportExport(User.userid, User.settings);
   displayAccountSettings(User.userid, User.settings);
-  displayImportExport(User.settings);
   $('input[type="checkbox"]').each(subCheckboxChange);
   LoadingScreen.hide();
 }
@@ -87,9 +88,51 @@ function displayAccountSettings(id, settings) {
   $('#logout').css({ 'background-color': 'orange', color: 'white' });
   $('#removedata').css({ 'background-color': 'red', color: 'white' });
 }
+function displaySyncCalendar(userid, settings) {
+  $('#formSetting').append(createCollapsible('Sync Calendar', 'syncCalendar'));
+  $('#syncCalendar .checkbox-label').append(`
+    <div class="optionBlock" id="syncCalendarInputs">
+      <span>Input URL of calendar in iCal format</span>
+      <a href="https://support.google.com/calendar/answer/37648?hl=en#zippy=%2Cget-your-calendar-view-only">Guide to get Google Calendar link</a>
+    </div>
+  `);
+  settings.syncCalendars.forEach((calendar, index) => {
+    $('#syncCalendarInputs').append(addSyncCalendarInput(index, calendar.url, calendar.name, calendar.color));
+  });
+  if (settings.syncCalendars.length === 0) {
+    $('#syncCalendarInputs').append(addSyncCalendarInput());
+  }
+  $('#syncCalendarInputs').append(plusButton('syncCalendarPlus'));
+}
 
-function displayImportExport(settings) {
-  $('#formSetting').append(createCollapsible('Import/Export ICAL', 'importExport'));
+function addSyncCalendarInput(index = 0, url = '', name = '', color = '#385280') {
+  const HTML = `
+  <div class="optionInput SyncCalendarInput">
+    <label for="syncCalendarUrl${index}">
+      <p>Url:</p>
+      <input type="text" id="syncCalendarUrl${index}" placeholder="URL of calendar" value="${url}">
+    </label>  
+    <label for="syncCalendarName${index}">
+      <p>Name:</p>
+      <input type="text" id="syncCalendarName${index}" placeholder="Name for calendar" value="${name}">
+    </label>
+    <label for="syncCalendarColor${index}">
+      <p>Color:</p>
+      <input type="color" id="syncCalendarColor${index}" value="${color}">
+    </label>  
+  </div>`;
+  return HTML;
+}
+
+function plusButton(id) {
+  const HTML = `
+    <label for="${id}">
+      <button type="button" class="btn btn-primary" id="${id}">+</button>
+    </label>`;
+  return HTML;
+}
+function displayImportExport(userid, settings) {
+  $('#formSetting').append(createCollapsible('Import/Export iCal file', 'importExport'));
   $('#importExport .checkbox-label').append(`
     <div class="optionBlock" id="importExportInputs">
       <div class="optionInput" for="importIcalFile">
@@ -149,6 +192,47 @@ function handleCheckboxChange() {
   titleCheckboxChange.call(this);
 }
 
+function toastifyError(message) {
+  // eslint-disable-next-line no-undef
+  Toastify({
+    text: message,
+    duration: 1500,
+    close: false,
+    gravity: 'top',
+    position: 'center',
+    style: {
+      background: 'linear-gradient(to right, #ff416c, #ff4b2b)',
+    },
+  }).showToast();
+}
+
+function plusButtonListener() {
+  $('#syncCalendarPlus').on('click', () => {
+    const syncCalendarInputs = $('#syncCalendarInputs .SyncCalendarInput');
+    let valid = true;
+    syncCalendarInputs.each((index, input) => {
+      const url = $(input).find(`#syncCalendarUrl${index}`).val();
+      const name = $(input).find(`#syncCalendarName${index}`).val();
+      if (url === '' || name === '') {
+        valid = false;
+        toastifyError('Please enter valid URL and Name.');
+        return false;
+      }
+    });
+    if (valid) {
+      $('#syncCalendarPlus').parent().before(addSyncCalendarInput(syncCalendarInputs.length));
+      recalculateOptionBlockHeight();
+    }
+  });
+}
+
+function recalculateOptionBlockHeight() {
+  const optionBlock = $('#syncCalendarInputs');
+  const SyncCalendarInput = $('.SyncCalendarInput');
+  const optionBlockHeight = optionBlock.outerHeight(true) + SyncCalendarInput.outerHeight(true);
+  optionBlock.css('max-height', optionBlockHeight);
+}
+
 async function saveOptions(User) {
   $('#saveBtn').on('click', async () => {
     User.courses.forEach((course, index) => {
@@ -167,16 +251,34 @@ async function saveOptions(User) {
       await APIpostCall('importIcalFile', formData, `Error importing ICAL file`, 'multipart/form-data');
     }
 
+    const syncCalendarInputs = $('#syncCalendarInputs .SyncCalendarInput');
+    const newSyncCalendars = [];
+    syncCalendarInputs.each((index, input) => {
+      const url = $(input).find(`#syncCalendarUrl${index}`).val();
+      const name = $(input).find(`#syncCalendarName${index}`).val();
+      const color = $(input).find(`#syncCalendarColor${index}`).val();
+      if (url !== '' && name !== '') {
+        let syncCalendar = {
+          url: url,
+          name: name,
+          color: color,
+          type: 'url',
+        };
+        newSyncCalendars.push(syncCalendar);
+      }
+    });
+    User.settings.syncCalendars = newSyncCalendars;
     User.settings = {
       ...User.settings,
       startStudyTime: $('#startStudyTime').val(),
       endStudyTime: $('#endStudyTime').val(),
       email: $('#useremail').val(),
     };
+    console.log(User.settings);
 
     await saveUserDataToDB(User);
 
-    // window.location.href = 'schedule';
+    window.location.href = 'schedule';
   });
   $('#removedata').on('click', async () => {
     $('body').children().not('script').remove();
@@ -227,4 +329,5 @@ displayProfile(User);
 displaySettings(User);
 collapseListener();
 checkboxListener();
+plusButtonListener();
 saveOptions(User);

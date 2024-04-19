@@ -3,7 +3,6 @@ import { fileURLToPath } from 'url';
 import path, { dirname } from 'path';
 import Webscraper from './scraping.js';
 import { mockAlgorithm } from './Algorithm.js';
-import ICAL from 'ical.js';
 
 export {
   getMoodleInfo, logIn, saveOptions, getUserData, calculateSchedule, importIcalFile,
