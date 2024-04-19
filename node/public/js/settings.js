@@ -11,34 +11,36 @@ async function displaySettings(User) {
   displayImportExport(User.userid, User.settings);
   displayAccountSettings(User.userid, User.settings);
   $('input[type="checkbox"]').each(subCheckboxChange);
+  $('.optionBlock').prepend('<div class="optionBlockPadding"></div>');
+  $('.optionBlock').append('<div class="optionBlockPadding"></div>');
   LoadingScreen.hide();
 }
 
-function createCollapsible(name, id) {
+function createCollapsible(name, id, addclass = '') {
   const HTML = `
   <div class="collapsible-container" id="${id}">
-    <label class="checkbox-label" for="checkboxtitle">
-      <button type="button" class="collapsible">
-        ${name}
-        <span class="carot-collapsible">
-          <svg fill="#000000" width="20px" height="20px" viewBox="0 0 256 256" id="carot">
-            <path d="M128,188a11.96187,11.96187,0,0,1-8.48535-3.51465l-80-80a12.0001,12.0001,
-              0,0,1,16.9707-16.9707L128,159.0293l71.51465-71.51465a12.0001,12.0001,0,0,1,16.9707,16.9707l-80,
-              80A11.96187,11.96187,0,0,1,128,188Z">
-            </path>
-          </svg>
-        </span>
-      </button>
-    </label>  
+    <div class="collapsible ${addclass}">
+      <span>${name}</span>
+      <span class="carot-collapsible">
+        <svg fill="#000000" width="20px" height="20px" viewBox="0 0 256 256" id="carot">
+          <path d="M128,188a11.96187,11.96187,0,0,1-8.48535-3.51465l-80-80a12.0001,12.0001,
+            0,0,1,16.9707-16.9707L128,159.0293l71.51465-71.51465a12.0001,12.0001,0,0,1,16.9707,16.9707l-80,
+            80A11.96187,11.96187,0,0,1,128,188Z">
+          </path>
+        </svg>
+      </span>
+    </div>
   </div>`;
   return HTML;
 }
 
 function displayCourses(courses) {
+  $('#formSettings').append(createCollapsible('Courses and Lectures', 'courses'));
+  $('#courses').append('<div class="optionBlock courseContainer"></div>');
   courses.forEach((course, index) => {
-    $('#formSetting').append(createCollapsible(course.fullnamedisplay, course.id));
-    $(`#${course.id} .collapsible`).prepend(`<input type="checkbox" id="checkboxTitle${index}" value=${index} class="checkboxTitle">`);
-    $(`#${course.id} .checkbox-label`).append(`<div class="lecturelist" id="course${index}"></div>`);
+    $('#courses .optionBlock').first().append(createCollapsible(course.fullnamedisplay, course.id));
+    $(`#${course.id} .optionTitle`).prepend(`<input type="checkbox" id="checkboxTitle${index}" value=${index} class="checkboxTitle">`);
+    $(`#${course.id}`).append(`<div class="optionBlock lecturelist" id="course${index}"></div>`);
 
     course.contents.forEach((lecture, k) => {
       $(`#course${index}`).append(`
@@ -55,8 +57,8 @@ function displayCourses(courses) {
 }
 
 function displayStudyTime(settings) {
-  $('#formSetting').append(createCollapsible('Study Time', 'studyTime'));
-  $('#studyTime .checkbox-label').append(`
+  $('#formSettings').append(createCollapsible('Study Time', 'studyTime'));
+  $('#studyTime').append(`
     <div class="optionBlock">
       <label class="optionInput" for="startStudyTime">
         <input type="time" id="startStudyTime" name="startStudyTime" value="${settings.startStudyTime}"/>
@@ -70,9 +72,10 @@ function displayStudyTime(settings) {
   `);
   console.log(settings);
 }
+
 function displayAccountSettings(id, settings) {
-  $('#formSetting').append(createCollapsible('Account', 'accountSettings'));
-  $('#accountSettings .checkbox-label').append(`
+  $('#formSettings').append(createCollapsible('Account', 'accountSettings'));
+  $('#accountSettings').append(`
     <div class="optionBlock" id="accountSettingsInputs">
       <label class="optionInput" for="email">
         <span>Change Email</span>              
@@ -88,9 +91,10 @@ function displayAccountSettings(id, settings) {
   $('#logout').css({ 'background-color': 'orange', color: 'white' });
   $('#removedata').css({ 'background-color': 'red', color: 'white' });
 }
+
 function displaySyncCalendar(userid, settings) {
-  $('#formSetting').append(createCollapsible('Sync Calendar', 'syncCalendar'));
-  $('#syncCalendar .checkbox-label').append(`
+  $('#formSettings').append(createCollapsible('Sync Calendar', 'syncCalendar'));
+  $('#syncCalendar').append(`
     <div class="optionBlock" id="syncCalendarInputs">
       <span>Input URL of calendar in iCal format</span>
       <a href="https://support.google.com/calendar/answer/37648?hl=en#zippy=%2Cget-your-calendar-view-only">Guide to get Google Calendar link</a>
@@ -102,7 +106,7 @@ function displaySyncCalendar(userid, settings) {
   if (settings.syncCalendars.length === 0) {
     $('#syncCalendarInputs').append(addSyncCalendarInput());
   }
-  $('#syncCalendarInputs').append(plusButton('syncCalendarPlus'));
+  $('#syncCalendarInputs').append(plusButton('syncCalendarPlus', 'Add new calendar'));
 }
 
 function addSyncCalendarInput(index = 0, url = '', name = '', color = '#385280') {
@@ -124,16 +128,17 @@ function addSyncCalendarInput(index = 0, url = '', name = '', color = '#385280')
   return HTML;
 }
 
-function plusButton(id) {
+function plusButton(id, text = '') {
   const HTML = `
     <label for="${id}">
-      <button type="button" class="btn btn-primary" id="${id}">+</button>
+      <button type="button" class="btn plusBtn" id="${id}">${text}<span>+</span></button>
     </label>`;
   return HTML;
 }
+
 function displayImportExport(userid, settings) {
-  $('#formSetting').append(createCollapsible('Import/Export iCal file', 'importExport'));
-  $('#importExport .checkbox-label').append(`
+  $('#formSettings').append(createCollapsible('Import/Export iCal file', 'importExport'));
+  $('#importExport').append(`
     <div class="optionBlock" id="importExportInputs">
       <div class="optionInput" for="importIcalFile">
         <span id="importText">Import Data</span>
@@ -150,19 +155,27 @@ function collapseListener() {
   $('.collapsible').on('click', function listener(event) {
     if (!event.target.matches('input[type="checkbox"]')) {
       this.classList.toggle('active');
-      const content = this.nextElementSibling;
-      content.classList.toggle('active');
+      const optionBlock = this.nextElementSibling;
+      optionBlock.classList.toggle('active');
       const carot = this.querySelector('.carot-collapsible');
-      if (content.style.maxHeight) {
-        content.style.maxHeight = null;
+      if (optionBlock.style.maxHeight) {
+        optionBlock.style.maxHeight = null;
         carot.style.transform = 'rotate(0deg)';
       } else {
-        content.style.maxHeight = `${content.scrollHeight}px`;
+        optionBlock.style.maxHeight = `${optionBlock.scrollHeight}px`;
         carot.style.transform = 'rotate(180deg)';
+        $(window).trigger('resize');
+      }
+      if (optionBlock.classList.contains('active') && optionBlock.classList.contains('lecturelist')) {
+        const courses = $('.courseContainer');
+        const maxHeight = courses.css('max-height');
+        const newHeight = optionBlock.scrollHeight + maxHeight;
+        courses.css('max-height', newHeight);
       }
     }
   });
 }
+
 function titleCheckboxChange() {
   const $checkbox = $(this);
   if ($checkbox.hasClass('checkboxTitle')) {
@@ -248,7 +261,7 @@ async function saveOptions(User) {
         formData.append('ics', file);
         console.log(file.name);
       });
-      await APIpostCall('importIcalFile', formData, `Error importing ICAL file`, 'multipart/form-data');
+      await APIpostCall('importIcalFile', formData, 'Error importing ICAL file', 'multipart/form-data');
     }
 
     const syncCalendarInputs = $('#syncCalendarInputs .SyncCalendarInput');
@@ -258,7 +271,7 @@ async function saveOptions(User) {
       const name = $(input).find(`#syncCalendarName${index}`).val();
       const color = $(input).find(`#syncCalendarColor${index}`).val();
       if (url !== '' && name !== '') {
-        let syncCalendar = {
+        const syncCalendar = {
           url: url,
           name: name,
           color: color,
