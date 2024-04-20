@@ -67,11 +67,7 @@ function goToPreviousPage() {
 
 function goToNextPage() {
   if (index > 0) {
-    index++;
-    console.log(`index is ${index}`);
-    $(`#form${index - 1}`).hide();
-    $(`#form${index}`).show();
-    const examDate = $(`#datepicker${index - 2}`).val();
+    const examDate = $(`#datepicker${index - 1}`).val();
     if (examDate === '') {
       // eslint-disable-next-line no-undef
       // Displays error message if no exam date is selected
@@ -87,6 +83,10 @@ function goToNextPage() {
       }).showToast();
       return;
     }
+    index++;
+    console.log(`index is ${index}`);
+    $(`#form${index - 1}`).hide();
+    $(`#form${index}`).show();
     if (index === amountOfCourses + 2) {
       next.hideButton();
       save.showButton();
