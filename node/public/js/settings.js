@@ -39,9 +39,10 @@ function displayCourses(courses) {
   $('#courses').append('<div class="optionBlock courseContainer"></div>');
   courses.forEach((course, index) => {
     $('#courses .optionBlock').first().append(createCollapsible(course.fullnamedisplay, course.id));
-    $(`#${course.id} .optionTitle`).prepend(`<input type="checkbox" id="checkboxTitle${index}" value=${index} class="checkboxTitle">`);
+    $(`#${course.id} .collapsible`).prepend(`<input type="checkbox" id="checkboxTitle${index}" value=${index} class="checkboxTitle">`);
     $(`#${course.id}`).append(`<div class="optionBlock lecturelist" id="course${index}"></div>`);
-
+    $(`#course${index}`).append(`<div class="CourseOptions" id="CourseOptions${index}"></div>`);
+    addCourseOptions(index, course);
     course.contents.forEach((lecture, k) => {
       $(`#course${index}`).append(`
             <div class="checkbox checkbox-container">
@@ -54,6 +55,19 @@ function displayCourses(courses) {
         `);
     });
   });
+}
+
+function addCourseOptions(index, course) {
+  $(`#CourseOptions${index}`).append(`
+    <label class="optionInput" for="color${index}">
+      <span>Color</span>              
+      <input type="color" id="color${index}" value="${course.color}"/>
+    </label>
+    <label class="optionInput" for="date${index}">
+      <span>Exam Date</span>              
+      <input type="date" id="date${index}" value="${course.examDate}"/>
+    </label>
+  `);
 }
 
 function displayStudyTime(settings) {
@@ -249,6 +263,7 @@ function recalculateOptionBlockHeight() {
 async function saveOptions(User) {
   $('#saveBtn').on('click', async () => {
     User.courses.forEach((course, index) => {
+      course.color = $(`#color${index}`).val();
       course.contents.forEach((lecture, k) => {
         lecture.chosen = $(`#checkbox${k}-forList${index}`).is(':checked');
       });

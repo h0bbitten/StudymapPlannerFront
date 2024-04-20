@@ -529,6 +529,14 @@ body {
   position: absolute;
 }
 
+.collapsible-container:has(.lecturelist) {
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  align-items: center;
+}
+
 .collapsible {
   background-color: #385280;
   color: #ffffff;
@@ -544,6 +552,7 @@ body {
 
 .collapsible.active, .collapsible:hover {
   background-color: #243554;
+
 }
 
 .carot-collapsible {
@@ -553,15 +562,17 @@ body {
   transition: transform 0.3s;
 }
 
-.optionBlock:not(.lecturelist) {
+.optionBlock {
   padding: 0 18px;
   max-height: 0;
   overflow: hidden;
   border: 1px solid black;
   transition: max-height 0.3s ease-out;
   background-color: #5f7191;
+}
+
+.optionBlock {
   text-align: center;
-  box-sizing: border-box;
 }
 
 .optionInput{
@@ -577,21 +588,6 @@ body {
   float: right;
 }
 
-.lecturelist {
-  padding: 0 18px;
-  max-height: 0;
-  display: none;
-  overflow: hidden;
-  align-items: center;
-  background-color: #385280;
-  border: 1px solid black;
-}
-.lecturelist.active {
-  background-color: #546686;
-  display: block;
-  transition: max-height 0.3s ease-out;
-}
-
 .SyncCalendarInput {
   padding: 20px 0;
 }
@@ -600,3 +596,10 @@ body {
   padding: 10px;
 }
 
+.lecturelist {
+  border: none;
+}
+
+.checkbox-container {
+  text-align: left;
+}
