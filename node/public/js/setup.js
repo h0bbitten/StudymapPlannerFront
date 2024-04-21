@@ -189,6 +189,7 @@ async function saveOptions() {
   User.settings.setupDone = true;
 
   User.settings.syncCalendars = [];
+  User.settings.importedCalendars = [];
 
   await saveUserDataToDB(User);
 

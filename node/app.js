@@ -126,6 +126,20 @@ async function saveOptions(req, res) {
   try {
     console.log('Saving options');
     const User = req.body;
+    User.settings.importedCalendars = User.settings.importedCalendars.filter((calendar) => {
+      if (calendar.type === 'remove') {
+        const id = req.session.userid;
+        const parentDir = path.resolve(currentDir, '..');
+        const filePath = path.join(parentDir, 'database', 'icals', id.toString(), calendar.name);
+        if (fs.existsSync(filePath)) {
+          fs.unlinkSync(filePath);
+          console.log(`File ${calendar.name} removed successfully`);
+          return false;
+        }
+        console.log(`File ${calendar.name} does not exist`);
+      }
+      return true;
+    });
     fs.writeFile(`./database/${User.userid}.json`, JSON.stringify(User), (err) => {
       if (err) {
         console.error('Error saving User data:', err);

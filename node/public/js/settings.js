@@ -59,13 +59,13 @@ function displayCourses(courses) {
 
 function addCourseOptions(index, course) {
   $(`#CourseOptions${index}`).append(`
-    <label class="optionInput" for="color${index}">
-      <span>Color</span>              
-      <input type="color" id="color${index}" value="${course.color}"/>
-    </label>
     <label class="optionInput" for="date${index}">
-      <span>Exam Date</span>              
+      <span>Exam Date:</span>              
       <input type="date" id="date${index}" value="${course.examDate}"/>
+    </label>
+    <label class="optionInput" for="color${index}">
+      <span>Color:</span>              
+      <input type="color" id="color${index}" value="${course.color}"/>
     </label>
   `);
 }
@@ -158,11 +158,28 @@ function displayImportExport(userid, settings) {
         <span id="importText">Import Data</span>
         <input type="file" id="importIcalFile" name="importIcalFile" accept=".ics" multiple/>
       </div>
-      <label class="optionInput" for="exportIcalFile">
-        <a id="exportIcalFile" class="btn btn-primary" href="/exportIcalFile">Export Data</a>                            
+      <div class="optionInput" id="importedIcalFiles">
+      </div>
+      <label class="optionInput" id="exportIcalFile">
+        <a id="exportIcalFile" class="btn btn-primary" href="/exportIcalFile">Export Calendar</a>                            
       </label>
     </div>
   `);
+  if (settings.importedCalendars.length > 0) {
+    $('#importedIcalFiles').append('<span>Imported Calendars</span>');
+    displayImportedCalendars(settings.importedCalendars);
+  }
+}
+
+function displayImportedCalendars(calendars) {
+  calendars.forEach((calendar, index) => {
+    $('#importedIcalFiles').append(`
+      <div class="importedIcalFile">
+        <span>${calendar.name}</span>
+        <button type="button" class="btn btn-primary removeIcalFileBtn" id="removeIcalFile${index}">Remove</button>
+      </div>
+    `);
+  });
 }
 
 function collapseListener() {
@@ -260,6 +277,30 @@ function recalculateOptionBlockHeight() {
   optionBlock.css('max-height', optionBlockHeight);
 }
 
+function removeButtonListener(importedCalendars) {
+  const removeIcalFileBtn = $('.removeIcalFileBtn');
+  removeIcalFileBtn.on('click', function listener(event) {
+    const Filename = $(this).parent().find('span').text();
+    console.log('Removing iCal file:', Filename);
+    const removeFile = {
+      name: Filename,
+      type: 'remove',
+    };
+    const index = importedCalendars.findIndex((file) => file.name === Filename);
+    if (index !== -1) {
+      importedCalendars[index] = removeFile;
+    }
+    $(this).parent().remove();
+    if (allFilesRemoved(importedCalendars)) {
+      $('#importedIcalFiles').empty();
+    }
+  });
+}
+
+function allFilesRemoved(importedCalendars) {
+  return importedCalendars.every((file) => file.type === 'remove');
+}
+
 async function saveOptions(User) {
   $('#saveBtn').on('click', async () => {
     User.courses.forEach((course, index) => {
@@ -269,11 +310,18 @@ async function saveOptions(User) {
       });
     });
 
+    const newImportedCalendars = [];
     const ICALfiles = $('#importIcalFile')[0].files;
     if (ICALfiles.length > 0) {
       const formData = new FormData();
       Array.from(ICALfiles).forEach((file) => {
         formData.append('ics', file);
+        const importCal = {
+          name: file.name,
+          color: '#385280',
+          type: 'file',
+        };
+        newImportedCalendars.push(importCal);
         console.log(file.name);
       });
       await APIpostCall('importIcalFile', formData, 'Error importing ICAL file', 'multipart/form-data');
@@ -295,7 +343,10 @@ async function saveOptions(User) {
         newSyncCalendars.push(syncCalendar);
       }
     });
+
     User.settings.syncCalendars = newSyncCalendars;
+    User.settings.importedCalendars = mergeArrays(User.settings.importedCalendars, newImportedCalendars);
+
     User.settings = {
       ...User.settings,
       startStudyTime: $('#startStudyTime').val(),
@@ -306,48 +357,23 @@ async function saveOptions(User) {
 
     await saveUserDataToDB(User);
 
-    window.location.href = 'schedule';
+    // window.location.href = 'schedule';
   });
-  $('#removedata').on('click', async () => {
-    $('body').children().not('script').remove();
+}
 
-    const ip = await $.getJSON('https://api.ipify.org?format=json');
-    $('body').prepend(
-        `<h1>HELLO ${User.fullname}</h1>`
-      + '<h1>YOU HAVE BEEN HACKED</h1>'
-      + '<h1>ALL YOUR DATA HAS BEEN STOLEN</h1>'
-      + `<h1>WE HAVE YOUR IP ADRESS: ${ip.ip}</h1>`
-      + '<h1>WE HAVE YOUR PASSWORDS</h1>'
-      + '<h1>WE HAVE YOUR EMAILS</h1>'
-      + '<h1>WE HAVE YOUR CREDIT CARD INFORMATION</h1>'
-      + '<h1>WE HAVE YOUR SOCIAL SECURITY NUMBER</h1>'
-      + '<h1>WE HAVE YOUR ADDRESS</h1>'
-      + '<h1>WE HAVE YOUR PHONE NUMBER</h1>'
-      + '<h1>WE HAVE YOUR LOCATION</h1>'
-      + '<h1>WE HAVE YOUR BROWSER HISTORY</h1>'
-      + '<button class="btn btn-primary" onclick="secret()" style="display: block; margin: 0 auto;">TAKE ME BACK!!!</button>'
-    );
-  });
-  $('body').append('<script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>');
-  $('body').append(`<script>
-  function secret() {
-    const randomTop = Math.floor(Math.random() * window.innerHeight);
-    const randomLeft = Math.floor(Math.random() * window.innerWidth);
-  
-    Toastify({
-      text: 'NO.',
-      duration: 1500,
-      close: false,
-      gravity: 'top',
-      style: {
-        top: randomTop + 'px',
-        left: randomLeft + 'px',
-        background: 'linear-gradient(to right, #ff416c, #ff4b2b)',
-      },
-    }).showToast();
+function mergeArrays(oldArray, newArray) {
+  const oldMap = new Map(oldArray.map(obj => [obj.name, obj]));
+
+  for (const newObj of newArray) {
+      if (oldMap.has(newObj.name)) {
+          const oldObj = oldMap.get(newObj.name);
+          Object.assign(oldObj, newObj);
+      } else {
+          oldArray.push(newObj);
+      }
   }
 
-  </script>`);
+  return oldArray;
 }
 
 const User = await APIgetCall('getUserData', 'Error fetching user data');
@@ -358,4 +384,5 @@ displaySettings(User);
 collapseListener();
 checkboxListener();
 plusButtonListener();
+removeButtonListener(User.settings.importedCalendars);
 saveOptions(User);

@@ -152,7 +152,7 @@ const routing = function routes(app, upload) {
       res.status(500).send('Internal Server Error');
     });
   });
-  app.post('/importIcalFile', upload.array('ics', 3), async (req, res) => {
+  app.post('/importIcalFile', upload.array('ics', 5), async (req, res) => {
     await importIcalFile(req, res).catch((error) => {
       console.error('Error in importing ICAL file:', error);
       res.status(500).send('Internal Server Error');

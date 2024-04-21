@@ -69,7 +69,7 @@ class LoadingScreen {
 }
 
 function displayProfile(profile) {
-  $('#user_profile').html(`<p>Welcome back ${profile.fullname}</p><img src="${profile.userpictureurl}" alt="Profile pic">`);
+  $('#user_profile').html(`<p>Welcome ${profile.fullname}</p><img src="${profile.userpictureurl}" alt="Profile pic">`);
 }
 
 async function saveUserDataToDB(User) {
