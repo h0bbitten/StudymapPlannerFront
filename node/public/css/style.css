@@ -129,6 +129,7 @@ a:hover {
 #monthDisplay{
   font-family:'Arial Black','Arial Bold',Gadget,sans-serif;
   font-size:28px;
+<<<<<<< HEAD
   transform:translatex(-3px) translatey(51px);
 }
 
@@ -182,6 +183,58 @@ a:hover {
   background-color: #385280;
 }
 
+=======
+ }
+ 
+    
+    #header div,
+    #weekdays div {
+      width: 100px;
+      padding: 10px;
+      margin: auto;
+      border-right: 2px solid #00000000;
+    }
+    
+    #weekdays {
+      order: 2;
+      background-color: #38528000;
+      color: #ffffff;
+      width: 700px;
+      display: flex;
+    }
+    
+    #calendar {
+      order: 2;
+      width: auto;
+      margin-left: auto;
+      display: flex;
+      flex-wrap: wrap;
+    }
+    .day {
+      width: 100px;
+      padding: 10px;
+      height: 100px;
+      cursor: pointer;
+      box-sizing: border-box;
+      background-color: rgba(63, 63, 63, 0);
+      margin: 0;
+      box-shadow: 0px 0px 3px #CBD4C2;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .day:hover {
+      background-color: #233e6d00;
+    }
+    
+    .day + #currentDay {
+      background-color:#38528000;
+    }
+    .day + #currentDay:hover{
+      background-color: #38528000;
+    }
+    
+>>>>>>> setup-new
 /* Month display */
 #monthDisplay {
   font-family: "Alata", sans-serif;
@@ -259,6 +312,7 @@ a:hover {
   align-items: center;
 }
 
+<<<<<<< HEAD
 #form0div {
   display: flex;
   justify-content: center;
@@ -280,6 +334,67 @@ a:hover {
 .checkbox {
   margin-top: 5px;
 }
+=======
+    #buttons {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      
+    }
+  
+    .btn {
+      background-color: #385280;
+      border: none;
+      color: white;
+      padding: 10px 25px;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 16px;
+      margin-top: 10px;
+      margin-left: 10px;
+      transition-duration: 0.4s;
+      position: center;
+          
+    }
+  
+    .btn:hover {
+        background-color: #2b3e60;
+        color: white;
+    }
+  
+
+    .formsList {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      background-color: grey;
+    } 
+
+    .forms {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    } 
+    #form0div {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      
+    }
+  
+    #header {
+      text-align: center;
+      justify-content: center;
+    }
+  
+    .studyTime {
+      margin-top: 20px;
+      margin-left: 20px;
+    }
+>>>>>>> setup-new
 
 #calendar .time-labels .hour{
   height:40px !important;
@@ -447,10 +562,23 @@ a:hover {
 }
 
 
+<<<<<<< HEAD
 #header {
   text-align: center;
   justify-content: center;
 }
+=======
+  .studyTime {
+    margin-top: 20px;
+    margin-left: 20px;
+    size: 50%;
+  }
+
+  #time{
+    size: 10%;
+  }
+
+>>>>>>> setup-new
 
 .studyTime {
   margin-top: 20px;
@@ -458,11 +586,22 @@ a:hover {
 }
 
 
+<<<<<<< HEAD
 :root {
   --text-color: #333;
   --background-color: #fff;
   --link-color: #007bff;
 }
+=======
+  body {
+    color: var(--text-color);
+    background-color: var(--background-color);
+  }
+  .dark-mode nav {
+    background-color: #1f1f1f00; /* Slightly lighter dark shade for navbar */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0); /* Darker shadow for depth */
+  }
+>>>>>>> setup-new
 
 .dark-mode {
   --text-color: #fff;
@@ -470,6 +609,7 @@ a:hover {
 --link-color: #6c757d;
 }
 
+<<<<<<< HEAD
 body {
   color: var(--text-color);
   background-color: var(--background-color);
@@ -603,3 +743,75 @@ body {
 .checkbox-container {
   text-align: left;
 }
+=======
+  .timeblock {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 8px;
+    font-size: 0.75rem; /* 14px */
+    font-weight: 500;
+    background-color: #f0f0f0; /* light grey background for contrast */
+    border: 1px solid #ccc; /* subtle border */
+    border-radius: 4px;
+    margin-bottom: 4px;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;;
+    line-height: 1.2;
+    transition: transform 0.3s ease, z-index 0s linear 0.3s; /* Smooth transition for transform and delayed z-index */
+    transform-origin: top; /* Ensures the block scales from the top edge */
+    z-index: 1; /* Keeps the block under others by default */
+    overflow: hidden;
+  }
+  .timeblock .time {
+    font-weight: bold;
+    color: #333;
+  }
+  
+  .timeblock .title {
+    color: #555;
+    font-size: clamp(0.75rem, 2.5vw, 0.875rem);
+  }
+  
+  .timeblock .description {
+    display: block; /* show the description by default */
+    color: #777;
+  }
+  .timeblock:hover {
+    background-color: #e0e0e0; 
+    box-shadow: 0px 0px 5px #cbd4c2; 
+    z-index: 2; 
+    transform: scale(1.2); 
+    overflow: visible; 
+    white-space: normal; 
+    height: auto;
+    width: auto; 
+    max-width: 100%; 
+    position: absolute; 
+}
+
+.day {
+  /* Your existing styles */
+  position: relative; /* Ensure the hour lines are positioned relative to the day container */
+}
+
+.day::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 100px; /* Adjust this value to position the hour line appropriately */
+  height: 100%;
+  width: 2px; /* Width of the hour line */
+  background-color: #000; /* Color of the hour line */
+}
+
+.week-view .day {
+  /* Adjust width for week view */
+  width: 150px;
+}
+
+.week-view .day::before {
+  /* Adjust left position for week view */
+  left: 150px;
+}
+>>>>>>> setup-new
