@@ -129,61 +129,6 @@ a:hover {
 #monthDisplay{
   font-family:'Arial Black','Arial Bold',Gadget,sans-serif;
   font-size:28px;
-<<<<<<< HEAD
-  transform:translatex(-3px) translatey(51px);
-}
-
-
-#header div,
-#weekdays div {
-  width: 100px;
-  padding: 10px;
-  margin: auto;
-  border-right: 2px solid #000000;
-}
-
-#weekdays {
-  order: 2;
-  background-color: #385280;
-  color: #ffffff;
-  width: 700px;
-  display: flex;
-}
-
-#calendar {
-  order: 2;
-  width: auto;
-  margin-left: auto;
-  display: flex;
-  flex-wrap: wrap;
-  max-height: 500px;
-  overflow: auto;
-}
-.day {
-  width: 100px;
-  padding: 10px;
-  height: 100px;
-  cursor: pointer;
-  box-sizing: border-box;
-  background-color: rgb(63, 63, 63);
-  margin: 0;
-  box-shadow: 0px 0px 3px #CBD4C2;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
-.day:hover {
-  background-color: #233e6d;
-}
-
-.day + #currentDay {
-  background-color:#385280;
-}
-.day + #currentDay:hover{
-  background-color: #385280;
-}
-
-=======
  }
  
     
@@ -234,7 +179,6 @@ a:hover {
       background-color: #38528000;
     }
     
->>>>>>> setup-new
 /* Month display */
 #monthDisplay {
   font-family: "Alata", sans-serif;
@@ -312,29 +256,6 @@ a:hover {
   align-items: center;
 }
 
-<<<<<<< HEAD
-#form0div {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-
-}
-
-#header {
-  text-align: center;
-  justify-content: center;
-}
-
-.studyTime {
-  margin-top: 20px;
-  margin-left: 20px;
-}
-
-.checkbox {
-  margin-top: 5px;
-}
-=======
     #buttons {
       display: flex;
       justify-content: center;
@@ -394,7 +315,6 @@ a:hover {
       margin-top: 20px;
       margin-left: 20px;
     }
->>>>>>> setup-new
 
 #calendar .time-labels .hour{
   height:40px !important;
@@ -562,12 +482,6 @@ a:hover {
 }
 
 
-<<<<<<< HEAD
-#header {
-  text-align: center;
-  justify-content: center;
-}
-=======
   .studyTime {
     margin-top: 20px;
     margin-left: 20px;
@@ -578,7 +492,6 @@ a:hover {
     size: 10%;
   }
 
->>>>>>> setup-new
 
 .studyTime {
   margin-top: 20px;
@@ -586,13 +499,6 @@ a:hover {
 }
 
 
-<<<<<<< HEAD
-:root {
-  --text-color: #333;
-  --background-color: #fff;
-  --link-color: #007bff;
-}
-=======
   body {
     color: var(--text-color);
     background-color: var(--background-color);
@@ -601,7 +507,6 @@ a:hover {
     background-color: #1f1f1f00; /* Slightly lighter dark shade for navbar */
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0); /* Darker shadow for depth */
   }
->>>>>>> setup-new
 
 .dark-mode {
   --text-color: #fff;
@@ -609,141 +514,6 @@ a:hover {
 --link-color: #6c757d;
 }
 
-<<<<<<< HEAD
-body {
-  color: var(--text-color);
-  background-color: var(--background-color);
-}
-.dark-mode nav {
-  background-color: #1f1f1f; /* Slightly lighter dark shade for navbar */
-  box-shadow: 0 2px 4px rgba(0,0,0,0.5); /* Darker shadow for depth */
-}
-
-.dark-mode .navbar-icon img {
-  filter: invert(1);
-}
-
-.timeblock {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: flex-start;
-  padding: 8px;
-  font-size: 0.75rem; /* 14px */
-  font-weight: 500;
-  background-color: #f0f0f0; /* light grey background for contrast */
-  border: 1px solid #ccc; /* subtle border */
-  border-radius: 4px;
-  margin-bottom: 4px;
-  transition: background-color 0.3s ease, box-shadow 0.3s ease;;
-  line-height: 1.2;
-  transition: transform 0.3s ease, z-index 0s linear 0.3s; /* Smooth transition for transform and delayed z-index */
-  transform-origin: top; /* Ensures the block scales from the top edge */
-  z-index: 1; /* Keeps the block under others by default */
-  overflow: hidden;
-}
-.timeblock .time {
-  font-weight: bold;
-  color: #333;
-}
-
-.timeblock .title {
-  color: #555;
-  font-size: clamp(0.75rem, 2.5vw, 0.875rem);
-}
-
-.timeblock .description {
-  display: block; /* show the description by default */
-  color: #777;
-}
-.timeblock:hover {
-  background-color: #e0e0e0; 
-  box-shadow: 0px 0px 5px #cbd4c2; 
-  z-index: 2; 
-  transform: scale(1.2); 
-  overflow: visible; 
-  white-space: normal; 
-  height: auto;
-  width: auto; 
-  max-width: 100%; 
-  position: absolute;
-}
-
-.collapsible-container:has(.lecturelist) {
-  text-align: left;
-  display: flex;
-  flex-direction: column;
-  flex-wrap: nowrap;
-  align-items: center;
-}
-
-.collapsible {
-  background-color: #385280;
-  color: #ffffff;
-  cursor: pointer;
-  padding: 18px;
-  width: 100%;
-  border: none;
-  text-align: left;
-  outline: none;
-  font-size: 15px;
-  border: 1px solid black;
-}
-
-.collapsible.active, .collapsible:hover {
-  background-color: #243554;
-
-}
-
-.carot-collapsible {
-  margin-right: 5px;
-  float: right;
-  margin-left: 20px;
-  transition: transform 0.3s;
-}
-
-.optionBlock {
-  padding: 0 18px;
-  max-height: 0;
-  overflow: hidden;
-  border: 1px solid black;
-  transition: max-height 0.3s ease-out;
-  background-color: #5f7191;
-}
-
-.optionBlock {
-  text-align: center;
-}
-
-.optionInput{
-  display: block;
-}
-
-.plusBtn {
-  width: 100%;
-  max-width: 400px;
-}
-
-.plusBtn span {
-  float: right;
-}
-
-.SyncCalendarInput {
-  padding: 20px 0;
-}
-
-.optionBlockPadding {
-  padding: 10px;
-}
-
-.lecturelist {
-  border: none;
-}
-
-.checkbox-container {
-  text-align: left;
-}
-=======
   .timeblock {
     display: flex;
     flex-direction: column;
@@ -814,4 +584,3 @@ body {
   /* Adjust left position for week view */
   left: 150px;
 }
->>>>>>> setup-new
