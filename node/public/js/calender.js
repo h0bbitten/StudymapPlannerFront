@@ -104,11 +104,11 @@ function loadWeekView() {
 
   $('#calendar').append('<div class="time-labels"></div>');
 
+  // Add hour marks
   for (let hour = startStudyTime; hour <= endStudyTime; hour++) {
     $('.time-labels').append(`
-                              <div class="hour"
-                              style="height: ${hourPX}px; display: flex; align-items: center; padding-left: 10px;">${hour}:00</div>
-                            `);
+      <div class="hour" style="height: ${hourPX}px; display: flex; align-items: center; padding-left: 10px;">${hour}:00</div>
+    `);
   }
 
   for (let day = 1; day <= 7; day++) {
@@ -118,6 +118,7 @@ function loadWeekView() {
 
     $(`.day-interval-${day}`).append(`<div class="day" id="day${day}" style="flex: 1;">${weekDay.getDate()}</div>`);
 
+    // Add hour marks within each day interval
     for (let hour = 1; hour <= 24; hour++) {
       $(`.day-interval-${day}`).append(`<div class="hour" id="hour${hour}" style="height: ${hourPX}px;"></div>`);
     }
@@ -151,6 +152,12 @@ function addTimeBlock(startTime, endTime, title, description, color) {
     if (endTime <= endOfDay) {
       const dayOfWeek = moment(startTime).isoWeekday();
       $(`#day${dayOfWeek}`).append(createTimeBlock(startTime, endTime, title, description, color));
+      
+      // Add hour lines within the day interval
+      const hourLinesContainer = $(`#hour-lines-${dayOfWeek}`);
+      for (let hour = startStudyTime; hour <= endStudyTime; hour++) {
+        hourLinesContainer.append(`<div class="hour-line" style="height: ${hourPX}px;"></div>`);
+      }
     } else {
       const nextDay = moment(startTime).add(1, 'days').startOf('day');
       if (nextDay.valueOf() < currentWeekEndTime) {
@@ -159,6 +166,12 @@ function addTimeBlock(startTime, endTime, title, description, color) {
         const newStartTime = nextDay.valueOf();
         const newEndTime = newStartTime + duration;
         $(`#day${nextDayOfWeek}`).append(createTimeBlock(newStartTime, newEndTime, title, description, color));
+        
+        // Add hour lines within the day interval
+        const hourLinesContainer = $(`#hour-lines-${nextDayOfWeek}`);
+        for (let hour = startStudyTime; hour <= endStudyTime; hour++) {
+          hourLinesContainer.append(`<div class="hour-line" style="height: ${hourPX}px;"></div>`);
+        }
       }
     }
   }
