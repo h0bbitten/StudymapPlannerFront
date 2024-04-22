@@ -83,6 +83,24 @@ function goToNextPage() {
       }).showToast();
       return;
     }
+    const currentDate = new Date();
+    const selectedDate = new Date(examDate);
+
+    if (selectedDate < currentDate) {
+      // eslint-disable-next-line no-undef
+      // Displays error message if selected exam date is before the current moment
+      Toastify({
+        text: 'Please select a future exam date.',
+        duration: 1500,
+        close: false,
+        gravity: 'top',
+        position: 'center',
+        style: {
+          background: 'linear-gradient(to right, #ff416c, #ff4b2b)',
+        },
+      }).showToast();
+      return;
+    }
     index++;
     console.log(`index is ${index}`);
     $(`#form${index - 1}`).hide();
