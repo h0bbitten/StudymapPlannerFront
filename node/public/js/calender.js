@@ -119,6 +119,7 @@ function loadWeekView() {
 
   $('#calendar').append('<div class="time-labels"></div>');
 
+  // Add hour marks
   for (let hour = startStudyTime; hour <= endStudyTime; hour++) {
     $('.time-labels').append(`
       <div class="hour" style="height: ${hourPX}px; display: flex; align-items: center; padding-left: 10px;">
@@ -132,6 +133,7 @@ function loadWeekView() {
 
     $(`.day-interval-${day + 1}`).append(`<div class="day" id="day${day + 1}" style="flex: 1;"></div>`);
 
+    // Add hour marks within each day interval
     for (let hour = 1; hour <= 24; hour++) {
       $(`.day-interval-${day + 1}`).append(`<div class="hour" id="hour${hour}" style="height: ${hourPX}px;"></div>`);
     }

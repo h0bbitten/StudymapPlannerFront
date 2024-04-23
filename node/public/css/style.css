@@ -259,27 +259,65 @@ a:hover {
   align-items: center;
 }
 
-#form0div {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
+    #buttons {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      
+    }
+  
+    .btn {
+      background-color: #385280;
+      border: none;
+      color: white;
+      padding: 10px 25px;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 16px;
+      margin-top: 10px;
+      margin-left: 10px;
+      transition-duration: 0.4s;
+      position: center;
+          
+    }
+  
+    .btn:hover {
+        background-color: #2b3e60;
+        color: white;
+    }
+  
 
-}
+    .formsList {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      background-color: grey;
+    } 
 
-#header {
-  text-align: center;
-  justify-content: center;
-}
-
-.studyTime {
-  margin-top: 20px;
-  margin-left: 20px;
-}
-
-.checkbox {
-  margin-top: 5px;
-}
+    .forms {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    } 
+    #form0div {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      
+    }
+  
+    #header {
+      text-align: center;
+      justify-content: center;
+    }
+  
+    .studyTime {
+      margin-top: 20px;
+      margin-left: 20px;
+    }
 
 #calendar .time-labels .hour{
   height:40px !important;
@@ -447,10 +485,16 @@ a:hover {
 }
 
 
-#header {
-  text-align: center;
-  justify-content: center;
-}
+  .studyTime {
+    margin-top: 20px;
+    margin-left: 20px;
+    size: 50%;
+  }
+
+  #time{
+    size: 10%;
+  }
+
 
 .studyTime {
   margin-top: 20px;
@@ -458,11 +502,14 @@ a:hover {
 }
 
 
-:root {
-  --text-color: #333;
-  --background-color: #fff;
-  --link-color: #007bff;
-}
+  body {
+    color: var(--text-color);
+    background-color: var(--background-color);
+  }
+  .dark-mode nav {
+    background-color: #1f1f1f00; /* Slightly lighter dark shade for navbar */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0); /* Darker shadow for depth */
+  }
 
 .dark-mode {
   --text-color: #fff;
@@ -470,136 +517,73 @@ a:hover {
 --link-color: #6c757d;
 }
 
-body {
-  color: var(--text-color);
-  background-color: var(--background-color);
-}
-.dark-mode nav {
-  background-color: #1f1f1f; /* Slightly lighter dark shade for navbar */
-  box-shadow: 0 2px 4px rgba(0,0,0,0.5); /* Darker shadow for depth */
+  .timeblock {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 8px;
+    font-size: 0.75rem; /* 14px */
+    font-weight: 500;
+    background-color: #f0f0f0; /* light grey background for contrast */
+    border: 1px solid #ccc; /* subtle border */
+    border-radius: 4px;
+    margin-bottom: 4px;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;;
+    line-height: 1.2;
+    transition: transform 0.3s ease, z-index 0s linear 0.3s; /* Smooth transition for transform and delayed z-index */
+    transform-origin: top; /* Ensures the block scales from the top edge */
+    z-index: 1; /* Keeps the block under others by default */
+    overflow: hidden;
+  }
+  .timeblock .time {
+    font-weight: bold;
+    color: #333;
+  }
+  
+  .timeblock .title {
+    color: #555;
+    font-size: clamp(0.75rem, 2.5vw, 0.875rem);
+  }
+  
+  .timeblock .description {
+    display: block; /* show the description by default */
+    color: #777;
+  }
+  .timeblock:hover {
+    background-color: #e0e0e0; 
+    box-shadow: 0px 0px 5px #cbd4c2; 
+    z-index: 2; 
+    transform: scale(1.2); 
+    overflow: visible; 
+    white-space: normal; 
+    height: auto;
+    width: auto; 
+    max-width: 100%; 
+    position: absolute; 
 }
 
-.dark-mode .navbar-icon img {
-  filter: invert(1);
+.day {
+  /* Your existing styles */
+  position: relative; /* Ensure the hour lines are positioned relative to the day container */
 }
 
-.timeblock {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: flex-start;
-  padding: 8px;
-  font-size: 0.75rem; /* 14px */
-  font-weight: 500;
-  background-color: #f0f0f0; /* light grey background for contrast */
-  border: 1px solid #ccc; /* subtle border */
-  border-radius: 4px;
-  margin-bottom: 4px;
-  transition: background-color 0.3s ease, box-shadow 0.3s ease;;
-  line-height: 1.2;
-  transition: transform 0.3s ease, z-index 0s linear 0.3s; /* Smooth transition for transform and delayed z-index */
-  transform-origin: top; /* Ensures the block scales from the top edge */
-  z-index: 1; /* Keeps the block under others by default */
-  overflow: hidden;
-}
-.timeblock .time {
-  font-weight: bold;
-  color: #333;
-}
-
-.timeblock .title {
-  color: #555;
-  font-size: clamp(0.75rem, 2.5vw, 0.875rem);
-}
-
-.timeblock .description {
-  display: block; /* show the description by default */
-  color: #777;
-}
-.timeblock:hover {
-  background-color: #e0e0e0; 
-  box-shadow: 0px 0px 5px #cbd4c2; 
-  z-index: 2; 
-  transform: scale(1.2); 
-  overflow: visible; 
-  white-space: normal; 
-  height: auto;
-  width: auto; 
-  max-width: 100%; 
+.day::before {
+  content: "";
   position: absolute;
+  top: 0;
+  left: 100px; /* Adjust this value to position the hour line appropriately */
+  height: 100%;
+  width: 2px; /* Width of the hour line */
+  background-color: #000; /* Color of the hour line */
 }
 
-.collapsible-container:has(.lecturelist) {
-  text-align: left;
-  display: flex;
-  flex-direction: column;
-  flex-wrap: nowrap;
-  align-items: center;
+.week-view .day {
+  /* Adjust width for week view */
+  width: 150px;
 }
 
-.collapsible {
-  background-color: #385280;
-  color: #ffffff;
-  cursor: pointer;
-  padding: 18px;
-  width: 100%;
-  border: none;
-  text-align: left;
-  outline: none;
-  font-size: 15px;
-  border: 1px solid black;
-}
-
-.collapsible.active, .collapsible:hover {
-  background-color: #243554;
-
-}
-
-.carot-collapsible {
-  margin-right: 5px;
-  float: right;
-  margin-left: 20px;
-  transition: transform 0.3s;
-}
-
-.optionBlock {
-  padding: 0 18px;
-  max-height: 0;
-  overflow: hidden;
-  border: 1px solid black;
-  transition: max-height 0.3s ease-out;
-  background-color: #5f7191;
-}
-
-.optionBlock {
-  text-align: center;
-}
-
-.optionInput{
-  display: block;
-}
-
-.plusBtn {
-  width: 100%;
-  max-width: 400px;
-}
-
-.plusBtn span {
-  float: right;
-}
-
-.SyncCalendarInput {
-  padding: 20px 0;
-}
-
-.optionBlockPadding {
-  padding: 10px;
-}
-
-.lecturelist {
-  border: none;
-}
-
-.checkbox-container {
-  text-align: left;
+.week-view .day::before {
+  /* Adjust left position for week view */
+  left: 150px;
 }
