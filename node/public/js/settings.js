@@ -57,28 +57,18 @@ function displayCourses(courses) {
   });
 }
 
-  markAll.addButton();
-  clearAll.addButton();
-  markAll.showButton();
-  clearAll.showButton();
-
-  $('#formSetting').append(`
-    <div class="collapsible-container">
-    <button type="button" class="collapsible">Study Time</button>
-    <div class="lecturelist" id="studyTime" style="display: none">
-    <div class="checkbox checkbox-container">
-    <label class="checkbox-label time" for="startStudyTime">
-    <input type="time" id="startStudyTime" name="startStudyTime" value="${User.settings.startStudyTime}"/>
-    <span>Start study time</span>              
+function addCourseOptions(index, course) {
+  $(`#CourseOptions${index}`).append(`
+    <label class="optionInput" for="date${index}">
+      <span>Exam Date:</span>              
+      <input type="date" id="date${index}" value="${course.examDate}"/>
     </label>
-    </div>
-    <div class="checkbox checkbox-container">
-    <label class="checkbox-label time" for="endStudyTime">
-    <input type="time" id="endStudyTime" name="endStudyTime" value="${User.settings.endStudyTime}"/>
-    <span>End study time</span>              
+    <label class="optionInput" for="color${index}">
+      <span>Color:</span>              
+      <input type="color" id="color${index}" value="${course.color}"/>
     </label>
   `);
-
+}
 
 function displayStudyTime(settings) {
   $('#formSettings').append(createCollapsible('Study Time', 'studyTime'));
