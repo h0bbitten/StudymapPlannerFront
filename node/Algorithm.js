@@ -172,6 +172,7 @@ function enqueue(value, priority, size) {
   this.queue[size].value = value;
   this.queue[size].priority = priority;
 }
+
 function peek(value, priority) {
   let highestPriority = Number.MIN_SAFE_INTEGER;
   let index = -1;
