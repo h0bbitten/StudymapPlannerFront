@@ -250,4 +250,12 @@ function initButtons(timeblocks) {
     nav = 0;
     loadCalendar(timeblocks);
   });
+
+  document.getElementById('todayButton').addEventListener('click', () => {
+    view = 'week';
+    nav = 0;
+    weekNumber = now.isoWeek();
+    yearNumber = now.year();
+    loadCalendar(timeblocks);
+  });
 }
