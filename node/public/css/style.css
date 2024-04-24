@@ -259,27 +259,65 @@ a:hover {
   align-items: center;
 }
 
-#form0div {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
+    #buttons {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      
+    }
+  
+    .btn {
+      background-color: #385280;
+      border: none;
+      color: white;
+      padding: 10px 25px;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 16px;
+      margin-top: 10px;
+      margin-left: 10px;
+      transition-duration: 0.4s;
+      position: center;
+          
+    }
+  
+    .btn:hover {
+        background-color: #2b3e60;
+        color: white;
+    }
+  
 
-}
+    .formsList {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      background-color: grey;
+    } 
 
-#header {
-  text-align: center;
-  justify-content: center;
-}
-
-.studyTime {
-  margin-top: 20px;
-  margin-left: 20px;
-}
-
-.checkbox {
-  margin-top: 5px;
-}
+    .forms {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    } 
+    #form0div {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      
+    }
+  
+    #header {
+      text-align: center;
+      justify-content: center;
+    }
+  
+    .studyTime {
+      margin-top: 20px;
+      margin-left: 20px;
+    }
 
 #calendar .time-labels .hour{
   height:40px !important;
@@ -451,6 +489,16 @@ a:hover {
   text-align: center;
   justify-content: center;
 }
+  .studyTime {
+    margin-top: 20px;
+    margin-left: 20px;
+    size: 50%;
+  }
+
+  #time{
+    size: 10%;
+  }
+
 
 .studyTime {
   margin-top: 20px;
@@ -463,6 +511,14 @@ a:hover {
   --background-color: #fff;
   --link-color: #007bff;
 }
+  body {
+    color: var(--text-color);
+    background-color: var(--background-color);
+  }
+  .dark-mode nav {
+    background-color: #1f1f1f00; /* Slightly lighter dark shade for navbar */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0); /* Darker shadow for depth */
+  }
 
 .dark-mode {
   --text-color: #fff;
