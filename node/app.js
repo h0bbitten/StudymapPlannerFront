@@ -82,46 +82,64 @@ async function logIn(req, res) {
 }
 async function getMoodleInfo(req, res) {
   try {
-    const Moodle = new WSfunctions(req.session.token);
-    let User = {};
+    let token = req.session.token;
+    let Moodle = new WSfunctions(token);
+    let user = {};
 
     try {
-      const webserviceeResponse = await Moodle.core_webservice_get_site_info();
-      User = {
-        userid: webserviceeResponse.userid,
-        fullname: webserviceeResponse.fullname,
-        userpictureurl: webserviceeResponse.userpictureurl,
-        sitename: webserviceeResponse.sitename,
-        siteurl: webserviceeResponse.siteurl,
-        lang: webserviceeResponse.lang,
+      const webserviceResponse = await Moodle.core_webservice_get_site_info();
+      user = {
+        userid: webserviceResponse.userid,
+        fullname: webserviceResponse.fullname,
+        userpictureurl: webserviceResponse.userpictureurl,
+        sitename: webserviceResponse.sitename,
+        siteurl: webserviceResponse.siteurl,
+        lang: webserviceResponse.lang,
         courses: [],
       };
-      const courseresponse = await Moodle.core_course_get_enrolled_courses_by_timeline_classification();
-      User.courses = courseresponse.courses;
-      // We should come up with better filtering system, maybe on client side, but works for now
-      User.courses = User.courses.filter((course) => course.enddate !== 2527282800);
 
-      const coursePromises = User.courses.map(async (course) => {
-        const contents = await Moodle.core_course_get_contents(course.id);
-        const pages = await Moodle.mod_page_get_pages_by_courses(course.id);
-        const color = await assignColor(course.id);
-        const modulelink = await findModulelink(pages.pages);
-        const ECTS = modulelink ? await Webscraper(modulelink) : null;
+      let courseresponse = await Moodle.core_course_get_enrolled_courses_by_timeline_classification();
+      user.courses = courseresponse.courses.filter(course => course.enddate !== 2527282800);
 
-        return {
-          ...course, contents, pages: pages.pages, color, modulelink, ECTS,
-        };
-      });
+      user.courses = await scrapeModuleLinks(user.courses, Moodle);
 
-      User.courses = await Promise.all(coursePromises);
     } catch (error) {
-      console.error('Failed to get MoodleAPI data:', error);
+      console.error('Failed to get enrolled courses:', error);
     }
-    res.send(User);
+    res.send(user);
   } catch (error) {
     res.status(500).send(`Error getting Moodle info: ${error}`);
   }
 }
+
+
+async function scrapeModuleLinks(courses, Moodle) {
+  const enrichedCourses = courses.map(async (course) => {
+    const contents = await Moodle.core_course_get_contents(course.id);
+    const pages = await Moodle.mod_page_get_pages_by_courses(course.id);
+    const color = await assignColor(course.id);
+
+    // Check if pages.pages exists and is iterable
+    let modulelink;
+    if (pages && pages.pages && Array.isArray(pages.pages)) {
+      modulelink = await findModulelink(pages.pages);
+    } else {
+      console.error('Pages structure not as expected:', pages);
+    }
+
+    let ECTS = undefined;
+    if (modulelink) {
+      ECTS = await Webscraper(modulelink);
+    }
+
+    return {
+      ...course, contents, pages: pages.pages, color, modulelink, ECTS
+    };
+  });
+
+  return Promise.all(enrichedCourses);
+}
+
 async function saveOptions(req, res) {
   try {
     console.log('Saving options');
