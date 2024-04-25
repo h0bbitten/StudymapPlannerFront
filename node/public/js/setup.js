@@ -69,7 +69,6 @@ function goToNextPage() {
   if (index > 0) {
     const examDate = $(`#datepicker${index - 1}`).val();
     if (examDate === '') {
-      // eslint-disable-next-line no-undef
       // Displays error message if no exam date is selected
       Toastify({
         text: 'Please select an exam date for each course.',
@@ -87,7 +86,6 @@ function goToNextPage() {
     const selectedDate = new Date(examDate);
 
     if (selectedDate < currentDate) {
-      // eslint-disable-next-line no-undef
       // Displays error message if selected exam date is before the current moment
       Toastify({
         text: 'Please select a future exam date.',
