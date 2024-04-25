@@ -1,55 +1,85 @@
 import moment from 'moment';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
-import path, { dirname, parse } from 'path';
+import path, { dirname } from 'path';
 import ICAL from 'ical.js';
 import fetch from 'node-fetch';
-import { decode } from 'punycode';
-import { getUserData } from './app';
-
-export { Algorithm, mockAlgorithm };
 
 const { promises: fsPromises } = fs;
-
 const currentFilename = fileURLToPath(import.meta.url);
 const currentDir = dirname(currentFilename);
 
-async function mockAlgorithm(User) {
-  console.log('Calculating schedule for:', User.fullname);
+class PriorityQueue {
+  constructor() {
+    this.queue = [];
+    this.size = 0;
+  }
 
-  const events = await getEvents(User.userid, User.settings.syncCalendars);
-  let currentTime = moment().valueOf();
-  let lectures = [];
-  User.courses.forEach((course) => {
-    if (course.chosen === true) {
-      course.contents.forEach((lecture) => {
-        if (lecture.chosen === true) {
-          let startTime = currentTime;
-          let endTime = currentTime + (getRandomInt(1, 5) * 3600000);
-          events.forEach((event) => {
-            if (!(endTime < event.startTime || event.endTime < startTime)) {
-              const duration = (endTime - startTime);
-              startTime = event.endTime + (15 * 60000);
-              endTime = startTime + duration;
-            }
-          });
-          const timeBlock = {
-            title: course.fullname,
-            description: lecture.name,
-            startTime: startTime,
-            endTime: endTime,
-            color: course.color,
-          };
-          currentTime = endTime + (15 * 60000);
-          lectures.push(timeBlock);
-        }
-      });
+  enqueue(element) {
+    this.queue.push(element);
+    this.queue.sort((a, b) => b.priority - a.priority);
+    this.size++;  
+  }
+
+  dequeue() {
+    if (!this.isEmpty()) {
+      this.size--;
+      return this.queue.shift();
     }
-  });
+  }
 
-  lectures = lectures.concat(events);
-  return lectures;
+  peek() {
+    return this.queue[0];
+  }
+
+  isEmpty() {
+    return this.size === 0;
+  }
 }
+
+
+function calculatePriority(ECTS, examDate) {
+  const today = moment();
+  const daysToExam = moment(examDate).diff(today, 'days');
+  return (ECTS / Math.max(1, daysToExam)) * 100; 
+
+async function mockAlgorithm(User) {
+  console.log('Start mockAlgorithm with User:', User);
+  try {
+      console.log('Fetching iCal Events...');
+      const icalEvents = await getEvents(User.userid, User.settings.syncCalendars);
+      console.log('iCal Events:', icalEvents);
+
+      console.log('Fetching Moodle Events...');
+      const moodleEvents = parseMoodleCourses(User.courses);
+      console.log('Moodle Events:', moodleEvents);
+
+      console.log('Merging Events...');
+      const combinedEvents = mergeEvents(icalEvents, moodleEvents);
+      console.log('Combined Events:', combinedEvents);
+
+      const queue = new PriorityQueue();
+      combinedEvents.forEach(event => {
+          queue.enqueue(event);  
+          console.log('Enqueued Event:', event);
+      });
+
+      let lectures = [];
+      while (!queue.isEmpty()) {
+          let event = queue.dequeue();
+          console.log('Dequeued Event:', event);
+          lectures.push(event);
+      }
+
+      console.log('Final Scheduled Lectures:', lectures);
+      return lectures;  
+  } catch (error) {
+      console.error('Error in mockAlgorithm:', error);
+      throw error;  
+  }
+}
+
+
 
 function getRandomInt(min, max) {
   min = Math.ceil(min);
@@ -58,164 +88,96 @@ function getRandomInt(min, max) {
 }
 
 async function getEvents(userid, syncCalendars) {
-  try {
-    const urls = await retrieveICalURLs(userid, syncCalendars);
-    const events = await parseICalFiles(urls);
-    return events;
-  } catch (error) {
-    console.error('Error fetching events:', error);
-    throw error;
-  }
+  const urls = await retrieveICalURLs(userid, syncCalendars);
+  return await parseICalFiles(urls);
 }
 
 async function retrieveICalURLs(userid, syncCalendars) {
-  const parentDir = path.resolve(currentDir, '..');
-  const directory = path.join(parentDir, 'database', 'icals', userid.toString());
+  const directory = path.join(currentDir, '..', 'database', 'icals', userid.toString());
+  await fsPromises.mkdir(directory, { recursive: true }).catch(() => {});
 
-  try {
-    // Check if the directory exists
-    const directoryExists = await fsPromises.access(directory, fs.constants.F_OK)
-      .then(() => true)
-      .catch(() => false);
-
-    if (!directoryExists) {
-      console.error('Directory does not exist:', directory);
-      return syncCalendars;
-    }
-
-    let fileUrls = await fsPromises.readdir(directory);
-    fileUrls = fileUrls.map((url) => {
-      const fileInfo = {
-        url: path.join(directory, url),
-        name: url,
-        color: '#FF0000',
-        type: 'file',
-      };
-      return fileInfo;
-    });
-    console.log(fileUrls);
-    const linkUrls = syncCalendars;
-    const Urls = fileUrls.concat(linkUrls);
-    return Urls;
-  } catch (error) {
-    console.error('Error reading directory:', directory, error);
-    throw error;
-  }
+  let fileUrls = await fsPromises.readdir(directory);
+  fileUrls = fileUrls.map(url => ({
+    url: path.join(directory, url),
+    name: url,
+    color: '#FF0000',
+    type: 'file',
+  }));
+  return fileUrls.concat(syncCalendars);
 }
+
 
 async function parseICalFiles(icalURLs) {
-  try {
-    console.log('Parsing ICAL files:', icalURLs);
-
-    const eventPromises = icalURLs.map(async (url, index) => {
+  console.log('Received iCal URLs:', icalURLs);  
+  const eventPromises = icalURLs.map(async (url) => {
+      console.log('Attempting to fetch and parse iCal file:', url.url);
       try {
-        console.log('Parsing ICAL file:', url.url);
-        let icalData;
-        if (url.type === 'file') {
-          console.log('Reading local ICAL file:', url.url);
-          icalData = await fs.promises.readFile(url.url, 'utf-8');
-        } else {
-          console.log('Fetching external ICAL file:', url.url);
-          const response = await fetch(url.url);
-          icalData = await response.text();
-        }
-        const jcalData = ICAL.parse(icalData);
-        const vcalendar = new ICAL.Component(jcalData);
-        const vevents = vcalendar.getAllSubcomponents();
-        const events = vevents.map((vevent) => {
-          const event = {
-            title: vevent.getFirstPropertyValue('summary'),
-            description: vevent.getFirstPropertyValue('description'),
-            startTime: vevent.getFirstPropertyValue('dtstart').toUnixTime() * 1000,
-            endTime: vevent.getFirstPropertyValue('dtend').toUnixTime() * 1000,
-            color: url.color,
-          };
-          return event;
-        });
-        return events;
+          let icalData = url.type === 'file' ?
+              await fsPromises.readFile(url.url, 'utf-8') :
+              await fetch(url.url).then(response => response.text());
+
+          console.log(`Fetched data from ${url.url}:`, icalData.substring(0, 200)); 
+          const jcalData = ICAL.parse(icalData);
+          const vcalendar = new ICAL.Component(jcalData);
+          const events = vcalendar.getAllSubcomponents('vevent').map(vevent => ({
+              title: vevent.getFirstPropertyValue('summary'),
+              description: vevent.getFirstPropertyValue('description'),
+              startTime: vevent.getFirstPropertyValue('dtstart').toUnixTime() * 1000,
+              endTime: vevent.getFirstPropertyValue('dtend').toUnixTime() * 1000,
+              color: url.color,
+          }));
+          console.log('Parsed events:', events);
+          return events;
       } catch (error) {
-        console.error('Error parsing ICAL file:', url.url, error);
-        return [];
+          console.error('Error fetching or parsing iCal file:', error);
+          return [];
       }
-    });
-    const eventsArray = await Promise.all(eventPromises);
-    const events = eventsArray.flat();
-    return events;
-  } catch (error) {
-    console.error('Error parsing ICAL files:', error);
-    throw error;
-  }
-}
-
-class Course {
-  constructor(queue, size, name, examDate, ECTS, subjects) {
-    // Course info skal fetches her
-    this.queue = [];
-    this.name = User.name;
-    this.examDate = examDate;
-    this.ECTS = User.ECTS;
-    this.subjects = User.subjects;
-    console.log(this.queue);
-    console.log(this.ECTS);
-  }
-}
-
-class studyBlock {
-  constructor(date, duration) {
-    this.date = date;
-    this.duration = duration;
-  }
-}
-
-function enqueue(value, priority, size) {
-  size++;
-
-  this.queue[size].value = value;
-  this.queue[size].priority = priority;
-}
-function peek(value, priority) {
-  let highestPriority = Number.MIN_SAFE_INTEGER;
-  let index = -1;
-
-  for (let i = 0; i <= this.size; i++) {
-    // If priority is same choose
-    // the element with the
-    // highest value
-    if (highestPriority == this.queue[i].priority && index > -1
-            && this.queue[index].value < this.queue[i].value) {
-      highestPriority = this.queue[i].priority;
-      index = i;
-    }
-  }
-
-  return index;
-}
-
-function dequeue() {
-  const index = peek();
-
-  // Shift the element one index before
-  // from the position of the element
-  // with highest priority is found
-  for (let i = index; i < this.size; i++) {
-    this.queue[i] = this.queue[i + 1];
-  }
-
-  // Decrease the size of the
-  // priority queue by one
-  this.size--;
-}
-
-function Algorithm(User) {
-  User.courses.forEach((course) => {
-    const courseSomething = new Course(course.queue, course.size, course.name, course.examDate, course.ECTS, course.subjects);
-
-    course.contents.forEach((lecture, i) => {
-      courseSomething.queue.push({ name: lecture.name, priority: i });
-    });
-
-    enqueue(courseSomething, courseSomething.priority, courseSomething.length);
   });
-  console.log(User.queue);
-  return User.queue;
+
+  const parsedEvents = await Promise.all(eventPromises);
+  const flatEvents = parsedEvents.flat();
+  console.log('All parsed iCal events:', flatEvents);
+  return flatEvents;
 }
+
+function parseMoodleCourses(courses) {
+  let events = [];
+  if (!courses) {
+    console.error('No courses data available.');
+    return events; 
+  }
+
+  courses.forEach(course => {
+    if (course.chosen && course.contents) {
+      console.log(`Processing course: ${course.fullname}`);
+      course.contents.forEach(content => {
+        if (content.dates && Array.isArray(content.dates) && content.dates.length > 0) {
+          content.dates.forEach(date => {
+            if (date.startTime && date.endTime) {  
+              events.push({
+                title: course.name,
+                description: content.name || 'No description',  
+                startTime: moment.unix(date.startTime).valueOf(),
+                endTime: moment.unix(date.endTime).valueOf(),
+                color: course.color || '#0000FF'  
+              });
+            }
+          });
+        } else {
+          console.log(`No valid dates found for content in course: ${course.fullname}`);
+        }
+      });
+    } else {
+      console.log(`Course not chosen or missing content: ${course.fullname}`);
+    }
+  });
+  console.log('Moodle Events Parsed:', events);
+  return events;
+}
+
+
+function mergeEvents(icalEvents, moodleEvents) {
+  return [...icalEvents, ...moodleEvents].sort((a, b) => a.startTime - b.startTime);
+}
+
+export { mockAlgorithm };
