@@ -244,12 +244,16 @@ function initButtons(timeblocks) {
   document.getElementById('weekButton').addEventListener('click', () => {
     view = 'week';
     nav = 0;
+    weekNumber = now.isoWeek();
+    yearNumber = now.year();
     loadCalendar(timeblocks);
   });
 
   document.getElementById('monthButton').addEventListener('click', () => {
     view = 'month';
     nav = 0;
+    weekNumber = now.isoWeek();
+    yearNumber = now.year();
     loadCalendar(timeblocks);
   });
 
