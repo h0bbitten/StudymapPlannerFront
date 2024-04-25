@@ -19,36 +19,44 @@ async function mockAlgorithm(User) {
   const events = await getEvents(User.userid, User.settings.syncCalendars);
   let currentTime = moment().valueOf();
   let lectures = [];
-  User.courses.forEach((course) => {
-    if (course.chosen === true) {
-      course.contents.forEach((lecture) => {
-        if (lecture.chosen === true) {
-          let startTime = currentTime;
-          let endTime = currentTime + (getRandomInt(1, 5) * 3600000);
-          events.forEach((event) => {
-            if (!(endTime < event.startTime || event.endTime < startTime)) {
-              const duration = (endTime - startTime);
-              startTime = event.endTime + (15 * 60000);
-              endTime = startTime + duration;
-            }
+
+  User.courses.forEach(course => {
+      if (course.chosen) {
+          course.contents.forEach(lecture => {
+              if (lecture.chosen) {
+                  let startTime = currentTime > moment(startStudyTime).valueOf() 
+                                  ? moment().add(1, 'days').startOf('day').add(moment.duration(startStudyTime))
+                                  : moment(currentTime);
+
+                  let endTime = moment(startTime).add(getRandomInt(1, 5), 'hours');
+
+                  events.forEach(event => {
+                      if (!(endTime.valueOf() < event.startTime || event.endTime < startTime.valueOf())) {
+                          const duration = endTime.diff(startTime);
+                          startTime = moment(event.endTime).add(15, 'minutes');
+                          endTime = moment(startTime).add(duration);
+                      }
+                  });
+
+                  const timeBlock = {
+                      title: course.fullname,
+                      description: lecture.name,
+                      startTime: startTime.toISOString(),
+                      endTime: endTime.toISOString(),
+                      color: course.color,
+                  };
+
+                  currentTime = endTime.add(15, 'minutes').valueOf();
+                  lectures.push(timeBlock);
+              }
           });
-          const timeBlock = {
-            title: course.fullname,
-            description: lecture.name,
-            startTime: startTime,
-            endTime: endTime,
-            color: course.color,
-          };
-          currentTime = endTime + (15 * 60000);
-          lectures.push(timeBlock);
-        }
-      });
-    }
+      }
   });
 
   lectures = lectures.concat(events);
   return lectures;
 }
+
 
 function getRandomInt(min, max) {
   min = Math.ceil(min);
