@@ -357,7 +357,7 @@ async function saveOptions(User) {
 
     await saveUserDataToDB(User);
 
-    // window.location.href = 'schedule';
+    window.location.href = 'schedule';
   });
 }
 

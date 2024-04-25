@@ -17,7 +17,7 @@ const endStudyTime = 24;//= parseInt(endStudyTimeValue, 10);
 
 const dayPX = (1000 / 24) * (endStudyTime - startStudyTime);
 const hourPX = dayPX / (endStudyTime - startStudyTime);
-const minutePX = hourPX / 60; 
+const minutePX = hourPX / 60;
 function loadCalendar(inputTimeblocks) {
   console.log(inputTimeblocks);
   if (view === 'week') {
