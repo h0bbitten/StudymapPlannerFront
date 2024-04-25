@@ -5,6 +5,7 @@ import path, { dirname, parse } from 'path';
 import ICAL from 'ical.js';
 import fetch from 'node-fetch';
 import { decode } from 'punycode';
+import { getUserData } from './app';
 
 export { Algorithm, mockAlgorithm };
 
