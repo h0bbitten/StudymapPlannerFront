@@ -225,13 +225,26 @@ function createPopUp() {
     const description = $(this).find('.description').text();
     const title = $(this).find('.title').text();
     const time = $(this).find('.time').text();
-    const modalContentHTML = `<h2>${title}</h2><h3>${time}</h3><p>${description}</p>`;
+
+    // Create the modal content HTML
+    const modalContentHTML = `
+      <div class="modal-header">${title}</div>
+      <div class="modal-section">
+        <div class="section-title">Course</div>
+        <div>${description}</div>
+      </div>
+      <div class="modal-section">
+        <div class="section-title">Time</div>
+        <div>${time}</div>
+      </div>
+      <!-- Add more sections as needed -->
+    `;
     $('#modalContent').html(modalContentHTML);
-    $('#infoModal').css('display', 'block');
+    $('#infoModal').css('display', 'flex'); // Show the modal with flex to center it
   });
 
   $('.close').click(function() {
-    $('#infoModal').css('display', 'none');
+    $('#infoModal').css('display', 'none'); // Hide the modal
   });
 }
 
