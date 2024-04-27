@@ -145,6 +145,8 @@ function loadWeekView(timeblocks) {
     addTimeBlock(lecture.startTime, lecture.endTime, lecture.title, lecture.description, lecture.color);
   });
   console.log(startStudyTime, endStudyTime);
+
+  createPopUp();
 }
 
 
@@ -217,6 +219,23 @@ function minutesIntoDay(timestamp) {
 
   return minutesDifference;
 }
+
+function createPopUp() {
+  $('.timeblock').click(function() {
+    const description = $(this).find('.description').text();
+    const title = $(this).find('.title').text();
+    const time = $(this).find('.time').text();
+    const modalContentHTML = `<h2>${title}</h2><h3>${time}</h3><p>${description}</p>`;
+    $('#modalContent').html(modalContentHTML);
+    $('#infoModal').css('display', 'block');
+  });
+
+  $('.close').click(function() {
+    $('#infoModal').css('display', 'none');
+  });
+}
+
+
 
 function initButtons(timeblocks) {
   document.getElementById('nextButton').addEventListener('click', () => {
