@@ -305,6 +305,7 @@ async function saveOptions(User) {
   $('#saveBtn').on('click', async () => {
     User.courses.forEach((course, index) => {
       course.color = $(`#color${index}`).val();
+      course.examDate = $(`#date${index}`).val();
       course.contents.forEach((lecture, k) => {
         lecture.chosen = $(`#checkbox${k}-forList${index}`).is(':checked');
       });
@@ -357,7 +358,7 @@ async function saveOptions(User) {
 
     await saveUserDataToDB(User);
 
-    window.location.href = 'schedule';
+    // window.location.href = 'schedule';
   });
 }
 

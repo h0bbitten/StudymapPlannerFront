@@ -102,7 +102,6 @@ async function getMoodleInfo(req, res) {
       user.courses = courseresponse.courses.filter(course => course.enddate !== 2527282800);
 
       user.courses = await scrapeModuleLinks(user.courses, Moodle);
-
     } catch (error) {
       console.error('Failed to get enrolled courses:', error);
     }

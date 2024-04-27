@@ -19,7 +19,6 @@ const dayPX = (1000 / 24) * (endStudyTime - startStudyTime);
 const hourPX = dayPX / (endStudyTime - startStudyTime);
 const minutePX = hourPX / 60;
 function loadCalendar(inputTimeblocks) {
-  console.log(inputTimeblocks);
   if (view === 'week') {
     loadWeekView(inputTimeblocks);
   } else {
@@ -144,7 +143,6 @@ function loadWeekView(timeblocks) {
   timeblocks.forEach((lecture) => {
     addTimeBlock(lecture.startTime, lecture.endTime, lecture.title, lecture.description, lecture.color);
   });
-  console.log(startStudyTime, endStudyTime);
 }
 
 
@@ -189,8 +187,6 @@ function createTimeBlock(startTime, endTime, title, description, color) {
   const top = (minutesIntoDay(startTime) * (1000 / 24 / 60));
   const minuteDuration = (endTime - startTime) / 60000;
   const height = minuteDuration * (1000 / 24 / 60);
-
-  console.log(startTime);
   const html = `
       <div class="timeblock" style="height: ${height}px; background-color: ${color};
       position: absolute; top: ${top}px; width: 130px; font-size: 13px">

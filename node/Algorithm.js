@@ -19,18 +19,18 @@ async function mockAlgorithm(User) {
   console.log('Calculating schedule for:', User.fullname);
 
   const events = await getEvents(User.userid, User.settings.syncCalendars);
-  let currentTime = moment().valueOf();
+  const currentTime = moment().valueOf();
   let lectures = [];
 
   User.courses.sort((a, b) => new Date(a.examDate) - new Date(b.examDate));
   // User.courses.reverse();
 
+  let endofLastPeriod;
   User.courses.forEach((course, examIndex) => {
     if (course.chosen === true) {
       events.push(createExamEvent(course));
 
-      //const studyPeriodStart = currentTime;
-      const studyPeriodStart = examIndex === 0 ? currentTime : moment(User.courses[examIndex - 1].examDate).endOf('day');
+      const studyPeriodStart = examIndex === 0 ? currentTime : endofLastPeriod;
       const studyPeriodEnd = moment(course.examDate).startOf('day');
       const daysToExam = Math.floor(moment.duration(studyPeriodEnd - studyPeriodStart).asDays());
       // Lav logic for at udrenge tid tilgængeligt til eksamen - free time, og tid allerede sat af til lectures og events i perioden
@@ -39,7 +39,7 @@ async function mockAlgorithm(User) {
                             .asMilliseconds();
       const freeTimePrDay = (HourMilliSec * 24) - studyTimePrDay;
 
-      console.log('Free time pr. day:', freeTimePrDay, 'Study time pr. day:', studyTimePrDay, 'Days to exam:', daysToExam);
+      // console.log('Free time pr. day:', freeTimePrDay, 'Study time pr. day:', studyTimePrDay, 'Days to exam:', daysToExam);
       const studyPeriodDuration = (studyPeriodEnd - studyPeriodStart) - (freeTimePrDay * daysToExam);
       // Sætter værdien af studyTime til at være 10 timer pr. ECTS point
       // Harcoder ECTS point til 5, da webscraperen stadig ikke returnerer ECTS point
@@ -54,10 +54,10 @@ async function mockAlgorithm(User) {
         }
         return acc;
       }, 0);
-      console.log('Sum of chosen lectures time:', sumOfChosenLecturesTime, 'Time to study till exam:', studyPeriodDuration);
+      // console.log('Sum of chosen lectures time:', sumOfChosenLecturesTime, 'Time to study till exam:', studyPeriodDuration);
       if (sumOfChosenLecturesTime > studyPeriodDuration) {
         console.log('Not enough time to study for lectures:', course.fullname);
-        return null;
+        // return null;
       }
       let start = studyPeriodStart;
       course.contents.forEach((lecture) => {
@@ -72,7 +72,7 @@ async function mockAlgorithm(User) {
             }
           });
           const startTimeOfDay = getUNIXfromTimeOfDay(startTime, User.settings.startStudyTime);
-          const endTimeOfDay = getUNIXfromTimeOfDay(endTime, User.settings.startStudyTime);
+          const endTimeOfDay = getUNIXfromTimeOfDay(endTime, User.settings.endStudyTime);
 
           if (startTime < startTimeOfDay) {
             startTime = startTimeOfDay;
@@ -93,11 +93,18 @@ async function mockAlgorithm(User) {
           start = endTime + (15 * 60000);
           lectures.push(timeBlock);
         }
+        if (lecture === course.contents[course.contents.length - 1]) {
+          endofLastPeriod = start;
+        }
       });
     }
   });
   lectures = lectures.concat(events);
   return lectures;
+}
+
+function calculateStudyPeriods(course, examIndex, currentTime, User) {
+
 }
 
 function getUNIXfromTimeOfDay(originalTimestamp, timeOfDay) {
@@ -116,6 +123,7 @@ function getUNIXfromTimeOfDay(originalTimestamp, timeOfDay) {
   // Get the UNIX timestamp of the combined date and time
   const newTimestamp = combinedMoment.unix() * 1000; // Multiply by 1000 to get milliseconds
 
+  // console.log('Original timestamp:', originalTimestamp, 'Time of day:', timeOfDay, 'New timestamp:', newTimestamp);
   return newTimestamp;
 }
 
