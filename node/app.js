@@ -2,7 +2,7 @@ import fs from 'fs';
 import { fileURLToPath } from 'url';
 import path, { dirname } from 'path';
 import Webscraper from './scraping.js';
-import { mockAlgorithm } from './Algorithm.js';
+import { Algorithm } from './Algorithm.js';
 
 export {
   getMoodleInfo, logIn, saveOptions, getUserData, calculateSchedule, importIcalFile,
@@ -174,7 +174,7 @@ async function saveOptions(req, res) {
 async function calculateSchedule(req, res) {
   try {
     const User = await retrieveAndParseUserData(req.session.userid);
-    const Timeblocks = await mockAlgorithm(User); // await Algorithm(User);
+    const Timeblocks = await Algorithm(User);
     res.send(JSON.stringify(Timeblocks));
   } catch (error) {
     console.error('Failed to calculate schedule:', error);

@@ -304,6 +304,7 @@ function allFilesRemoved(importedCalendars) {
 async function saveOptions(User) {
   $('#saveBtn').on('click', async () => {
     User.courses.forEach((course, index) => {
+      course.chosen = $(`#checkboxTitle${index}`).is(':checked');
       course.color = $(`#color${index}`).val();
       course.examDate = $(`#date${index}`).val();
       course.contents.forEach((lecture, k) => {

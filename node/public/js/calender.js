@@ -141,7 +141,7 @@ function loadWeekView(timeblocks) {
   const currentWeekEndTime = getEndOfWeek(weekNumber, yearNumber);
 
   timeblocks.forEach((lecture) => {
-    addTimeBlock(lecture.startTime, lecture.endTime, lecture.title, lecture.description, lecture.color);
+    addTimeBlock(lecture.startTime, lecture.endTime, lecture.description, lecture.description, lecture.color);
   });
 }
 
