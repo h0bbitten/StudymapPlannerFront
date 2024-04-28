@@ -1,5 +1,5 @@
 export {
-  applyTheme, setCookie, getCookie, LoadingScreen, displayProfile, settingsBtn, saveUserDataToDB, Button, APIgetCall,
+  applyTheme, setCookie, getCookie, LoadingScreen, displayProfile, settingsBtn, saveUserDataToDB, Button, APIgetCall, APIpostCall,
 };
 
 async function applyTheme() {
@@ -69,7 +69,7 @@ class LoadingScreen {
 }
 
 function displayProfile(profile) {
-  $('#user_profile').html(`<p>Welcome back ${profile.fullname}</p><img src="${profile.userpictureurl}" alt="Profile pic">`);
+  $('#user_profile').html(`<p>Welcome ${profile.fullname}</p><img src="${profile.userpictureurl}" alt="Profile pic">`);
 }
 
 async function saveUserDataToDB(User) {
@@ -88,6 +88,25 @@ async function saveUserDataToDB(User) {
     }
   } catch (error) {
     console.error('Error saving setup data:', error);
+    throw error;
+  }
+}
+async function APIpostCall(url, data, errorCallback, contentType = 'application/json') {
+  try {
+    const response = await fetch(`http://localhost:3000/${url}`, {
+      method: 'POST',
+      cache: 'no-cache',
+/*       headers: {
+        'Content-Type': contentType,
+      }, */
+      body: data,
+    });
+    if (!response.ok) {
+      throw new Error('Network response error');
+    }
+    return response;
+  } catch (error) {
+    console.error(errorCallback, error);
     throw error;
   }
 }

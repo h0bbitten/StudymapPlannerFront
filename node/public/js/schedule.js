@@ -1,7 +1,7 @@
 import {
   applyTheme, LoadingScreen, displayProfile, APIgetCall,
 } from './script.js';
-import loadCalendar from './calender.js';
+import {loadCalendar, initButtons} from './calender.js';
 
 async function scheduleInitialization() {
   LoadingScreen.add();
@@ -24,6 +24,7 @@ async function scheduleInitialization() {
 async function displayCal() {
   const Timeblocks = await APIgetCall('calculateSchedule', 'Error calculating schedule');
   console.log(Timeblocks);
+  initButtons(Timeblocks);
   loadCalendar(Timeblocks);
 }
 
