@@ -13,13 +13,14 @@
     "rules": {
         "max-classes-per-file": "off",
         "import/extensions": ["error", "ignorePackages"],
-        "max-len": ["error", { "code": 150 }],
+        "max-len": ["error", { "code": 175 }],
         "indent": ["error", 2],
         "no-use-before-define": "off",
         "no-console": "off",
         "no-param-reassign": "off",
         "no-plusplus": "off",
         "linebreak-style": "off",
-        "object-shorthand": "off"
+        "object-shorthand": "off",
+        "no-restricted-syntax": "off"
     }
 }

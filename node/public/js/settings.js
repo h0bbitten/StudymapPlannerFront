@@ -6,7 +6,7 @@ async function displaySettings(User) {
   LoadingScreen.add();
   LoadingScreen.show();
   displayCourses(User.courses);
-  displayStudyTime(User.settings);
+  displayScheduleOptions(User.settings);
   displaySyncCalendar(User.userid, User.settings);
   displayImportExport(User.userid, User.settings);
   displayAccountSettings(User.userid, User.settings);
@@ -70,9 +70,9 @@ function addCourseOptions(index, course) {
   `);
 }
 
-function displayStudyTime(settings) {
-  $('#formSettings').append(createCollapsible('Study Time', 'studyTime'));
-  $('#studyTime').append(`
+function displayScheduleOptions(settings) {
+  $('#formSettings').append(createCollapsible('Schedule', 'scheduleOptions'));
+  $('#scheduleOptions').append(`
     <div class="optionBlock">
       <label class="optionInput" for="startStudyTime">
         <input type="time" id="startStudyTime" name="startStudyTime" value="${settings.startStudyTime}"/>
@@ -82,9 +82,23 @@ function displayStudyTime(settings) {
         <input type="time" id="endStudyTime" name="endStudyTime" value="${settings.endStudyTime}"/>
         <span>End study time</span>              
       </label>
+      <div class="optionInput">
+        <label for="algorithm">Change Algorithm:</label>
+        <select name="algorithm" id="algorithm">
+          <option value="emptyFirstComeFirstServe">First Come First Serve</option>
+          <option value="fiveDayStudyPlan">5 Day Study Plan</option>
+          <option value="addaptiveGapWithMixing">Fill From The End (mixing allowed)</option>
+          <option value="addaptiveGapNoMixing">Fill From The End (no mixing)</option>
+        </select>
+      </div>
+      <div class="optionInput">
+        <label for="preferEarly">Schedule lectures as early as possible in the day; else as late as possible:</label>
+        <input type="checkbox" id="preferEarly" name="preferEarly"/>
+      </div>  
     </div>
   `);
-  console.log(settings);
+  $('#algorithm').val(settings.algorithm);
+  $('#preferEarly').prop('checked', settings.preferEarly);
 }
 
 function displayAccountSettings(id, settings) {
@@ -354,25 +368,27 @@ async function saveOptions(User) {
       startStudyTime: $('#startStudyTime').val(),
       endStudyTime: $('#endStudyTime').val(),
       email: $('#useremail').val(),
+      preferEarly: $('#preferEarly').is(':checked'),
+      algorithm: $('#algorithm').val(),
     };
     console.log(User.settings);
 
     await saveUserDataToDB(User);
 
-    // window.location.href = 'schedule';
+    window.location.href = 'schedule';
   });
 }
 
 function mergeArrays(oldArray, newArray) {
-  const oldMap = new Map(oldArray.map(obj => [obj.name, obj]));
+  const oldMap = new Map(oldArray.map((obj) => [obj.name, obj]));
 
   for (const newObj of newArray) {
-      if (oldMap.has(newObj.name)) {
-          const oldObj = oldMap.get(newObj.name);
-          Object.assign(oldObj, newObj);
-      } else {
-          oldArray.push(newObj);
-      }
+    if (oldMap.has(newObj.name)) {
+      const oldObj = oldMap.get(newObj.name);
+      Object.assign(oldObj, newObj);
+    } else {
+      oldArray.push(newObj);
+    }
   }
 
   return oldArray;

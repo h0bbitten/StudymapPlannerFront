@@ -10,6 +10,7 @@ const filePath = 'database/courseDetails.txt';
 // hvormed vi kan afvente til en handling er udført med at fortsætte funktionen
 async function Webscraper(url, forceUpdate = false) {
   let existingData = {};
+  let ectsReturn = null
   try {
     const fileContent = await fs.readFile(filePath, { encoding: 'utf8' });
     fileContent.split('\n').forEach(line => {

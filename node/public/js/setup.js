@@ -250,6 +250,8 @@ async function saveOptions() {
 
   User.settings.setupDone = true;
 
+  User.settings.preferEarly = true;
+  User.settings.algorithm = undefined;
   User.settings.syncCalendars = [];
   User.settings.importedCalendars = [];
 
