@@ -226,7 +226,6 @@ function createPopUp() {
     const title = $(this).find('.title').text();
     const time = $(this).find('.time').text();
 
-    // Create the modal content HTML
     const modalContentHTML = `
       <div class="modal-header">${title}</div>
       <div class="modal-section">
@@ -240,15 +239,13 @@ function createPopUp() {
       <!-- Add more sections as needed -->
     `;
     $('#modalContent').html(modalContentHTML);
-    $('#infoModal').css('display', 'flex'); // Show the modal with flex to center it
+    $('#infoModal').css('display', 'flex');
   });
 
   $('.close').click(function() {
-    $('#infoModal').css('display', 'none'); // Hide the modal
+    $('#infoModal').css('display', 'none');
   });
 }
-
-
 
 function initButtons(timeblocks) {
   document.getElementById('nextButton').addEventListener('click', () => {
