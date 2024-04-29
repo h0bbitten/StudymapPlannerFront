@@ -2,7 +2,7 @@ import { fileURLToPath } from 'url';
 import path, { dirname } from 'path';
 import swaggerDocs from './swagger.js';
 import {
-  getMoodleInfo, logIn, saveOptions, getUserData, calculateSchedule, importIcalFile,
+  getMoodleInfo, logIn, saveOptions, getUserData, getSchedule, importIcalFile,
 } from './app.js';
 
 const currentFilename = fileURLToPath(import.meta.url);
@@ -117,8 +117,8 @@ const routing = function routes(app, upload) {
       return res.redirect('/login');
     });
   });
-  app.get('/calculateSchedule', async (req, res) => {
-    await calculateSchedule(req, res).catch((error) => {
+  app.get('/getSchedule', async (req, res) => {
+    await getSchedule(req, res).catch((error) => {
       console.error('Error in getting calculating schedule:', error);
       res.status(500).send('Internal Server Error');
     });

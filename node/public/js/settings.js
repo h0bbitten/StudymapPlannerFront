@@ -6,7 +6,7 @@ async function displaySettings(User) {
   LoadingScreen.add();
   LoadingScreen.show();
   displayCourses(User.courses);
-  displayScheduleOptions(User.settings);
+  displayScheduleOptions(User.settings, User.schedule.algorithm, User.schedule.preferEarly);
   displaySyncCalendar(User.userid, User.settings);
   displayImportExport(User.userid, User.settings);
   displayAccountSettings(User.userid, User.settings);
@@ -70,7 +70,7 @@ function addCourseOptions(index, course) {
   `);
 }
 
-function displayScheduleOptions(settings) {
+function displayScheduleOptions(settings, algorithm, preferEarly) {
   $('#formSettings').append(createCollapsible('Schedule', 'scheduleOptions'));
   $('#scheduleOptions').append(`
     <div class="optionBlock">
@@ -97,8 +97,8 @@ function displayScheduleOptions(settings) {
       </div>  
     </div>
   `);
-  $('#algorithm').val(settings.algorithm);
-  $('#preferEarly').prop('checked', settings.preferEarly);
+  $('#algorithm').val(algorithm);
+  $('#preferEarly').prop('checked', preferEarly);
 }
 
 function displayAccountSettings(id, settings) {
@@ -368,9 +368,12 @@ async function saveOptions(User) {
       startStudyTime: $('#startStudyTime').val(),
       endStudyTime: $('#endStudyTime').val(),
       email: $('#useremail').val(),
-      preferEarly: $('#preferEarly').is(':checked'),
-      algorithm: $('#algorithm').val(),
     };
+    const algorithm = $('#algorithm').val();
+    if (algorithm !== User.schedule.algorithm) User.schedule.outDated = true;
+    User.schedule.algorithm = algorithm;
+    User.schedule.preferEarly = $('#preferEarly').is(':checked');
+
     console.log(User.settings);
 
     await saveUserDataToDB(User);
@@ -395,6 +398,7 @@ function mergeArrays(oldArray, newArray) {
 }
 
 const User = await APIgetCall('getUserData', 'Error fetching user data');
+console.log(User);
 
 applyTheme();
 displayProfile(User);

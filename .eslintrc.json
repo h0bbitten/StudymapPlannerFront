@@ -21,6 +21,7 @@
         "no-plusplus": "off",
         "linebreak-style": "off",
         "object-shorthand": "off",
-        "no-restricted-syntax": "off"
+        "no-restricted-syntax": "off",
+        "prefer-destructuring":"off"
     }
 }

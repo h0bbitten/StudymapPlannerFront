@@ -69,8 +69,8 @@ function goToNextPage() {
   if (index > 0) {
     const examDate = $(`#datepicker${index - 1}`).val();
     if (examDate === '') {
-      // eslint-disable-next-line no-undef
       // Displays error message if no exam date is selected
+      // eslint-disable-next-line no-undef
       Toastify({
         text: 'Please select an exam date for each course.',
         duration: 1500,
@@ -87,8 +87,8 @@ function goToNextPage() {
     const selectedDate = new Date(examDate);
 
     if (selectedDate < currentDate) {
-      // eslint-disable-next-line no-undef
       // Displays error message if selected exam date is before the current moment
+      // eslint-disable-next-line no-undef
       Toastify({
         text: 'Please select a future exam date.',
         duration: 1500,
@@ -115,8 +115,8 @@ function goToNextPage() {
     checkboxes = $('input[type=checkbox]');
     amountOfCourses = $('input[type=checkbox]:checked').length;
     if (amountOfCourses === 0) {
-      // eslint-disable-next-line no-undef
       // Displays error message if no courses are selected
+      // eslint-disable-next-line no-undef
       Toastify({
         text: 'Please select atleast one course.',
         duration: 1500,
@@ -145,7 +145,7 @@ function goToNextPage() {
               </form>
               </div>
           `);
-           // Appends a datepicker to each course form  
+           // Appends a datepicker to each course form
           $(`#form${index2}`).append(`
             <div class="datepicker-container">
               <label for="datepicker${i}">Exam date:</label>
@@ -158,10 +158,7 @@ function goToNextPage() {
             const examDate = $(this).val();
             User.courses[i].examDate = examDate;
             });
-
           // Initialize datepicker
-          
-       
           // Appends a checkbox for each lecture
         User.courses[i].contents.forEach((lecture, j) => {
           $(`#form${index2}`).append(`
@@ -172,9 +169,6 @@ function goToNextPage() {
               </label>
             </div>
           `);
-
-          
-          
         });
       }
     });
@@ -183,7 +177,6 @@ function goToNextPage() {
     $('#form1').show();
     $('#header').text('Which lectures do you want to study for the exam?');
     previous.showButton();
-  
   }
 
   console.log(amountOfCourses);
@@ -246,14 +239,15 @@ async function saveOptions() {
   User.settings = {};
   User.settings.startStudyTime = startStudyTime;
   User.settings.endStudyTime = endStudyTime;
-  console.log(User.startStudyTime, User.endStudyTime);
-
-  User.settings.setupDone = true;
-
-  User.settings.preferEarly = true;
-  User.settings.algorithm = undefined;
   User.settings.syncCalendars = [];
   User.settings.importedCalendars = [];
+
+  User.schedule = {};
+  User.schedule.preferEarly = true;
+  User.schedule.outDated = true;
+  User.schedule.algorithm = 'default';
+
+  User.settings.setupDone = true;
 
   await saveUserDataToDB(User);
 

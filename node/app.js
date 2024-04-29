@@ -2,10 +2,10 @@ import fs from 'fs';
 import { fileURLToPath } from 'url';
 import path, { dirname } from 'path';
 import Webscraper from './scraping.js';
-import { Algorithm } from './Algorithm.js';
+import Algorithm from './Algorithm.js';
 
 export {
-  getMoodleInfo, logIn, saveOptions, getUserData, calculateSchedule, importIcalFile,
+  getMoodleInfo, logIn, saveOptions, getUserData, getSchedule, importIcalFile,
 };
 
 const currentFilename = fileURLToPath(import.meta.url);
@@ -82,8 +82,8 @@ async function logIn(req, res) {
 }
 async function getMoodleInfo(req, res) {
   try {
-    let token = req.session.token;
-    let Moodle = new WSfunctions(token);
+    const token = req.session.token;
+    const Moodle = new WSfunctions(token);
     let user = {};
 
     try {
@@ -98,8 +98,8 @@ async function getMoodleInfo(req, res) {
         courses: [],
       };
 
-      let courseresponse = await Moodle.core_course_get_enrolled_courses_by_timeline_classification();
-      user.courses = courseresponse.courses.filter(course => course.enddate !== 2527282800);
+      const courseresponse = await Moodle.core_course_get_enrolled_courses_by_timeline_classification();
+      user.courses = courseresponse.courses.filter((course) => course.enddate !== 2527282800);
 
       user.courses = await scrapeModuleLinks(user.courses, Moodle);
     } catch (error) {
@@ -110,7 +110,6 @@ async function getMoodleInfo(req, res) {
     res.status(500).send(`Error getting Moodle info: ${error}`);
   }
 }
-
 
 async function scrapeModuleLinks(courses, Moodle) {
   const enrichedCourses = courses.map(async (course) => {
@@ -157,25 +156,46 @@ async function saveOptions(req, res) {
       }
       return true;
     });
-    fs.writeFile(`./database/${User.userid}.json`, JSON.stringify(User), (err) => {
-      if (err) {
-        console.error('Error saving User data:', err);
-        res.status(500).send('Error saving User data');
-      } else {
-        console.log('User data saved successfully');
-        res.status(200).send('User data saved successfully');
-      }
-    });
+    const goodResponse = await writeUserToDB(User);
+    console.log('goodResponse to saving data:', goodResponse);
+    if (goodResponse) {
+      res.status(200).send('User data saved successfully');
+    } else {
+      res.status(500).send('Error saving User data');
+    }
   } catch (err) {
     res.status(500).send('Internal Server Error');
   }
 }
 
-async function calculateSchedule(req, res) {
+const writeFileAsync = fs.promises.writeFile;
+
+async function writeUserToDB(User) {
   try {
+    await writeFileAsync(`./database/${User.userid}.json`, JSON.stringify(User));
+    console.log('User data saved successfully');
+    return true;
+  } catch (err) {
+    console.error('Error saving User data:', err);
+    return false;
+  }
+}
+
+async function getSchedule(req, res) {
+  try {
+    const algorithm = req.query.algorithm;
+    const ForceRecalculate = req.query.forcerecalculate;
     const User = await retrieveAndParseUserData(req.session.userid);
-    const Timeblocks = await Algorithm(User);
-    res.send(JSON.stringify(Timeblocks));
+    let Schedule = User.schedule;
+    const recalculate = ForceRecalculate === 'true' || !Schedule || Schedule.outDated === true;
+    console.log('Recalculate:', recalculate);
+    if (recalculate) {
+      console.log('Recalculating schedule');
+      Schedule = await Algorithm(User, algorithm);
+      User.schedule = Schedule;
+      writeUserToDB(User);
+    }
+    res.send(JSON.stringify(Schedule));
   } catch (error) {
     console.error('Failed to calculate schedule:', error);
     res.status(500).send('Internal Server Error');

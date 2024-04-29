@@ -5,7 +5,7 @@ import path, { dirname, parse } from 'path';
 import ICAL from 'ical.js';
 import fetch from 'node-fetch';
 
-export { Algorithm };
+export default Algorithm;
 
 const { promises: fsPromises } = fs;
 
@@ -13,36 +13,46 @@ const currentFilename = fileURLToPath(import.meta.url);
 const currentDir = dirname(currentFilename);
 const HourMilliSec = 3600000;
 
-async function Algorithm(User) {
+async function Algorithm(User, algorithm) {
   console.log('Calculating schedule for:', User.fullname);
-  const preferEarlyLectures = User.settings.preferEarly;
+  const preferEarlyLectures = User.schedule.preferEarly;
+  const startStudyTime = User.settings.startStudyTime;
+  const endStudyTime = User.settings.endStudyTime;
+  const Courses = JSON.parse(JSON.stringify(User.courses));
 
-  const studyTimePrDay = moment.duration(moment(User.settings.endStudyTime, 'HH:mm')
-    .diff(moment(User.settings.startStudyTime, 'HH:mm')))
+  const studyTimePrDay = moment.duration(moment(endStudyTime, 'HH:mm')
+    .diff(moment(startStudyTime, 'HH:mm')))
     .asMilliseconds();
   const freeTimePrDay = (HourMilliSec * 24) - studyTimePrDay;
 
-  console.log('Study time pr. day:', studyTimePrDay, 'in Hours:', (studyTimePrDay / HourMilliSec), 'Free time pr. day:', freeTimePrDay, 'in Hours:', (freeTimePrDay / HourMilliSec));
+  console.log('Study time pr. day:', studyTimePrDay, 'in Hours:', (studyTimePrDay / HourMilliSec), 'Free time pr. day:',freeTimePrDay, 'in Hours:', (freeTimePrDay / HourMilliSec));
 
   const events = await getEvents(User.userid, User.settings.syncCalendars);
   const currentTime = moment().valueOf();
-  User.courses.sort((a, b) => new Date(a.examDate) - new Date(b.examDate));
-  let schedule = [];
-  switch (User.settings.algorithm) {
+  Courses.sort((a, b) => new Date(a.examDate) - new Date(b.examDate));
+  const schedule = {
+    algorithm: algorithm === 'default' ? 'addaptiveGapNoMixing' : algorithm,
+    preferEarly: preferEarlyLectures,
+    Timeblocks: [],
+    CreateDate: currentTime,
+    outdated: false,
+  };
+  console.log('Schedule Algorithm:', schedule.algorithm);
+  switch (schedule.algorithm) {
   case 'emptyFirstComeFirstServe':
-    schedule = emptyFirstComeFirstServe(User.courses, currentTime, events, User.settings.startStudyTime, User.settings.endStudyTime, preferEarlyLectures);
+    schedule.Timeblocks = emptyFirstComeFirstServe(Courses, currentTime, events, startStudyTime, endStudyTime, preferEarlyLectures);
     break;
   case 'fiveDayStudyPlan':
-    schedule = fiveDayStudyPlan(User.courses, currentTime, events, User.settings.startStudyTime, User.settings.endStudyTime, preferEarlyLectures);
+    schedule.Timeblocks = fiveDayStudyPlan(Courses, currentTime, events, startStudyTime, endStudyTime, preferEarlyLectures);
     break;
   case 'addaptiveGapWithMixing':
-    schedule = addaptiveGapWithMixing(User.courses, currentTime, events, User.settings.startStudyTime, User.settings.endStudyTime, preferEarlyLectures, freeTimePrDay);
+    schedule.Timeblocks = addaptiveGapWithMixing(Courses, currentTime, events, startStudyTime, endStudyTime, preferEarlyLectures, freeTimePrDay);
     break;
   case 'addaptiveGapNoMixing':
-    schedule = addaptiveGapNoMixing(User.courses, currentTime, events, User.settings.startStudyTime, User.settings.endStudyTime, preferEarlyLectures, freeTimePrDay);
+    schedule.Timeblocks = addaptiveGapNoMixing(Courses, currentTime, events, startStudyTime, endStudyTime, preferEarlyLectures, freeTimePrDay);
     break;
   default:
-    schedule = addaptiveGapNoMixing(User.courses, currentTime, events, User.settings.startStudyTime, User.settings.endStudyTime, preferEarlyLectures, freeTimePrDay);
+    schedule.Timeblocks = addaptiveGapNoMixing(Courses, currentTime, events, startStudyTime, endStudyTime, preferEarlyLectures, freeTimePrDay);
     break;
   }
 
