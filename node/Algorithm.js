@@ -38,6 +38,7 @@ async function mockAlgorithm(User) {
             startTime: startTime,
             endTime: endTime,
             color: course.color,
+            courseURL: course.viewurl,
           };
           currentTime = endTime + (15 * 60000);
           lectures.push(timeBlock);
