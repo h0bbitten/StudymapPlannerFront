@@ -120,6 +120,7 @@ function emptyFirstComeFirstServe(courses, currentTime, events, startStudyTime, 
             endTime: endTime,
             color: course.color,
             type: 'lecture',
+            courseURL: course.viewurl,
           };
           start = endTime + (15 * 60000);
           lectures.push(timeBlock);
