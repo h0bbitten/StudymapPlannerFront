@@ -90,10 +90,18 @@ function displayScheduleOptions(settings, algorithm, preferEarly) {
           <option value="addaptiveGapWithMixing">Fill From The End (mixing allowed)</option>
           <option value="addaptiveGapNoMixing">Fill From The End (no mixing)</option>
         </select>
+        <div class="tooltip">
+          <span id="algoInfo">?</span>
+          <span class="tooltiptext">Algorithm info</span>
+        </div>
       </div>
       <div class="optionInput">
         <label for="preferEarly">Schedule lectures as early as possible in the day; else as late as possible:</label>
         <input type="checkbox" id="preferEarly" name="preferEarly"/>
+      </div>
+      <div class="optionInput">
+        <label for="wantPrep">Have a preparation day for each exam, as close the exam as possible:</label>
+        <input type="checkbox" id="wantPrep" name="wantPrep"/>
       </div>  
     </div>
   `);
@@ -315,6 +323,58 @@ function allFilesRemoved(importedCalendars) {
   return importedCalendars.every((file) => file.type === 'remove');
 }
 
+function infoBoxListener() {
+  $('#algoInfo').on('click', () => {
+    const modalContentHTML = `
+      <div class="modal-header">Algorithms</div>
+      <div class="modal-section">
+        <div class="section-title">First come first serve</div>
+        <div>
+          This algorithm will create a schedule that has dumped the chosen lectures of each course,
+          sorted by exam date, with a 1 gap between each lecture.
+        </div>
+        <img src="../img/AllAlgosGridEvent-FirstComeFirstServeSketch.drawio.png" alt="First come first serve" style="width: 100%">
+      </div>
+      <div class="modal-section">
+        <div class="section-title">5 Day Study Plan</div>
+        <div>
+          The 5 Day Study Plan will create a schedule that will try to lay the lectures of each course as close to the exam date as possible,
+           with a 1 hour gap between each lecture.
+        </div>
+        <img src="../img/AllAlgosGridEvent-5DayStudyScheduleSketch.drawio.png" alt="5 Day Study Plan" style="width: 100%">
+      </div>
+      <div class="modal-section">
+        <div class="section-title">Strected Schedule (Mixing Allowed)</div>
+        <div>
+          This algorithm will make use of as much of the time available as possible, with a variable gap between each lecture,
+           with a mix of lectures from different courses.
+        </div>
+        <img src="../img/AllAlgosGridEvent-StrectchedMixSketch.drawio.png" alt="Strected schedule" style="width: 100%">
+      </div>
+      <div class="modal-section">
+        <div class="section-title">Strected Schedule (Mixing Disallowed)</div>
+        <div>
+          This algorithm will make use of as much of the time available as possible, with a variable gap between each lecture,
+           with no mixing of lectures from different courses.
+        </div>
+        <img src="../img/AllAlgosGridEvent-StrectchedNoMixSketch.drawio.png" alt="Strected schedule" style="width: 100%">
+      </div>
+    `;
+    $('#modalContent').html(modalContentHTML);
+    $('#infoModal').css('display', 'flex');
+    $('.modal-content').css({
+      width: '60vw',
+      'overflow-y': 'auto',
+      height: '60vh',
+    });
+  });
+  $(document).keydown(closePopup);
+  $('.close').on('click', closePopup);
+  function closePopup() {
+    $('#infoModal').css('display', 'none');
+  }
+}
+
 async function saveOptions(User) {
   $('#saveBtn').on('click', async () => {
     User.courses.forEach((course, index) => {
@@ -407,4 +467,5 @@ collapseListener();
 checkboxListener();
 plusButtonListener();
 removeButtonListener(User.settings.importedCalendars);
+infoBoxListener();
 saveOptions(User);
