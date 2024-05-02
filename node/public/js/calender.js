@@ -17,9 +17,8 @@ const endStudyTime = 24;//= parseInt(endStudyTimeValue, 10);
 
 const dayPX = (1000 / 24) * (endStudyTime - startStudyTime);
 const hourPX = dayPX / (endStudyTime - startStudyTime);
-const minutePX = hourPX / 60; 
+const minutePX = hourPX / 60;
 function loadCalendar(inputTimeblocks) {
-  console.log(inputTimeblocks);
   if (view === 'week') {
     loadWeekView(inputTimeblocks);
   } else {
@@ -142,9 +141,11 @@ function loadWeekView(timeblocks) {
   const currentWeekEndTime = getEndOfWeek(weekNumber, yearNumber);
 
   timeblocks.forEach((lecture) => {
-    addTimeBlock(lecture.startTime, lecture.endTime, lecture.title, lecture.description, lecture.color);
+    addTimeBlock(lecture.startTime, lecture.endTime, lecture.description, lecture.description, lecture.color);
   });
   console.log(startStudyTime, endStudyTime);
+
+  createPopUp();
 }
 
 
@@ -189,8 +190,6 @@ function createTimeBlock(startTime, endTime, title, description, color) {
   const top = (minutesIntoDay(startTime) * (1000 / 24 / 60));
   const minuteDuration = (endTime - startTime) / 60000;
   const height = minuteDuration * (1000 / 24 / 60);
-
-  console.log(startTime);
   const html = `
       <div class="timeblock" style="height: ${height}px; background-color: ${color};
       position: absolute; top: ${top}px; width: 130px; font-size: 13px">
@@ -216,6 +215,33 @@ function minutesIntoDay(timestamp) {
   const minutesDifference = momentObj.diff(startOfDay, 'minutes');
 
   return minutesDifference;
+}
+
+function createPopUp() {
+  $('.timeblock').click(function() {
+    const description = $(this).find('.description').text();
+    const title = $(this).find('.title').text();
+    const time = $(this).find('.time').text();
+
+    const modalContentHTML = `
+      <div class="modal-header">${title}</div>
+      <div class="modal-section">
+        <div class="section-title">Course</div>
+        <div>${description}</div>
+      </div>
+      <div class="modal-section">
+        <div class="section-title">Time</div>
+        <div>${time}</div>
+      </div>
+      <!-- Add more sections as needed -->
+    `;
+    $('#modalContent').html(modalContentHTML);
+    $('#infoModal').css('display', 'flex');
+  });
+
+  $('.close').click(function() {
+    $('#infoModal').css('display', 'none');
+  });
 }
 
 function initButtons(timeblocks) {
@@ -244,12 +270,16 @@ function initButtons(timeblocks) {
   document.getElementById('weekButton').addEventListener('click', () => {
     view = 'week';
     nav = 0;
+    weekNumber = now.isoWeek();
+    yearNumber = now.year();
     loadCalendar(timeblocks);
   });
 
   document.getElementById('monthButton').addEventListener('click', () => {
     view = 'month';
     nav = 0;
+    weekNumber = now.isoWeek();
+    yearNumber = now.year();
     loadCalendar(timeblocks);
   });
 

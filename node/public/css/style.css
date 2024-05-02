@@ -659,3 +659,109 @@ body {
 .checkbox-container {
   text-align: left;
 }
+
+/* Modal Background */
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 10; /* Sit on top */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgba(0,0,0,0.4); /* Black with opacity */
+  align-items: center;
+  justify-content: center;
+}
+
+/* Modal Content Box */
+.modal-content {
+  background-color: #333; /* Dark background */
+  color: white; /* White text color */
+  margin: auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 400px; /* Fixed width */
+  box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+  border-radius: 8px; /* Rounded corners */
+  position: relative; /* For positioning the close button */
+}
+
+/* Close Button */
+.close {
+  color: #aaa;
+  position: absolute;
+  top: 7px;
+  right: 15px;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: white;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+/* Modal Header */
+.modal-header {
+  font-size: 20px;
+  text-align: left;
+  font-weight: bold;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #444; /* Subtle line for header */
+}
+
+/* Content sections */
+.modal-section {
+  padding: 10px 0; /* Spacing between sections */
+  border-bottom: 1px solid #555; /* Subtle line for each section */
+}
+
+/* Last section doesn't have a bottom border */
+.modal-section:last-child {
+  border-bottom: none;
+}
+
+/* Section Title */
+.section-title {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 5px; /* Space between title and content */
+}
+
+/* Modal Footer, if you have any actions */
+.modal-footer {
+  padding-top: 10px;
+  text-align: right;
+}
+
+/* Tooltip container */
+.tooltip {
+  position: relative;
+  display: inline-block;
+  border-bottom: 1px dotted black; /* If you want dots under the hoverable text */
+}
+
+/* Tooltip text */
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: 120px;
+  background-color: black;
+  color: #fff;
+  text-align: center;
+  padding: 5px 0;
+  border-radius: 6px;
+ 
+  /* Position the tooltip text - see examples below! */
+  position: absolute;
+  z-index: 1;
+}
+
+/* Show the tooltip text when you mouse over the tooltip container */
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+}
+
