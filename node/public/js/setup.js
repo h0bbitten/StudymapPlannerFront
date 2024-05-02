@@ -67,6 +67,40 @@ function goToPreviousPage() {
 
 function goToNextPage() {
   if (index > 0) {
+    const examDate = $(`#datepicker${index - 1}`).val();
+    if (examDate === '') {
+      // Displays error message if no exam date is selected
+      // eslint-disable-next-line no-undef
+      Toastify({
+        text: 'Please select an exam date for each course.',
+        duration: 1500,
+        close: false,
+        gravity: 'top',
+        position: 'center',
+        style: {
+          background: 'linear-gradient(to right, #ff416c, #ff4b2b)',
+        },
+      }).showToast();
+      return;
+    }
+    const currentDate = new Date();
+    const selectedDate = new Date(examDate);
+
+    if (selectedDate < currentDate) {
+      // Displays error message if selected exam date is before the current moment
+      // eslint-disable-next-line no-undef
+      Toastify({
+        text: 'Please select a future exam date.',
+        duration: 1500,
+        close: false,
+        gravity: 'top',
+        position: 'center',
+        style: {
+          background: 'linear-gradient(to right, #ff416c, #ff4b2b)',
+        },
+      }).showToast();
+      return;
+    }
     index++;
     console.log(`index is ${index}`);
     $(`#form${index - 1}`).hide();
@@ -81,6 +115,7 @@ function goToNextPage() {
     checkboxes = $('input[type=checkbox]');
     amountOfCourses = $('input[type=checkbox]:checked').length;
     if (amountOfCourses === 0) {
+      // Displays error message if no courses are selected
       // eslint-disable-next-line no-undef
       Toastify({
         text: 'Please select atleast one course.',
@@ -100,25 +135,44 @@ function goToNextPage() {
     checkboxes.each((i, checkbox) => {
       if (checkbox.checked) {
         index2++;
+        // Appends a form for each course
         $('#forms').append(`
-                    <div id="form${index2}div" class="forms">
-                    <form id="form${index2}" style="display: none;">
-                    <h3 id="${User.courses[i].id}">${User.courses[i].fullnamedisplay}</h3>
-                    </form>
-                    </div>
-                `);
+              <div id="form${index2}div" class="forms">
+              <form id="form${index2}" style="display: none;">
+              <h3 id="${User.courses[i].id}">${User.courses[i].fullnamedisplay}</h3>
+
+             
+              </form>
+              </div>
+          `);
+           // Appends a datepicker to each course form
+          $(`#form${index2}`).append(`
+            <div class="datepicker-container">
+              <label for="datepicker${i}">Exam date:</label>
+              <input type="date" id="datepicker${i}" class="datepicker" name="datepicker" required>
+            </div>
+            `);
+
+            // Save the chosen exam date for each course
+            $(`#datepicker${i}`).change(function() {
+            const examDate = $(this).val();
+            User.courses[i].examDate = examDate;
+            });
+          // Initialize datepicker
+          // Appends a checkbox for each lecture
         User.courses[i].contents.forEach((lecture, j) => {
           $(`#form${index2}`).append(`
-                    <div class="checkbox lecture-container">
-                        <label class="lectureLabel" for="lecture${j}">
-                            <input type="checkbox" id="lecture${j}" name="type" value="${j}" checked>
-                            <span id="lecture${j}Text">${lecture.name}</span>
-                        </label>
-                    </div>
-                    `);
+            <div class="checkbox lecture-container">
+              <label class="lectureLabel" for="lecture${j}">
+                <input type="checkbox" id="lecture${j}" name="type" value="${j}" checked>
+                <span id="lecture${j}Text">${lecture.name}</span>
+              </label>
+            </div>
+          `);
         });
       }
     });
+    // Shows the first course form and hides the course selection form
     $('#form0').hide();
     $('#form1').show();
     $('#header').text('Which lectures do you want to study for the exam?');
@@ -127,6 +181,7 @@ function goToNextPage() {
 
   console.log(amountOfCourses);
 
+  // Shows study time form if index is equal to amount of courses + 1
   if (index === amountOfCourses + 1) {
     $('#forms').append(`
             <div id="form${index + 1}div" class="forms">
@@ -184,7 +239,13 @@ async function saveOptions() {
   User.settings = {};
   User.settings.startStudyTime = startStudyTime;
   User.settings.endStudyTime = endStudyTime;
-  console.log(User.startStudyTime, User.endStudyTime);
+  User.settings.syncCalendars = [];
+  User.settings.importedCalendars = [];
+
+  User.schedule = {};
+  User.schedule.preferEarly = true;
+  User.schedule.outDated = true;
+  User.schedule.algorithm = 'default';
 
   User.settings.setupDone = true;
 
