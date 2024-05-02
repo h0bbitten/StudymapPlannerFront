@@ -68,14 +68,7 @@ function loadMonthView(timeblocks) {
     return blockDate.getMonth() === month && blockDate.getFullYear() === year;
   });
 
-  const daysWithTimeblocks = new Map();
-  monthTimeblocks.forEach(block => {
-    const day = new Date(block.startTime).getDate();
-    if (!daysWithTimeblocks.has(day)) {
-      daysWithTimeblocks.set(day, []);
-    }
-    daysWithTimeblocks.get(day).push(block.title);
-  });
+  const daysWithTimeblocks = new Set(monthTimeblocks.map(block => new Date(block.startTime).getDate()));
 
   for (let i = 1; i <= daysInMonth; i++) {
     const daySquare = document.createElement('div');
@@ -83,25 +76,18 @@ function loadMonthView(timeblocks) {
     daySquare.innerText = i;
     
     if (daysWithTimeblocks.has(i)) {
-      const titles = daysWithTimeblocks.get(i);
       const timeBlockIndicator = document.createElement('div');
-      timeBlockIndicator.style.width = '80px';
-      timeBlockIndicator.style.height = '30px';
-      timeBlockIndicator.style.backgroundColor = '#f67280';
-      timeBlockIndicator.style.borderRadius = '5%';
-      timeBlockIndicator.style.color = 'white';
-      timeBlockIndicator.style.display = 'flex';
-      timeBlockIndicator.style.justifyContent = 'center';
-      timeBlockIndicator.style.alignItems = 'center';
-      timeBlockIndicator.style.fontSize = '8px';
-      timeBlockIndicator.style.overflow = 'hidden';
-      timeBlockIndicator.textContent = titles.join(', ');
+      timeBlockIndicator.style.width = '12px';
+      timeBlockIndicator.style.height = '12px';
+      timeBlockIndicator.style.backgroundColor = '#7c8d85';
+      timeBlockIndicator.style.borderRadius = '50%';
       daySquare.appendChild(timeBlockIndicator);
     }
     
     calendar.appendChild(daySquare);
   }
 }
+
 
 function loadWeekView(timeblocks) {
   calendar.classList.add('week-view');
