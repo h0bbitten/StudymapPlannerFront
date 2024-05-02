@@ -3,7 +3,7 @@ import { fileURLToPath } from 'url';
 import path, { dirname } from 'path';
 import Webscraper from './scraping.js';
 import Algorithm from './Algorithm.js';
-import { ensureUserExists, saveOrUpdateCourse, saveUserDetails, pool} from './database.js';
+import { ensureUserExists, saveUserDetails, pool} from './database.js';
 
 export {
   getMoodleInfo, logIn, saveOptions, getUserData, getSchedule, importIcalFile,
@@ -159,15 +159,14 @@ async function saveOptions(req, res) {
 }
 
 
-const writeFileAsync = fs.promises.writeFile;
-
 async function writeUserToDB(User) {
   try {
-    await writeFileAsync(`./database/${User.userid}.json`, JSON.stringify(User));
-    console.log('User data saved successfully');
+    const userId = await ensureUserExists(User.userid);  // Ensure the user exists
+    await saveUserDetails(userId, User);  // This now updates the 'details' column
+    console.log('User data updated successfully in MySQL');
     return true;
   } catch (err) {
-    console.error('Error saving User data:', err);
+    console.error('Error updating User data:', err);
     return false;
   }
 }
@@ -184,7 +183,7 @@ async function getSchedule(req, res) {
       console.log('Recalculating schedule');
       Schedule = await Algorithm(User, algorithm);
       User.schedule = Schedule;
-      writeUserToDB(User);
+      await writeUserToDB(User);  
     }
     res.send(JSON.stringify(Schedule));
   } catch (error) {
@@ -192,6 +191,7 @@ async function getSchedule(req, res) {
     res.status(500).send('Internal Server Error');
   }
 }
+
 
 async function retrieveAndParseUserData(userid) {
   try {
