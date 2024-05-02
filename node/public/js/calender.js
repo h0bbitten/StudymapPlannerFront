@@ -1,7 +1,7 @@
 export { loadCalendar, initButtons };
 
 let nav = 0;
-let view = 'month';
+let view = 'week';
 const calendar = document.getElementById('calendar');
 
 const now = moment();
@@ -45,6 +45,10 @@ function loadMonthView(timeblocks) {
   calendar.innerHTML = '';
 
   const weekDaysDiv = document.getElementById('weekdays');
+  $('#weekdays').css('padding-left', '344px');
+  $('#weekdays').css('transform', 'translatex(0px) translatey(0px)');
+  $('#weekdays').css('width', '1045px');
+
   weekDaysDiv.innerHTML = '';
   for (let i = 0; i < 7; i++) {
     const dayHeader = document.createElement('div');
@@ -84,6 +88,11 @@ function loadWeekView(timeblocks) {
 
  if(view === 'week'){ 
  const weekDaysDiv = document.getElementById('weekdays');
+ //$(weekDaysDiv).css('width', '1102px');
+ $('#weekdays').css('padding-left', '53px');
+ $('#weekdays').css('transform', 'translatex(0px) translatey(0px)');
+ $('#weekdays').css('width', '1101px');
+ 
   if (weekDaysDiv) {
     let dayNameAbbreviated, dateDisplay, dayHeader;
     for (let i = 0; i < 7; i++) {

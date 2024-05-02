@@ -20,6 +20,15 @@ nav {
   justify-content: flex-end;
 }
 
+#logoCorner{
+  position:relative;
+  right:-33px;
+  transform:translatex(-989px) translatey(0px);
+  min-height:112px;
+  margin-left:0px;
+  width:115px !important;
+ }
+
 #navbar img {
   width: 35px;
   height: 35px;
@@ -27,7 +36,7 @@ nav {
 
 #user_profile img{
   display:inline-block;
-  transform:translatex(-45px) translatey(-26px);
+  transform:translatex(-43px) translatey(-27px);
 }
 
 #user_profile{
@@ -37,6 +46,17 @@ nav {
 .navbar-icons {
   display: flex;
 }
+
+#settingsBtn{
+  display:inline-block;
+  transform:translatex(-8px) translatey(7px);
+ }
+
+ 
+ #dark-mode-btn{
+  display:inline-block;
+  transform:translatex(3px) translatey(7px);
+ }
 
 .navbar-icon {
   margin-left: 20px;
@@ -48,6 +68,10 @@ nav {
   cursor: pointer;
   filter: none; /* Unchanged, normal icon appearance */
 }
+
+#user_profile p{
+  font-size:20px;
+ }
 
 #schedule {
   margin-top: 20px;
