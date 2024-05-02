@@ -1,9 +1,8 @@
 export { loadCalendar, initButtons };
 
 let nav = 0;
-let view = 'week';
+let view = 'month';
 const calendar = document.getElementById('calendar');
-const weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
 const now = moment();
 let weekNumber = now.isoWeek();
@@ -29,7 +28,7 @@ function loadCalendar(inputTimeblocks) {
 function loadMonthView(timeblocks) {
   calendar.classList.remove('week-view');
   const baseDate = new Date();
-  const dt = new Date(baseDate.getFullYear(), baseDate.getMonth() + nav, 1); // Always create a new date object based on the current date
+  const dt = new Date(baseDate.getFullYear(), baseDate.getMonth() + nav, 1); 
 
   const month = dt.getMonth();
   const year = dt.getFullYear();
@@ -44,6 +43,16 @@ function loadMonthView(timeblocks) {
 
   document.getElementById('monthDisplay').innerText = `${dt.toLocaleDateString('en-US', { month: 'long' })} ${year}`;
   calendar.innerHTML = '';
+
+  const weekDaysDiv = document.getElementById('weekdays');
+  weekDaysDiv.innerHTML = '';
+  for (let i = 0; i < 7; i++) {
+    const dayHeader = document.createElement('div');
+    dayHeader.classList.add('day-header');
+    dayHeader.textContent = weekdays[i];
+    weekDaysDiv.appendChild(dayHeader);
+  }
+
 
   for (let i = 0; i < paddingDays; i++) {
     const daySquare = document.createElement('div');
@@ -73,7 +82,8 @@ function loadWeekView(timeblocks) {
   document.getElementById('monthDisplay')
  .innerText = `${date.format('MMMM')} ${date.format('D')} - ${date.add(6, 'days').format('D')}, ${date.format('YYYY')} \n`;
 
-  const weekDaysDiv = document.getElementById('weekdays');
+ if(view === 'week'){ 
+ const weekDaysDiv = document.getElementById('weekdays');
   if (weekDaysDiv) {
     let dayNameAbbreviated, dateDisplay, dayHeader;
     for (let i = 0; i < 7; i++) {
@@ -86,6 +96,7 @@ function loadWeekView(timeblocks) {
       }
     }
   }
+} 
 
   calendar.innerHTML = '';
 
@@ -105,7 +116,6 @@ function loadWeekView(timeblocks) {
 
     $(`.day-interval-${day + 1}`).append(`<div class="day" id="day${day + 1}" style="flex: 1;"></div>`);
 
-    // Add hour marks within each day interval
     for (let hour = 1; hour <= 24; hour++) {
       $(`.day-interval-${day + 1}`).append(`<div class="hour" id="hour${hour}" style="height: ${hourPX}px;"></div>`);
     }
@@ -137,7 +147,6 @@ function addTimeBlock(startTime, endTime, title, description, color) {
   const currentWeekStartTime = getStartOfWeek(weekNumber, yearNumber);
   const currentWeekEndTime = getEndOfWeek(weekNumber, yearNumber);
 
-  // Function to add a time block to a specific day.
   function createTimeBlockSegment(start, end, dayOfWeek) {
     if (startTime >= currentWeekStartTime && startTime < currentWeekEndTime) {
       $(`#day${dayOfWeek}`).append(createTimeBlock(start, end, title, description, color));
