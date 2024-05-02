@@ -540,7 +540,7 @@ body {
   background-color: var(--background-color);
 }
 .dark-mode nav {
-  background-color: #1f1f1f; /* Slightly lighter dark shade for navbar */
+  background-color: #121e2a; /* Slightly lighter dark shade for navbar */
   box-shadow: 0 2px 4px rgba(0,0,0,0.5); /* Darker shadow for depth */
 }
 
