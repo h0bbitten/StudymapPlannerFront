@@ -2,12 +2,8 @@ import fs from 'fs';
 import { fileURLToPath } from 'url';
 import path, { dirname } from 'path';
 import Webscraper from './scraping.js';
-<<<<<<< HEAD
-import { mockAlgorithm } from './Algorithm.js';
-import { ensureUserExists, saveOrUpdateCourse, saveUserDetails, pool} from './database.js';
-=======
 import Algorithm from './Algorithm.js';
->>>>>>> Algos
+import { ensureUserExists, saveOrUpdateCourse, saveUserDetails, pool} from './database.js';
 
 export {
   getMoodleInfo, logIn, saveOptions, getUserData, getSchedule, importIcalFile,
@@ -147,7 +143,6 @@ async function saveOptions(req, res) {
   try {
     console.log('Saving options');
     const User = req.body;
-<<<<<<< HEAD
 
     // Ensure user exists in the database or create a new entry
     const userId = await ensureUserExists(User.userid);
@@ -157,43 +152,16 @@ async function saveOptions(req, res) {
     console.log('User data saved successfully to MySQL');
 
     res.status(200).send('User data saved successfully');
-=======
-    User.settings.importedCalendars = User.settings.importedCalendars.filter((calendar) => {
-      if (calendar.type === 'remove') {
-        const id = req.session.userid;
-        const parentDir = path.resolve(currentDir, '..');
-        const filePath = path.join(parentDir, 'database', 'icals', id.toString(), calendar.name);
-        if (fs.existsSync(filePath)) {
-          fs.unlinkSync(filePath);
-          console.log(`File ${calendar.name} removed successfully`);
-          return false;
-        }
-        console.log(`File ${calendar.name} does not exist`);
-      }
-      return true;
-    });
-    const goodResponse = await writeUserToDB(User);
-    console.log('goodResponse to saving data:', goodResponse);
-    if (goodResponse) {
-      res.status(200).send('User data saved successfully');
-    } else {
-      res.status(500).send('Error saving User data');
-    }
->>>>>>> Algos
   } catch (err) {
     console.error('Server error:', err);
     res.status(500).send('Internal Server Error');
   }
 }
 
-<<<<<<< HEAD
 
-async function calculateSchedule(req, res) {
-=======
 const writeFileAsync = fs.promises.writeFile;
 
 async function writeUserToDB(User) {
->>>>>>> Algos
   try {
     await writeFileAsync(`./database/${User.userid}.json`, JSON.stringify(User));
     console.log('User data saved successfully');
