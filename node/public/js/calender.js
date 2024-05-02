@@ -123,7 +123,7 @@ function loadWeekView(timeblocks) {
   for (let day = 0; day < 7; day++) {
     $('#calendar').append(`<div class="day-interval-${day + 1}"></div>`);
 
-    $(`.day-interval-${day + 1}`).append(`<div class="day" id="day${day + 1}" style="flex: 1;"></div>`);
+    $(`.day-interval-${day + 1}`).append(`<div class="day" id="day${day + 1}" style="flex: 1"></div>`);
 
     for (let hour = 1; hour <= 24; hour++) {
       $(`.day-interval-${day + 1}`).append(`<div class="hour" id="hour${hour}" style="height: ${hourPX}px;"></div>`);
