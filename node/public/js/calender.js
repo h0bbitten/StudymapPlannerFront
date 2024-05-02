@@ -57,17 +57,48 @@ function loadMonthView(timeblocks) {
     weekDaysDiv.appendChild(dayHeader);
   }
 
-
   for (let i = 0; i < paddingDays; i++) {
     const daySquare = document.createElement('div');
     daySquare.classList.add('day', 'padding');
     calendar.appendChild(daySquare);
   }
 
+  const monthTimeblocks = timeblocks.filter(block => {
+    const blockDate = new Date(block.startTime);
+    return blockDate.getMonth() === month && blockDate.getFullYear() === year;
+  });
+
+  const daysWithTimeblocks = new Map();
+  monthTimeblocks.forEach(block => {
+    const day = new Date(block.startTime).getDate();
+    if (!daysWithTimeblocks.has(day)) {
+      daysWithTimeblocks.set(day, []);
+    }
+    daysWithTimeblocks.get(day).push(block.title);
+  });
+
   for (let i = 1; i <= daysInMonth; i++) {
     const daySquare = document.createElement('div');
     daySquare.classList.add('day');
     daySquare.innerText = i;
+    
+    if (daysWithTimeblocks.has(i)) {
+      const titles = daysWithTimeblocks.get(i);
+      const timeBlockIndicator = document.createElement('div');
+      timeBlockIndicator.style.width = '80px';
+      timeBlockIndicator.style.height = '30px';
+      timeBlockIndicator.style.backgroundColor = '#f67280';
+      timeBlockIndicator.style.borderRadius = '5%';
+      timeBlockIndicator.style.color = 'white';
+      timeBlockIndicator.style.display = 'flex';
+      timeBlockIndicator.style.justifyContent = 'center';
+      timeBlockIndicator.style.alignItems = 'center';
+      timeBlockIndicator.style.fontSize = '8px';
+      timeBlockIndicator.style.overflow = 'hidden';
+      timeBlockIndicator.textContent = titles.join(', ');
+      daySquare.appendChild(timeBlockIndicator);
+    }
+    
     calendar.appendChild(daySquare);
   }
 }
@@ -81,14 +112,11 @@ function loadWeekView(timeblocks) {
   const startOfWeek = new Date(today.setDate(today.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1)));
   const date = moment(startOfWeek);
 
-  // const weekNumber = date.isoWeek();
-
   document.getElementById('monthDisplay')
  .innerText = `${date.format('MMMM')} ${date.format('D')} - ${date.add(6, 'days').format('D')}, ${date.format('YYYY')} \n`;
 
  if(view === 'week'){ 
  const weekDaysDiv = document.getElementById('weekdays');
- //$(weekDaysDiv).css('width', '1102px');
  $('#weekdays').css('padding-left', '53px');
  $('#weekdays').css('transform', 'translatex(0px) translatey(0px)');
  $('#weekdays').css('width', '1101px');
@@ -111,7 +139,6 @@ function loadWeekView(timeblocks) {
 
   $('#calendar').append('<div class="time-labels"></div>');
 
-  // Add hour marks
   for (let hour = startStudyTime; hour <= endStudyTime; hour++) {
     $('.time-labels').append(`
       <div class="hour" style="height: ${hourPX}px; display: flex; align-items: center; padding-left: 10px;">
