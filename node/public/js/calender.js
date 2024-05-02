@@ -28,57 +28,33 @@ function loadCalendar(inputTimeblocks) {
 
 function loadMonthView(timeblocks) {
   calendar.classList.remove('week-view');
-  const dt = new Date();
-
-  if (nav !== 0) {
-    dt.setMonth(new Date().getMonth() + nav);
-  }
+  const baseDate = new Date();
+  const dt = new Date(baseDate.getFullYear(), baseDate.getMonth() + nav, 1); // Always create a new date object based on the current date
 
   const month = dt.getMonth();
   const year = dt.getFullYear();
-  const firstDayOfMonth = new Date(year, month, 1);
   const daysInMonth = new Date(year, month + 1, 0).getDate();
 
-  const dateString = firstDayOfMonth.toLocaleDateString('en-gb', {
+  const dateString = dt.toLocaleDateString('en-GB', {
     weekday: 'long',
-    year: 'numeric',
-    month: 'numeric',
-    day: 'numeric',
   });
-  let paddingDays = weekdays.indexOf(dateString.split(', ')[0]);
 
-  if (paddingDays === -1) {
-    paddingDays = 6;
-  }
+  const weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+  let paddingDays = weekdays.indexOf(dateString);
 
-  document.getElementById('monthDisplay').innerText = `${dt.toLocaleDateString('en-us', { month: 'long' })} ${year}`;
-
+  document.getElementById('monthDisplay').innerText = `${dt.toLocaleDateString('en-US', { month: 'long' })} ${year}`;
   calendar.innerHTML = '';
 
-  for (let i = 1; i <= paddingDays + daysInMonth; i++) {
+  for (let i = 0; i < paddingDays; i++) {
+    const daySquare = document.createElement('div');
+    daySquare.classList.add('day', 'padding');
+    calendar.appendChild(daySquare);
+  }
+
+  for (let i = 1; i <= daysInMonth; i++) {
     const daySquare = document.createElement('div');
     daySquare.classList.add('day');
-
-    if (i > paddingDays) {
-      daySquare.innerText = i - paddingDays;
-    } else {
-      daySquare.classList.add('padding');
-    }
-
-    if (i > paddingDays) {
-      const dayNumber = i - paddingDays;
-      daySquare.innerText = dayNumber;
-
-      if (month === 2 && lectureIndex < timeblocks.length) {
-        const eventPara = document.createElement('p');
-        eventPara.classList.add('event');
-        eventPara.textContent = timeblocks[lectureIndex++];
-        daySquare.appendChild(eventPara);
-      }
-    } else {
-      daySquare.classList.add('padding');
-    }
-
+    daySquare.innerText = i;
     calendar.appendChild(daySquare);
   }
 }

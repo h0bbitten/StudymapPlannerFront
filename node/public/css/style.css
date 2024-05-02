@@ -149,15 +149,6 @@ a:hover {
   display: flex;
 }
 
-#calendar {
-  order: 2;
-  width: auto;
-  margin-left: auto;
-  display: flex;
-  flex-wrap: wrap;
-  max-height: 500px;
-  overflow: auto;
-}
 .day {
   width: 100px;
   padding: 10px;
@@ -227,10 +218,20 @@ a:hover {
 
 /* Calendar container */
 #calendar {
+  width: 775px;
+  margin: auto;
+  display: flex;
+  flex-wrap: wrap;
+  order: 2;
+}
+
+#calendar.week-view {
   width: auto;
   margin-left: auto;
   display: flex;
   flex-wrap: wrap;
+  max-height: 500px;
+  overflow: auto;
 }
 
 #loading {
