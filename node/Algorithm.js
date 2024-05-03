@@ -20,31 +20,45 @@ class PreAlgoMethods {
     this.EarlyLectures = User.schedule.preferEarly;
     this.StartStudyTime = User.settings.startStudyTime;
     this.EndStudyTime = User.settings.endStudyTime;
-    this.Courses = PreAlgoMethods.readyCourses(User.courses);
-    this.studyTimePrDay = PreAlgoMethods.studyTimePrDay(this.StartStudyTime, this.EndStudyTime);
+    this.Courses = this.prepCourses(User.courses);
+    this.studyTimePrDay = this.studyTimePrDay(this.StartStudyTime, this.EndStudyTime);
     this.freeTimePrDay = (HourMilliSec * 24) - this.studyTimePrDay;
     this.theTime = moment().valueOf();
-    this.schedule = this.preSchedule();
+    this.schedule = this.prepSchedule();
     this.id = User.userid;
     this.syncCalendars = User.settings.syncCalendars;
+    this.preparation = true;
   }
 
   async init() {
     this.events = await getEvents(this.id, this.syncCalendars);
   }
 
-  static readyCourses(courses) {
-    return JSON.parse(JSON.stringify(courses))
+  prepCourses(OGCourses) {
+    const courses = JSON.parse(JSON.stringify(OGCourses))
       .filter((course) => course.chosen === true)
-      .sort((a, b) => new Date(a.examDate) - new Date(b.examDate));
+      .sort((a, b) => new Date(b.examDate) - new Date(a.examDate))
+      .map((course) => {
+        course.contents = course.contents.filter((lecture) => lecture.chosen === true);
+        // ECTS point hardcoded to 5
+        course.studyPeriodTotal = 10 * 5 * HourMilliSec; // 10 timer pr. ECTS point
+        course.studyPeriodPrLecture = Math.ceil(course.studyPeriodTotal / course.contents.length);
+        course.contents.reverse();
+        return course;
+      });
+    if (this.algorithm === 'emptyFirstComeFirstServe') {
+      courses.reverse();
+      courses.forEach((course) => { course.contents.reverse(); });
+    }
+    return courses;
   }
 
-  static studyTimePrDay(startStudyTime, endStudyTime) {
-    return moment.duration(moment(endStudyTime, 'HH:mm')
-      .diff(moment(startStudyTime, 'HH:mm'))).asMilliseconds();
+  studyTimePrDay() {
+    return moment.duration(moment(this.EndStudyTime, 'HH:mm')
+      .diff(moment(this.StartStudyTime, 'HH:mm'))).asMilliseconds();
   }
 
-  preSchedule() {
+  prepSchedule() {
     return {
       algorithm: this.algorithm === 'default' ? 'addaptiveGapNoMixing' : this.algorithm,
       preferEarly: this.EarlyLectures,
@@ -83,34 +97,38 @@ class AlgoMethods {
 
 async function Algorithm(User, algorithm) {
   const Algo = new PreAlgoMethods(User, algorithm);
-  // Try with IIFE async constructor function instead
+  // Try with IIFE async constructor function later
   await Algo.init();
+
+  createExamEvents(Algo.Courses, Algo.events, Algo.StartStudyTime, Algo.EndStudyTime, Algo.preparation);
 
   switch (Algo.algorithm) {
   case 'emptyFirstComeFirstServe':
     Algo.schedule.Timeblocks = FirstComeFirstServe(Algo.params());
     break;
   case 'fiveDayStudyPlan':
-    Algo.schedule.Timeblocks = fiveDayStudyPlan(Algo.params());
+    Algo.schedule.Timeblocks = reverse(Algo.params(), false);
     break;
   case 'addaptiveGapWithMixing':
-    Algo.schedule.Timeblocks = addaptiveGapWithMixing(Algo.params());
+    Algo.schedule.Timeblocks = reverse(Algo.params(), true, true);
     break;
   case 'addaptiveGapNoMixing':
-    Algo.schedule.Timeblocks = addaptiveGapNoMixing(Algo.params());
+    Algo.schedule.Timeblocks = reverse(Algo.params(), true, false);
     break;
   default:
-    Algo.schedule.Timeblocks = addaptiveGapNoMixing(Algo.params());
+    Algo.schedule.Timeblocks = reverse(Algo.params(), true, false);
     break;
   }
+  Algo.schedule.Timeblocks = Algo.schedule.Timeblocks.concat(Algo.events);
+
   return Algo.schedule;
 }
 
+// Fix this later, fail if exceeding exam date
 function FirstComeFirstServe(params) {
   const { courses, events, currentTime, startStudyTime, endStudyTime, preferEarlyLectures } = params;
   const eventGap = HourMilliSec;
   let endofLastPeriod;
-  events.push(...createExamEvents(courses, startStudyTime, endStudyTime));
 
   let lectures = [];
   courses.forEach((course, examIndex) => {
@@ -179,151 +197,75 @@ function FirstComeFirstServe(params) {
   return lectures;
 }
 
-function fiveDayStudyPlan(params) {
-  const { courses, events, currentTime, startStudyTime, endStudyTime, preferEarlyLectures } = params;
-  const eventGap = HourMilliSec;
+function reverse(params, addaptive = true, mixing = false) {
+  const {
+    courses,
+    events,
+    currentTime,
+    startStudyTime,
+    endStudyTime,
+    preferEarlyLectures,
+  } = params;
+  const eventGap = addaptive ? params.eventGap : HourMilliSec;
+  const originalCourses = JSON.parse(JSON.stringify(courses));
+
+  console.log('Event gap in hours:', eventGap / HourMilliSec, 'hours');
+
   let lectures = [];
-  events.push(...createExamEvents(courses, startStudyTime, endStudyTime));
+  let failed = false;
+  let lastLectureStartTime = 0;
 
-  courses.reverse();
-  courses.forEach((course) => {
-    if (course.chosen === true) {
-      // ECTS point hardcoded to 5
-      const studyPeriod = 10 * 5 * HourMilliSec; // 10 timer pr. ECTS point
-      const studyPeriodPrLecture = Math.ceil(studyPeriod / course.contents.length);
-
-      let studyPeriodStart = moment(course.examDate).startOf('day').valueOf();
-      course.contents.reverse();
-      course.contents.forEach((lecture) => {
-        if (lecture.chosen === true) {
-          let endTime = studyPeriodStart;
-          let startTime = endTime - studyPeriodPrLecture;
-
-          [startTime, endTime] = checkOverlap(startTime, endTime, events, lectures, startStudyTime, endStudyTime, eventGap);
-
-          if (startTime < currentTime) {
-            console.log('Not enough time to study for lectures, failed at:', course.fullname, 'Lecture:', lecture.name);
-            return null;
-          }
-          studyPeriodStart = startTime - eventGap;
-          lectures.push(createLectureTimeBlock(course, lecture, startTime, endTime));
-        }
-      });
-    }
+  courses.forEach((course, courseIndex) => {
+    if (failed) return;
+    processLectures(course, calcStartPoint(course.examDate, courseIndex));
   });
-  if (preferEarlyLectures) {
-    lectures = prioritiseEarlyDayLectures(lectures, events, startStudyTime, endStudyTime);
-  }
-  lectures = lectures.concat(events);
+
+  tryAdaptiveGap();
+  adjustLectures();
+
   console.log('Returning lectures:', lectures.length);
   return lectures;
-}
 
-function addaptiveGapWithMixing(params) {
-  const { courses, events, currentTime, startStudyTime, endStudyTime, preferEarlyLectures, eventGap = HourMilliSec } = params;
-  console.log('Event gap in hours:', eventGap / HourMilliSec, 'hours');
-  const originalCourses = JSON.parse(JSON.stringify(courses));
-  const originalEvents = JSON.parse(JSON.stringify(events));
+  function calcStartPoint(examDate, courseIndex) {
+    let studyStartPoint;
+    if (courseIndex === 0 || mixing || !addaptive) {
+      studyStartPoint = moment(examDate).startOf('day').valueOf();
+    } else {
+      studyStartPoint = Math.min(lastLectureStartTime, moment(examDate).startOf('day').valueOf());
+    }
+    return studyStartPoint;
+  }
 
-  events.push(...createExamEvents(courses, startStudyTime, endStudyTime));
-  let lectures = [];
-  let tryAgain = false;
-
-  courses.reverse();
-  courses.forEach((course) => {
-    if (tryAgain) return;
-    // ECTS point hardcoded to 5
-    const studyPeriod = 10 * 5 * HourMilliSec; // 10 timer pr. ECTS point
-    const studyPeriodPrLecture = Math.ceil(studyPeriod / course.contents.length);
-
-    let studyPeriodStart = moment(course.examDate).startOf('day').valueOf();
-    course.contents.reverse();
+  function processLectures(course, startPoint) {
     course.contents.forEach((lecture) => {
-      if (tryAgain) return;
-      let endTime = studyPeriodStart;
-      let startTime = endTime - studyPeriodPrLecture;
+      if (failed) return;
+      let endTime = startPoint;
+      let startTime = endTime - course.studyPeriodPrLecture;
 
-      const [newStartTime, newEndTime] = checkOverlap(startTime, endTime, events, lectures, startStudyTime, endStudyTime, eventGap);
-      startTime = newStartTime;
-      endTime = newEndTime;
+      [startTime, endTime] = checkOverlap(startTime, endTime, events, lectures, startStudyTime, endStudyTime, eventGap);
 
       if (startTime < currentTime) {
         console.log('Not enough time to study for lectures, failed at:', course.fullname, 'Lecture:', lecture.name);
-        tryAgain = true;
+        failed = true;
+        return;
       }
-      studyPeriodStart = startTime - eventGap;
+      startPoint = startTime - eventGap;
+      lastLectureStartTime = startPoint;
       lectures.push(createLectureTimeBlock(course, lecture, startTime, endTime));
     });
-  });
-  if (tryAgain && eventGap > (HourMilliSec / 4)) {
-    lectures = tryWithReducedEventGap(params, originalCourses, originalEvents, addaptiveGapWithMixing);
-    if (lectures) return lectures;
   }
-  if (preferEarlyLectures) {
-    lectures = prioritiseEarlyDayLectures(lectures, events, startStudyTime, endStudyTime);
-  }
-  lectures = lectures.concat(events);
-  console.log('Returning lectures:', lectures.length);
-  return lectures;
-}
 
-function addaptiveGapNoMixing(params) {
-  const { courses, events, currentTime, startStudyTime, endStudyTime, preferEarlyLectures, eventGap = HourMilliSec } = params;
-  console.log('Event gap in hours:', eventGap / HourMilliSec, 'hours');
-  const originalCourses = JSON.parse(JSON.stringify(courses));
-  const originalEvents = JSON.parse(JSON.stringify(events));
-
-  events.push(...createExamEvents(courses, startStudyTime, endStudyTime));
-
-  let lectures = [];
-  let tryAgain = false;
-  let lastLectureStartTime = 0;
-  let studyPeriodStart;
-
-  courses.reverse();
-  courses.forEach((course, courseIndex) => {
-    if (tryAgain) return;
-    if (course.chosen === true) {
-      // ECTS point hardcoded to 5
-      const studyPeriod = 10 * 5 * HourMilliSec; // 10 timer pr. ECTS point
-      const studyPeriodPrLecture = Math.ceil(studyPeriod / course.contents.length);
-
-      if (courseIndex === 0) {
-        studyPeriodStart = moment(course.examDate).startOf('day').valueOf();
-      } else {
-        studyPeriodStart = Math.min(lastLectureStartTime, moment(course.examDate).startOf('day').valueOf());
-      }
-
-      course.contents.reverse();
-      course.contents.forEach((lecture) => {
-        if (tryAgain) return;
-        if (lecture.chosen === true) {
-          let endTime = studyPeriodStart;
-          let startTime = endTime - studyPeriodPrLecture;
-
-          [startTime, endTime] = checkOverlap(startTime, endTime, events, lectures, startStudyTime, endStudyTime, eventGap);
-
-          if (startTime < currentTime) {
-            console.log('Not enough time to study for lectures, failed at:', course.fullname, 'Lecture:', lecture.name);
-            tryAgain = true;
-          }
-          studyPeriodStart = startTime - eventGap;
-          lastLectureStartTime = studyPeriodStart;
-          lectures.push(createLectureTimeBlock(course, lecture, startTime, endTime));
-        }
-      });
+  function tryAdaptiveGap() {
+    if (addaptive && failed && eventGap > (HourMilliSec / 4)) {
+      lectures = tryWithReducedEventGap(params, originalCourses, events, reverse, mixing);
     }
-  });
-  if (tryAgain && eventGap > (HourMilliSec / 4)) {
-    lectures = tryWithReducedEventGap(params, originalCourses, originalEvents, addaptiveGapNoMixing);
-    if (lectures) return lectures;
   }
-  if (preferEarlyLectures) {
-    lectures = prioritiseEarlyDayLectures(lectures, events, startStudyTime, endStudyTime);
+
+  function adjustLectures() {
+    if (preferEarlyLectures) {
+      lectures = prioritiseEarlyDayLectures(lectures, events, startStudyTime, endStudyTime);
+    }
   }
-  lectures = lectures.concat(events);
-  console.log('Returning lectures:', lectures.length);
-  return lectures;
 }
 
 function createLectureTimeBlock(course, lecture, startTime, endTime) {
@@ -338,7 +280,7 @@ function createLectureTimeBlock(course, lecture, startTime, endTime) {
   };
 }
 
-function tryWithReducedEventGap(params, courses, events, retryFunction) {
+function tryWithReducedEventGap(params, courses, events, retryFunction, mixing = false) {
   if (!params.firstCall) {
     params.firstCall = true;
     if (params.eventGap > (HourMilliSec * 4)) {
@@ -352,7 +294,7 @@ function tryWithReducedEventGap(params, courses, events, retryFunction) {
 
   params.courses = courses;
   params.events = events;
-  return retryFunction(params);
+  return retryFunction(params, true, mixing);
 }
 
 function checkOverlap(startTime, endTime, eventArray, lectureArray, startStudyTime, endStudyTime, eventGap = HourMilliSec) {
@@ -481,31 +423,52 @@ function getUNIXfromTimeOfDay(originalTimestamp, timeOfDay) {
   return newTimestamp;
 }
 
-function createExamEvents(courses, startStudyTime, endStudyTime) {
-  const events = [];
+function createExamEvents(courses, events, startStudyTime, endStudyTime, preparation = false) {
+  const examEvents = [];
   courses.forEach((course) => {
-    if (course.chosen === true) {
-      const exam = {
-        title: course.fullname,
-        description: `Exam: ${course.fullname}`,
-        startTime: moment(course.examDate).startOf('day').valueOf(),
-        endTime: moment(course.examDate).endOf('day').valueOf(),
-        color: darkenColor(course.color, 0.35),
-        type: 'exam',
-      };
+    const exam = {
+      title: course.fullname,
+      description: `Exam: ${course.fullname}`,
+      startTime: moment(course.examDate).startOf('day').valueOf(),
+      endTime: moment(course.examDate).endOf('day').valueOf(),
+      color: darkenColor(course.color, 0.35),
+      type: 'exam',
+    };
+    examEvents.push(exam);
+    events.push(exam);
+  });
+  if (preparation) {
+    examEvents.forEach((exam) => {
       const RepetitionStart = getUNIXfromTimeOfDay(exam.startTime - (12 * HourMilliSec), startStudyTime);
       const RepetitionEnd = getUNIXfromTimeOfDay(exam.startTime - (12 * HourMilliSec), endStudyTime);
       const examRepetition = {
-        title: course.fullname,
-        description: `Exam Repetition: ${course.fullname}`,
+        title: exam.title,
+        description: `Exam Repetition: ${exam.title}`,
         startTime: RepetitionStart,
         endTime: RepetitionEnd,
-        color: darkenColor(course.color, 0.15),
+        color: darkenColor(exam.color, 0.15),
         type: 'examRepetition',
       };
-      events.push(examRepetition, exam);
-    }
-  });
+      let overlap = false;
+      do {
+        const duration = examRepetition.endTime - examRepetition.startTime;
+        let a;
+        let b;
+        [a, b, overlap] = adjustTimesByOverlapFromEvents(
+          examRepetition.startTime,
+          examRepetition.endTime,
+          duration,
+          events,
+          HourMilliSec,
+        );
+        if (overlap) {
+          examRepetition.startTime -= (HourMilliSec * 24);
+          examRepetition.endTime -= (HourMilliSec * 24);
+        }
+      } while (overlap);
+      events.push(examRepetition);
+    });
+  }
   return events;
 }
 
@@ -535,7 +498,6 @@ async function retrieveICalURLs(userid, syncCalendars) {
   const directory = path.join(parentDir, 'database', 'icals', userid.toString());
 
   try {
-    // Check if the directory exists
     const directoryExists = await fsPromises.access(directory, fs.constants.F_OK)
       .then(() => true)
       .catch(() => false);
