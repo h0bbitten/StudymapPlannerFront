@@ -20,6 +20,15 @@ nav {
   justify-content: flex-end;
 }
 
+#logoCorner{
+  position:relative;
+  right:-33px;
+  transform:translatex(-1700px) translatey(0px);
+  min-height:112px;
+  margin-left:0px;
+  width:115px !important;
+ }
+
 #navbar img {
   width: 35px;
   height: 35px;
@@ -27,7 +36,7 @@ nav {
 
 #user_profile img{
   display:inline-block;
-  transform:translatex(-45px) translatey(-26px);
+  transform:translatex(-43px) translatey(-27px);
 }
 
 #user_profile{
@@ -37,6 +46,17 @@ nav {
 .navbar-icons {
   display: flex;
 }
+
+#settingsBtn{
+  display:inline-block;
+  transform:translatex(-8px) translatey(7px);
+ }
+
+ 
+ #dark-mode-btn{
+  display:inline-block;
+  transform:translatex(3px) translatey(7px);
+ }
 
 .navbar-icon {
   margin-left: 20px;
@@ -48,6 +68,10 @@ nav {
   cursor: pointer;
   filter: none; /* Unchanged, normal icon appearance */
 }
+
+#user_profile p{
+  font-size:20px;
+ }
 
 #schedule {
   margin-top: 20px;
@@ -129,35 +153,30 @@ a:hover {
 #monthDisplay{
   font-family:'Arial Black','Arial Bold',Gadget,sans-serif;
   font-size:28px;
-  transform:translatex(-3px) translatey(51px);
+  transform:translatex(-30px) translatey(51px);
 }
-
 
 #header div,
 #weekdays div {
-  width: 100px;
+  width: 150px;
   padding: 10px;
   margin: auto;
   border-right: 2px solid #000000;
+  text-align: center;
+  box-shadow: 0 -50px 50px -50px #0829ff;
 }
 
 #weekdays {
-  order: 2;
-  background-color: #385280;
+  background-color: transparent;
   color: #ffffff;
-  width: 700px;
+  width: 1101px;
   display: flex;
+  justify-content: space-between; /* Evenly distribute weekdays */
+  transform:translatex(0px) translatey(0px);
+  padding-left:51px;
+  order: 2;
 }
 
-#calendar {
-  order: 2;
-  width: auto;
-  margin-left: auto;
-  display: flex;
-  flex-wrap: wrap;
-  max-height: 500px;
-  overflow: auto;
-}
 .day {
   width: 100px;
   padding: 10px;
@@ -166,7 +185,6 @@ a:hover {
   box-sizing: border-box;
   background-color: rgb(63, 63, 63);
   margin: 0;
-  box-shadow: 0px 0px 3px #CBD4C2;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -207,30 +225,22 @@ a:hover {
   outline: none;
 }
 
-/* Weekday headers */
-#weekdays div {
-  width: 150px;
-  padding: 10px;
-  margin: auto;
-  text-align: center;
-}
-
-#weekdays {
-  background-color: #385280;
-  color: #ffffff;
-  width: 1101px;
-  display: flex;
-  justify-content: space-between; /* Evenly distribute weekdays */
-  transform:translatex(0px) translatey(0px);
-  padding-left:51px;
-}
-
 /* Calendar container */
 #calendar {
+  width: 775px;
+  margin: auto;
+  display: flex;
+  flex-wrap: wrap;
+  order: 2;
+}
+
+#calendar.week-view {
   width: auto;
   margin-left: auto;
   display: flex;
   flex-wrap: wrap;
+  max-height: 500px;
+  overflow: auto;
 }
 
 #loading {
@@ -332,7 +342,6 @@ a:hover {
   box-sizing: border-box;
   background-color: rgb(63, 63, 63);
   margin: 0;
-  box-shadow: 0px 0px 3px #cbd4c2;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -361,7 +370,7 @@ a:hover {
   background-color: #385280;
 }
 
-.week-view .day + #currentDay {
+.week-view.day + #currentDay {
   background-color: #694d00;
 }
 
@@ -531,7 +540,7 @@ body {
   background-color: var(--background-color);
 }
 .dark-mode nav {
-  background-color: #1f1f1f; /* Slightly lighter dark shade for navbar */
+  background-color: #121e2a; /* Slightly lighter dark shade for navbar */
   box-shadow: 0 2px 4px rgba(0,0,0,0.5); /* Darker shadow for depth */
 }
 
