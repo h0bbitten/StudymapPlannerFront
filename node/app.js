@@ -1,10 +1,15 @@
 import fs from 'fs';
+import { fileURLToPath } from 'url';
+import path, { dirname } from 'path';
 import Webscraper from './scraping.js';
-import { mockAlgorithm } from './Algorithm.js';
+import Algorithm from './Algorithm.js';
 
 export {
-  getMoodleInfo, logIn, saveOptions, getUserData, calculateSchedule,
+  getMoodleInfo, logIn, saveOptions, getUserData, getSchedule, importIcalFile,
 };
+
+const currentFilename = fileURLToPath(import.meta.url);
+const currentDir = dirname(currentFilename);
 
 class WSfunctions {
   constructor(token) {
@@ -77,86 +82,120 @@ async function logIn(req, res) {
 }
 async function getMoodleInfo(req, res) {
   try {
-    const Moodle = new WSfunctions(req.session.token);
-    let User = {};
+    const token = req.session.token;
+    const Moodle = new WSfunctions(token);
+    let user = {};
 
     try {
-      const webserviceeResponse = await Moodle.core_webservice_get_site_info();
-      User = {
-        userid: webserviceeResponse.userid,
-        fullname: webserviceeResponse.fullname,
-        userpictureurl: webserviceeResponse.userpictureurl,
-        sitename: webserviceeResponse.sitename,
-        siteurl: webserviceeResponse.siteurl,
-        lang: webserviceeResponse.lang,
+      const webserviceResponse = await Moodle.core_webservice_get_site_info();
+      user = {
+        userid: webserviceResponse.userid,
+        fullname: webserviceResponse.fullname,
+        userpictureurl: webserviceResponse.userpictureurl,
+        sitename: webserviceResponse.sitename,
+        siteurl: webserviceResponse.siteurl,
+        lang: webserviceResponse.lang,
         courses: [],
       };
+
       const courseresponse = await Moodle.core_course_get_enrolled_courses_by_timeline_classification();
-      User.courses = courseresponse.courses;
-      // We should come up with better filtering system, maybe on client side, but works for now
-      User.courses = User.courses.filter((course) => course.enddate !== 2527282800);
+      user.courses = courseresponse.courses.filter((course) => course.enddate !== 2527282800);
 
-      const coursePromises = User.courses.map(async (course) => {
-        const contents = await Moodle.core_course_get_contents(course.id);
-        const pages = await Moodle.mod_page_get_pages_by_courses(course.id);
-        const color = await assignColor(course.id);
-        const modulelink = await findModulelink(pages.pages);
-        const ECTS = modulelink ? await Webscraper(modulelink) : null;
-
-        return {
-          ...course, contents, pages: pages.pages, color, modulelink, ECTS,
-        };
-      });
-
-      User.courses = await Promise.all(coursePromises);
+      user.courses = await scrapeModuleLinks(user.courses, Moodle);
     } catch (error) {
-      console.error('Failed to get MoodleAPI data:', error);
+      console.error('Failed to get enrolled courses:', error);
     }
-    res.send(User);
+    res.send(user);
   } catch (error) {
     res.status(500).send(`Error getting Moodle info: ${error}`);
   }
+}
+
+async function scrapeModuleLinks(courses, Moodle) {
+  const enrichedCourses = courses.map(async (course) => {
+    const contents = await Moodle.core_course_get_contents(course.id);
+    const pages = await Moodle.mod_page_get_pages_by_courses(course.id);
+    const color = await assignColor(course.id);
+
+    // Check if pages.pages exists and is iterable
+    let modulelink;
+    if (pages && pages.pages && Array.isArray(pages.pages)) {
+      modulelink = await findModulelink(pages.pages);
+    } else {
+      console.error('Pages structure not as expected:', pages);
+    }
+
+    let ECTS = undefined;
+    if (modulelink) {
+      ECTS = await Webscraper(modulelink);
+    }
+
+    return {
+      ...course, contents, pages: pages.pages, color, modulelink, ECTS
+    };
+  });
+
+  return Promise.all(enrichedCourses);
 }
 
 async function saveOptions(req, res) {
   try {
     console.log('Saving options');
     const User = req.body;
-
-    // Filter the user object to keep only the required information
-    const userDataToSave = {
-      userid: User.userid,
-      courses: User.courses.map(course => ({
-        id: course.id,
-        fullname: course.fullname,
-        contents: course.contents,
-        pages: course.pages
-      }))
-    };
-
-    // Save the filtered user data to the filesystem
-    fs.writeFile(`./database/${User.userid}.json`, JSON.stringify(userDataToSave, null, 2), (err) => {
-      if (err) {
-        console.error('Error saving user data:', err);
-        res.status(500).json({ message: 'Error saving user data' });
-      } else {
-        console.log('User data saved successfully');
-        res.status(200).json({ message: 'User data saved successfully' });
+    User.settings.importedCalendars = User.settings.importedCalendars.filter((calendar) => {
+      if (calendar.type === 'remove') {
+        const id = req.session.userid;
+        const parentDir = path.resolve(currentDir, '..');
+        const filePath = path.join(parentDir, 'database', 'icals', id.toString(), calendar.name);
+        if (fs.existsSync(filePath)) {
+          fs.unlinkSync(filePath);
+          console.log(`File ${calendar.name} removed successfully`);
+          return false;
+        }
+        console.log(`File ${calendar.name} does not exist`);
       }
+      return true;
     });
+    const goodResponse = await writeUserToDB(User);
+    console.log('goodResponse to saving data:', goodResponse);
+    if (goodResponse) {
+      res.status(200).send('User data saved successfully');
+    } else {
+      res.status(500).send('Error saving User data');
+    }
   } catch (err) {
-    console.error('Server error:', err);
-    res.status(500).json({ message: 'Internal Server Error' });
+    res.status(500).send('Internal Server Error');
   }
 }
 
+const writeFileAsync = fs.promises.writeFile;
 
-
-async function calculateSchedule(req, res) {
+async function writeUserToDB(User) {
   try {
+    await writeFileAsync(`./database/${User.userid}.json`, JSON.stringify(User));
+    console.log('User data saved successfully');
+    return true;
+  } catch (err) {
+    console.error('Error saving User data:', err);
+    return false;
+  }
+}
+
+async function getSchedule(req, res) {
+  try {
+    const algorithm = req.query.algorithm;
+    const ForceRecalculate = req.query.forcerecalculate;
     const User = await retrieveAndParseUserData(req.session.userid);
-    const Timeblocks = await mockAlgorithm(User); // await Algorithm(User);
-    res.send(JSON.stringify(Timeblocks));
+    let Schedule = User.schedule;
+    const recalculate = ForceRecalculate === 'true' || !Schedule || Schedule.outDated === true;
+    console.log('Recalculate:', recalculate);
+    if (recalculate) {
+      console.log('Recalculating schedule');
+      Schedule = await Algorithm(User, algorithm);
+      User.schedule = Schedule;
+      writeUserToDB(User);
+    }
+    res.send(JSON.stringify(Schedule));
   } catch (error) {
     console.error('Failed to calculate schedule:', error);
     res.status(500).send('Internal Server Error');
@@ -323,4 +362,26 @@ async function assignColor(integer) {
       reject(new Error('Input must be a positive integer'));
     }
   });
+}
+
+async function importIcalFile(req, res) {
+  try {
+    const { files } = req;
+    const id = req.session.userid;
+    const parentDir = path.resolve(currentDir, '..');
+    const directory = path.join(parentDir, 'database', 'icals', id.toString());
+    if (!fs.existsSync(directory)) {
+      fs.mkdirSync(directory, { recursive: true });
+    }
+
+    files.forEach((file) => {
+      const filePath = path.join(directory, file.originalname);
+      fs.renameSync(file.path, filePath);
+    });
+
+    res.status(200).send('Files uploaded successfully.');
+  } catch (error) {
+    console.error('Failed to import ICAL file:', error);
+    res.status(500).send('Internal Server Error');
+  }
 }

@@ -1,4 +1,4 @@
-export default loadCalendar;
+export { loadCalendar, initButtons };
 
 let nav = 0;
 let view = 'week';
@@ -18,19 +18,15 @@ const endStudyTime = 24;//= parseInt(endStudyTimeValue, 10);
 const dayPX = (1000 / 24) * (endStudyTime - startStudyTime);
 const hourPX = dayPX / (endStudyTime - startStudyTime);
 const minutePX = hourPX / 60;
-let Timeblocks = [];
 function loadCalendar(inputTimeblocks) {
-  Timeblocks = inputTimeblocks;
-  console.log(Timeblocks);
-  initButtons();
   if (view === 'week') {
-    loadWeekView();
+    loadWeekView(inputTimeblocks);
   } else {
-    loadMonthView();
+    loadMonthView(inputTimeblocks);
   }
 }
 
-function loadMonthView() {
+function loadMonthView(timeblocks) {
   calendar.classList.remove('week-view');
   const dt = new Date();
 
@@ -73,10 +69,10 @@ function loadMonthView() {
       const dayNumber = i - paddingDays;
       daySquare.innerText = dayNumber;
 
-      if (month === 2 && lectureIndex < Timeblocks.length) {
+      if (month === 2 && lectureIndex < timeblocks.length) {
         const eventPara = document.createElement('p');
         eventPara.classList.add('event');
-        eventPara.textContent = Timeblocks[lectureIndex++];
+        eventPara.textContent = timeblocks[lectureIndex++];
         daySquare.appendChild(eventPara);
       }
     } else {
@@ -87,7 +83,7 @@ function loadMonthView() {
   }
 }
 
-function loadWeekView() {
+function loadWeekView(timeblocks) {
   calendar.classList.add('week-view');
   const today = new Date();
   today.setDate(today.getDate() + nav);
@@ -95,8 +91,8 @@ function loadWeekView() {
   const dayOfWeek = today.getDay();
   const startOfWeek = new Date(today.setDate(today.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1)));
   const date = moment(startOfWeek);
-  const weekNumber = date.isoWeek();
 
+  // const weekNumber = date.isoWeek();
 
   document.getElementById('monthDisplay')
  .innerText = `${date.format('MMMM')} ${date.format('D')} - ${date.add(6, 'days').format('D')}, ${date.format('YYYY')} \n`;
@@ -119,6 +115,7 @@ function loadWeekView() {
 
   $('#calendar').append('<div class="time-labels"></div>');
 
+  // Add hour marks
   for (let hour = startStudyTime; hour <= endStudyTime; hour++) {
     $('.time-labels').append(`
       <div class="hour" style="height: ${hourPX}px; display: flex; align-items: center; padding-left: 10px;">
@@ -132,6 +129,7 @@ function loadWeekView() {
 
     $(`.day-interval-${day + 1}`).append(`<div class="day" id="day${day + 1}" style="flex: 1;"></div>`);
 
+    // Add hour marks within each day interval
     for (let hour = 1; hour <= 24; hour++) {
       $(`.day-interval-${day + 1}`).append(`<div class="hour" id="hour${hour}" style="height: ${hourPX}px;"></div>`);
     }
@@ -141,10 +139,13 @@ function loadWeekView() {
 
   const currentWeekStartTime = getStartOfWeek(weekNumber, yearNumber);
   const currentWeekEndTime = getEndOfWeek(weekNumber, yearNumber);
-  Timeblocks.forEach((lecture) => {
-    addTimeBlock(lecture.startTime, lecture.endTime, lecture.title, lecture.description, lecture.color);
+
+  timeblocks.forEach((lecture) => {
+    addTimeBlock(lecture.startTime, lecture.endTime, lecture.description, lecture.description, lecture.color);
   });
   console.log(startStudyTime, endStudyTime);
+
+  createPopUp();
 }
 
 
@@ -189,8 +190,6 @@ function createTimeBlock(startTime, endTime, title, description, color) {
   const top = (minutesIntoDay(startTime) * (1000 / 24 / 60));
   const minuteDuration = (endTime - startTime) / 60000;
   const height = minuteDuration * (1000 / 24 / 60);
-
-  console.log(startTime);
   const html = `
       <div class="timeblock" style="height: ${height}px; background-color: ${color};
       position: absolute; top: ${top}px; width: 130px; font-size: 13px">
@@ -218,38 +217,77 @@ function minutesIntoDay(timestamp) {
   return minutesDifference;
 }
 
-function initButtons() {
+function createPopUp() {
+  $('.timeblock').click(function() {
+    const description = $(this).find('.description').text();
+    const title = $(this).find('.title').text();
+    const time = $(this).find('.time').text();
+
+    const modalContentHTML = `
+      <div class="modal-header">${title}</div>
+      <div class="modal-section">
+        <div class="section-title">Course</div>
+        <div>${description}</div>
+      </div>
+      <div class="modal-section">
+        <div class="section-title">Time</div>
+        <div>${time}</div>
+      </div>
+      <!-- Add more sections as needed -->
+    `;
+    $('#modalContent').html(modalContentHTML);
+    $('#infoModal').css('display', 'flex');
+  });
+
+  $('.close').click(function() {
+    $('#infoModal').css('display', 'none');
+  });
+}
+
+function initButtons(timeblocks) {
   document.getElementById('nextButton').addEventListener('click', () => {
     if (view === 'month') {
       nav++;
-      load();
+      loadCalendar(timeblocks);
     } else {
       nav += 7;
       weekNumber++;
-      loadWeekView();
+      loadWeekView(timeblocks);
     }
   });
 
   document.getElementById('backButton').addEventListener('click', () => {
     if (view === 'month') {
       nav--;
-      loadCalendar();
+      loadCalendar(timeblocks);
     } else {
       nav -= 7;
       weekNumber--;
-      loadWeekView();
+      loadWeekView(timeblocks);
     }
   });
 
   document.getElementById('weekButton').addEventListener('click', () => {
     view = 'week';
     nav = 0;
-    loadCalendar();
+    weekNumber = now.isoWeek();
+    yearNumber = now.year();
+    loadCalendar(timeblocks);
   });
 
   document.getElementById('monthButton').addEventListener('click', () => {
     view = 'month';
     nav = 0;
-    loadCalendar();
+    weekNumber = now.isoWeek();
+    yearNumber = now.year();
+    loadCalendar(timeblocks);
+  });
+
+  document.getElementById('todayButton').addEventListener('click', () => {
+    view = 'week';
+    nav = 0;
+    weekNumber = now.isoWeek();
+    yearNumber = now.year();
+    loadCalendar(timeblocks);
   });
 }
