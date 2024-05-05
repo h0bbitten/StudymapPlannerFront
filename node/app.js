@@ -161,20 +161,20 @@ async function saveOptions(req, res) {
 
 async function writeUserToDB(User) {
   try {
-    const userId = await ensureUserExists(User.userid);  // Ensure the user exists
-    await saveUserDetails(userId, User);  // This now updates the 'details' column
+    const userId = await ensureUserExists(User.userid);  // Confirm user existence
+    await saveUserDetails(userId, User);  // Save full user object
     console.log('User data updated successfully in MySQL');
-    return true;
   } catch (err) {
     console.error('Error updating User data:', err);
-    return false;
+    throw err;  // Ensure exceptions are thrown to be caught by caller
   }
 }
 
+
 async function getSchedule(req, res) {
   try {
-    const algorithm = req.query.algorithm;
-    const ForceRecalculate = req.query.forcerecalculate;
+    const algorithm = req.query.algorithm || 'default'; // Ensure there's a default algorithm
+    const forceRecalculate = req.query.forcerecalculate === 'true';
     const User = await retrieveAndParseUserData(req.session.userid);
     console.log("User data before algorithm:", User);  // Check user data structure
 
@@ -182,12 +182,14 @@ async function getSchedule(req, res) {
     const recalculate = ForceRecalculate === 'true' || !Schedule || Schedule.outDated === true;
 
     if (recalculate) {
-      console.log('Recalculating schedule');
-      Schedule = await Algorithm(User, algorithm);
+      console.log('Recalculating schedule for:', User.fullname);
+      const Schedule = await Algorithm(User, algorithm); // Ensure Algorithm handles null properly
       User.schedule = Schedule;
-      await writeUserToDB(User);  
+      User.schedule.outDated = false; // Mark as updated
+      await writeUserToDB(User); // Save the updated user with new schedule
     }
-    res.send(JSON.stringify(Schedule));
+
+    res.json(User.schedule);
   } catch (error) {
     console.error('Failed to calculate schedule:', error);
     res.status(500).send('Internal Server Error');
