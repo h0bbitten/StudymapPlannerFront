@@ -82,11 +82,6 @@ class AlgoMethods {
 }
 
 async function Algorithm(User, algorithm) {
-  if (!User.schedule) {
-    // Handle undefined schedule or initialize a default schedule
-    console.log('No existing schedule found, initializing default');
-    User.schedule = { /* some default schedule structure */ };
-  }
   const Algo = new PreAlgoMethods(User, algorithm);
   // Try with IIFE async constructor function instead
   await Algo.init();
