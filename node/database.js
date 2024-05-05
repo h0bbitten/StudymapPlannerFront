@@ -2,9 +2,9 @@ import mysql from 'mysql2/promise';
 
 // Database connection pool
 const pool = mysql.createPool({
-  host: 'localhost',
+  host: 'mysql',
   user: 'root',
-  password: 'studymaproot',
+  password: 'rootyroot',
   database: 'users',
 });
 
@@ -21,25 +21,23 @@ async function ensureUserExists(externalUserID) {
     return user[0].id;
   } catch (error) {
     console.error('Error ensuring user exists:', error);
-    throw error; // Re-throw the error to be caught by the caller
-  }
-}
-
-// Gemmer ellere opdatere course
-async function saveOrUpdateCourse(userID, courseName, ects) {
-  const [course] = await pool.query('SELECT id FROM courses WHERE userID = ? AND courseName = ?', [userID, courseName]);
-  if (course.length === 0) {
-    await pool.query('INSERT INTO courses (userID, courseName, ects) VALUES (?, ?, ?)', [userID, courseName, ects]);
-  } else {
-    await pool.query('UPDATE courses SET ects = ? WHERE id = ?', [ects, course[0].id]);
+    throw error; 
   }
 }
 
 async function saveUserDetails(userId, userDetails) {
+  if (!userId || !userDetails) {
+    console.error("Invalid user data or ID:", userId, userDetails);
+    throw new Error("Invalid user data or ID provided");
+  }
+
   const detailsJson = JSON.stringify(userDetails);
   try {
-    await pool.query('UPDATE users SET details = ? WHERE id = ?', [detailsJson, userId]);
-    console.log('User details updated successfully');
+    const [result] = await pool.query('UPDATE users SET details = ? WHERE id = ?', [detailsJson, userId]);
+    if (result.affectedRows === 0) {
+      throw new Error("No rows updated - user may not exist.");
+    }
+    console.log('User details updated successfully for user ID:', userId);
   } catch (error) {
     console.error('Error updating user details:', error);
     throw error;
@@ -48,4 +46,5 @@ async function saveUserDetails(userId, userDetails) {
 
 
 
-export { ensureUserExists, saveOrUpdateCourse, saveUserDetails, pool};
+
+export { ensureUserExists, saveUserDetails};
