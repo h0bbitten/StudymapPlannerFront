@@ -216,16 +216,17 @@ async function retrieveAndParseUserData(userid) {
     const [rows] = await pool.query('SELECT details FROM users WHERE userID = ?', [userid]);
     if (rows.length > 0) {
       const userData = JSON.parse(rows[0].details);
-      console.log("Retrieved and parsed user data:", userData); // Log to see the actual retrieved data
+      console.log("Retrieved and parsed user data including schedule:", userData.schedule);
       return userData;
     } else {
       throw new Error('No user found with the given ID');
     }
   } catch (error) {
-    console.error('Failed to retrieve user data from database:', error);
+    console.error('Failed to retrieve or parse user data from database:', error);
     throw error;
   }
 }
+
 
 
 
