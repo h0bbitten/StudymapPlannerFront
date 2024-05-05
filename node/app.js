@@ -173,23 +173,23 @@ async function writeUserToDB(User) {
 
 async function getSchedule(req, res) {
   try {
-    const algorithm = req.query.algorithm || 'default'; // Ensure there's a default algorithm
-    const forceRecalculate = req.query.forcerecalculate === 'true';
     const User = await retrieveAndParseUserData(req.session.userid);
-    console.log("User data before algorithm:", User);  // Check user data structure
-
-    let Schedule = User.schedule;
-    const recalculate = ForceRecalculate === 'true' || !Schedule || Schedule.outDated === true;
-
-    if (recalculate) {
-      console.log('Recalculating schedule for:', User.fullname);
-      const Schedule = await Algorithm(User, algorithm); // Ensure Algorithm handles null properly
-      User.schedule = Schedule;
-      User.schedule.outDated = false; // Mark as updated
-      await writeUserToDB(User); // Save the updated user with new schedule
+    if (!User || !User.schedule) {
+      console.error('User or User schedule is undefined:', User);
+      return res.status(500).send('Error: User data is incomplete');
     }
 
-    res.json(User.schedule);
+    // Proceed if user data is correctly retrieved and formatted
+    let Schedule = User.schedule;
+    const recalculate = req.query.forcerecalculate === 'true' || !Schedule || Schedule.outDated === true;
+
+    if (recalculate) {
+      console.log('Recalculating schedule for user:', User.fullname);
+      Schedule = await Algorithm(User, req.query.algorithm);
+      User.schedule = Schedule;
+      await writeUserToDB(User);
+    }
+    res.send(JSON.stringify(Schedule));
   } catch (error) {
     console.error('Failed to calculate schedule:', error);
     res.status(500).send('Internal Server Error');
@@ -198,12 +198,13 @@ async function getSchedule(req, res) {
 
 
 
+
 async function retrieveAndParseUserData(userid) {
   try {
     const [rows] = await pool.query('SELECT details FROM users WHERE userID = ?', [userid]);
     if (rows.length > 0) {
       const userData = JSON.parse(rows[0].details);
-      console.log("Parsed user data:", userData);  // Add this line
+      console.log("Retrieved and parsed user data:", userData); // Log to see the actual retrieved data
       return userData;
     } else {
       throw new Error('No user found with the given ID');
