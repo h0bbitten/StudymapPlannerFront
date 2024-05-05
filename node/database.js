@@ -9,6 +9,7 @@ const pool = mysql.createPool({
 });
 
 async function ensureUserExists(externalUserID) {
+  
   try {
     console.log(`Trying to ensure user exists with ID: ${externalUserID}`);
     const [user] = await pool.query('SELECT id FROM users WHERE userID = ?', [externalUserID]);

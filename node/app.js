@@ -199,7 +199,7 @@ async function getSchedule(req, res) {
       console.log('Recalculating schedule for user:', User.fullname);
       Schedule = await Algorithm(User, req.query.algorithm);
       User.schedule = Schedule;
-      await writeUserToDB(User);
+      await writeUserToDB(User);  // Ensure the updated schedule is saved
     }
     res.send(JSON.stringify(Schedule));
   } catch (error) {
@@ -209,13 +209,14 @@ async function getSchedule(req, res) {
 }
 
 
-
-
 async function retrieveAndParseUserData(userid) {
   try {
     const [rows] = await pool.query('SELECT details FROM users WHERE userID = ?', [userid]);
     if (rows.length > 0) {
       const userData = JSON.parse(rows[0].details);
+      if (!userData.schedule) {  // Only add default schedule if not present
+        userData.schedule = { algorithm: 'default', Timeblocks: [], outdated: true };
+      }
       console.log("Retrieved and parsed user data including schedule:", userData.schedule);
       return userData;
     } else {
@@ -226,6 +227,7 @@ async function retrieveAndParseUserData(userid) {
     throw error;
   }
 }
+
 
 
 
