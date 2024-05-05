@@ -5,8 +5,8 @@ import {
 async function displaySettings(User) {
   LoadingScreen.add();
   LoadingScreen.show();
+  displayScheduleOptions(User.settings, User.schedule.algorithm, User.schedule.preferEarly, User.schedule.wantPrep);
   displayCourses(User.courses);
-  displayScheduleOptions(User.settings, User.schedule.algorithm, User.schedule.preferEarly);
   displaySyncCalendar(User.userid, User.settings);
   displayImportExport(User.userid, User.settings);
   displayAccountSettings(User.userid, User.settings);
@@ -70,7 +70,7 @@ function addCourseOptions(index, course) {
   `);
 }
 
-function displayScheduleOptions(settings, algorithm, preferEarly) {
+function displayScheduleOptions(settings, algorithm, preferEarly, wantPrep) {
   $('#formSettings').append(createCollapsible('Schedule', 'scheduleOptions'));
   $('#scheduleOptions').append(`
     <div class="optionBlock">
@@ -107,6 +107,7 @@ function displayScheduleOptions(settings, algorithm, preferEarly) {
   `);
   $('#algorithm').val(algorithm);
   $('#preferEarly').prop('checked', preferEarly);
+  $('#wantPrep').prop('checked', wantPrep);
 }
 
 function displayAccountSettings(id, settings) {
@@ -423,16 +424,26 @@ async function saveOptions(User) {
     User.settings.syncCalendars = newSyncCalendars;
     User.settings.importedCalendars = mergeArrays(User.settings.importedCalendars, newImportedCalendars);
 
-    User.settings = {
-      ...User.settings,
+    const Scheduleinputs = {
       startStudyTime: $('#startStudyTime').val(),
       endStudyTime: $('#endStudyTime').val(),
+      algorithm: $('#algorithm').val(),
+      preferEarly: $('#preferEarly').is(':checked'),
+      wantPrep: $('#wantPrep').is(':checked'),
+    };
+    if (
+      Object.keys(Scheduleinputs).some((key) => Scheduleinputs[key] !== User.schedule[key] && Scheduleinputs[key] !== User.settings[key])
+    ) User.schedule.outDated = true;
+
+    User.settings = {
+      ...User.settings,
+      startStudyTime: Scheduleinputs.startStudyTime,
+      endStudyTime: Scheduleinputs.endStudyTime,
       email: $('#useremail').val(),
     };
-    const algorithm = $('#algorithm').val();
-    if (algorithm !== User.schedule.algorithm) User.schedule.outDated = true;
-    User.schedule.algorithm = algorithm;
-    User.schedule.preferEarly = $('#preferEarly').is(':checked');
+    User.schedule.algorithm = Scheduleinputs.algorithm;
+    User.schedule.preferEarly = Scheduleinputs.preferEarly;
+    User.schedule.wantPrep = Scheduleinputs.wantPrep;
 
     console.log(User.settings);
 
