@@ -25,6 +25,28 @@ function loadCalendar(inputTimeblocks) {
   }
 }
 
+function generatePopupContentForDay(day, timeblocks) {
+  // Filter the timeblocks for the selected day
+  const timeblocksForDay = timeblocks.filter(block => {
+    const blockDate = new Date(block.startTime);
+    return blockDate.getDate() === day;
+  });
+
+  // Generate the HTML content for the popup
+  let popupContent = '';
+  timeblocksForDay.forEach(block => {
+    popupContent += `
+      <div class="timeblock">
+        <div class="time">${convertToTimeString(block.startTime)} - ${convertToTimeString(block.endTime)}</div>
+        <div class="title">${block.title}</div>
+        <div class="description">${block.description}</div>
+      </div>
+    `;
+  });
+
+  return popupContent;
+}
+
 function loadMonthView(timeblocks) {
   calendar.classList.remove('week-view');
   const baseDate = new Date();
@@ -83,11 +105,19 @@ function loadMonthView(timeblocks) {
       timeBlockIndicator.style.borderRadius = '50%';
       daySquare.appendChild(timeBlockIndicator);
     }
-    
+    daySquare.addEventListener('click', () => {
+      const popupContent = generatePopupContentForDay(i, monthTimeblocks);
+      // Assuming you have a modal with id 'infoModal' and a content container with id 'modalContent'
+      document.getElementById('modalContent').innerHTML = popupContent;
+      document.getElementById('infoModal').style.display = 'flex';
+    });
     calendar.appendChild(daySquare);
   }
 }
 
+document.querySelector('.close').addEventListener('click', function() {
+  document.getElementById('infoModal').style.display = 'none';
+});
 
 function loadWeekView(timeblocks) {
   calendar.classList.add('week-view');
