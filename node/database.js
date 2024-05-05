@@ -47,4 +47,4 @@ async function saveUserDetails(userId, userDetails) {
 
 
 
-export { ensureUserExists, saveUserDetails};
+export { ensureUserExists, saveUserDetails, pool};
