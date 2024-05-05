@@ -161,31 +161,35 @@ async function saveOptions(req, res) {
 
 async function writeUserToDB(User) {
   try {
-    const userId = await ensureUserExists(User.userid);  // Ensure the user exists
-    await saveUserDetails(userId, User);  // This now updates the 'details' column
+    const userId = await ensureUserExists(User.userid);  // Confirm user existence
+    await saveUserDetails(userId, User);  // Save full user object
     console.log('User data updated successfully in MySQL');
-    return true;
   } catch (err) {
     console.error('Error updating User data:', err);
-    return false;
+    throw err;  // Ensure exceptions are thrown to be caught by caller
   }
 }
 
+
 async function getSchedule(req, res) {
   try {
-    const algorithm = req.query.algorithm;
-    const ForceRecalculate = req.query.forcerecalculate;
+    const algorithm = req.query.algorithm || 'default'; // Ensure there's a default algorithm
+    const forceRecalculate = req.query.forcerecalculate === 'true';
     const User = await retrieveAndParseUserData(req.session.userid);
-    let Schedule = User.schedule;
-    const recalculate = ForceRecalculate === 'true' || !Schedule || Schedule.outDated === true;
+
+    // Determine if recalculation is necessary
+    const recalculate = forceRecalculate || !User.schedule || User.schedule.outDated;
     console.log('Recalculate:', recalculate);
+
     if (recalculate) {
-      console.log('Recalculating schedule');
-      Schedule = await Algorithm(User, algorithm);
+      console.log('Recalculating schedule for:', User.fullname);
+      const Schedule = await Algorithm(User, algorithm); // Ensure Algorithm handles null properly
       User.schedule = Schedule;
-      await writeUserToDB(User);  
+      User.schedule.outDated = false; // Mark as updated
+      await writeUserToDB(User); // Save the updated user with new schedule
     }
-    res.send(JSON.stringify(Schedule));
+
+    res.json(User.schedule);
   } catch (error) {
     console.error('Failed to calculate schedule:', error);
     res.status(500).send('Internal Server Error');
@@ -197,7 +201,10 @@ async function retrieveAndParseUserData(userid) {
   try {
     const [rows] = await pool.query('SELECT details FROM users WHERE userID = ?', [userid]);
     if (rows.length > 0) {
-      return JSON.parse(rows[0].details); // Assuming 'details' are stored as a JSON string
+      const user = JSON.parse(rows[0].details);
+      // Make sure the user object has a 'schedule' field
+      user.schedule = user.schedule || { outdated: true };  // Ensures schedule exists
+      return user;
     } else {
       throw new Error('No user found with the given ID');
     }
@@ -206,6 +213,7 @@ async function retrieveAndParseUserData(userid) {
     throw error;
   }
 }
+
 
 
 async function getUserData(req, res) {

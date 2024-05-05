@@ -35,19 +35,17 @@ async function saveOrUpdateCourse(userID, courseName, ects) {
   }
 }
 
-async function saveUserDetails(userID, userData) {
+async function saveUserDetails(userId, userDetails) {
+  const detailsJson = JSON.stringify(userDetails);
   try {
-      const userDetailsJSON = JSON.stringify(userData);
-      // Assuming 'details' is a column in your 'users' table where you want to store the JSON data
-      const query = 'UPDATE users SET details = ? WHERE id = ?';
-      const [result] = await pool.query(query, [userDetailsJSON, userID]);
-      console.log('User details saved successfully:', result);
-      return result;
+    await pool.query('UPDATE users SET details = ? WHERE id = ?', [detailsJson, userId]);
+    console.log('User details updated successfully');
   } catch (error) {
-      console.error('Error saving user details:', error);
-      throw error;  // Re-throw the error to be caught by the caller
+    console.error('Error updating user details:', error);
+    throw error;
   }
 }
+
 
 
 export { ensureUserExists, saveOrUpdateCourse, saveUserDetails, pool};
