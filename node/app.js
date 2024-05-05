@@ -176,9 +176,11 @@ async function getSchedule(req, res) {
     const algorithm = req.query.algorithm;
     const ForceRecalculate = req.query.forcerecalculate;
     const User = await retrieveAndParseUserData(req.session.userid);
+    console.log("User data before algorithm:", User);  // Check user data structure
+
     let Schedule = User.schedule;
     const recalculate = ForceRecalculate === 'true' || !Schedule || Schedule.outDated === true;
-    console.log('Recalculate:', recalculate);
+
     if (recalculate) {
       console.log('Recalculating schedule');
       Schedule = await Algorithm(User, algorithm);
@@ -193,11 +195,14 @@ async function getSchedule(req, res) {
 }
 
 
+
 async function retrieveAndParseUserData(userid) {
   try {
     const [rows] = await pool.query('SELECT details FROM users WHERE userID = ?', [userid]);
     if (rows.length > 0) {
-      return JSON.parse(rows[0].details); // Assuming 'details' are stored as a JSON string
+      const userData = JSON.parse(rows[0].details);
+      console.log("Parsed user data:", userData);  // Add this line
+      return userData;
     } else {
       throw new Error('No user found with the given ID');
     }
@@ -206,6 +211,7 @@ async function retrieveAndParseUserData(userid) {
     throw error;
   }
 }
+
 
 
 async function getUserData(req, res) {
