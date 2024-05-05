@@ -1,31 +1,19 @@
 # Use a newer official Node.js image as a base
-FROM node:20
+FROM node:20 as server
 
 # Set the working directory for server-side code
-#There is none. 
+WORKDIR /app
 
 # Copy server-side code and dependencies
-#COPY server/package*.json ./
+COPY package*.json ./
+
+# Install dependencies
 RUN npm install
-#COPY server/ ./
 
-# Set up client-side code (assuming client directory is not used)
-# FROM node:14 AS client
-# WORKDIR /app/client
-# COPY client/package*.json ./
-# RUN npm install
-# COPY client/ ./
+# Copy the rest of your server code
+COPY . .
 
-# Combine server and client into a single image
-FROM node:14
-
-# Set the working directory for the app
-#WORKDIR /app
-
-# Copy server code from the server stage
-#COPY --from=server /app/server /app/server
-
-# Expose the port for the server
+# Expose the port that your app runs on
 EXPOSE 3000
 
 # Define the command to start the server
