@@ -193,30 +193,37 @@ async function writeUserToDB(User) {
 
 async function getSchedule(req, res) {
   try {
-      const userId = req.session.userid;
-      const User = await retrieveAndParseUserData(userId);
-      console.log('User schedule before update:', User.schedule);
+    const userId = req.session.userid;
+    const User = await retrieveAndParseUserData(userId);
+    let Schedule = User.schedule;
+    const algorithm = req.query.algorithm || User.schedule.algorithm; // Default to current algorithm if not specified
+    const ForceRecalculate = req.query.forcerecalculate === 'true';
+    const algorithmChanged = User.schedule.algorithm !== algorithm;
+    
+    // Check if recalculation is needed because of the recalculate flag, outdated data, or algorithm change
+    const recalculate = ForceRecalculate || Schedule.outDated || algorithmChanged;
 
-      let recalculate = req.query.forcerecalculate === 'true' || User.schedule.outDated || User.schedule.algorithm !== req.query.algorithm;
-      console.log('Recalculate condition:', recalculate, 'for user ID:', userId);
+    console.log(`Recalculate condition met: ${recalculate}, due to force recalculate: ${ForceRecalculate}, outdated: ${Schedule.outDated}, algorithm change: ${algorithmChanged}`);
 
-      if (recalculate) {
-          console.log('Recalculating schedule for algorithm:', req.query.algorithm, 'for user:', userId);
-          User.schedule = await Algorithm(User, req.query.algorithm);  // Ensure Algorithm function is properly handling and importing
-          User.schedule.outDated = false;  // Reset the outdated flag after recalculation
+    if (recalculate) {
+      console.log(`Recalculating schedule using algorithm: ${algorithm}`);
+      Schedule = await Algorithm(User, algorithm);
+      User.schedule = Schedule;
+      User.schedule.algorithm = algorithm; // Update the algorithm to the new one
+      User.schedule.outDated = false; // Mark the schedule as up-to-date
 
-          const saveSuccess = await saveUserDetails(userId, User);
-          if (!saveSuccess) {
-              throw new Error("Failed to save user details to the database.");
-          }
+      const saveSuccess = await saveUserDetails(userId, User); // Save the updated user details to MySQL
+      if (!saveSuccess) {
+          throw new Error("Failed to save user details to the database.");
       }
-
-      res.send(JSON.stringify(User.schedule));
+    }
+    res.send(JSON.stringify(User.schedule));
   } catch (error) {
-      console.error('Failed to calculate schedule:', error);
-      res.status(500).send('Internal Server Error');
+    console.error('Failed to calculate schedule:', error);
+    res.status(500).send('Internal Server Error');
   }
 }
+
 
 
 async function retrieveAndParseUserData(userid) {
