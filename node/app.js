@@ -191,30 +191,32 @@ async function writeUserToDB(User) {
   }
 }
 
-
 async function getSchedule(req, res) {
   try {
-    const userId = req.session.userid;
-    const User = await retrieveAndParseUserData(userId);
-    console.log('User schedule before update:', User.schedule);
+      const userId = req.session.userid;
+      const User = await retrieveAndParseUserData(userId);
+      console.log('User schedule before update:', User.schedule);
 
-    let recalculate = req.query.forcerecalculate === 'true' || User.schedule.outDated || User.schedule.algorithm !== req.query.algorithm;
-    console.log('Recalculate condition:', recalculate, 'for user ID:', userId);
+      let recalculate = req.query.forcerecalculate === 'true' || User.schedule.outDated || User.schedule.algorithm !== req.query.algorithm;
+      console.log('Recalculate condition:', recalculate, 'for user ID:', userId);
 
-    if (recalculate) {
-      console.log('Recalculating schedule for algorithm:', req.query.algorithm, 'for user:', userId);
-      User.schedule = await Algorithm(User, req.query.algorithm); // Assuming this is imported correctly
-      User.schedule.outDated = false; // Reset the outdated flag after recalculation
-      await saveUserDetails(userId, User); // Ensure this function also logs the outcome of the save operation
-    }
+      if (recalculate) {
+          console.log('Recalculating schedule for algorithm:', req.query.algorithm, 'for user:', userId);
+          User.schedule = await Algorithm(User, req.query.algorithm);  // Ensure Algorithm function is properly handling and importing
+          User.schedule.outDated = false;  // Reset the outdated flag after recalculation
 
-    res.send(JSON.stringify(User.schedule));
+          const saveSuccess = await saveUserDetails(userId, User);
+          if (!saveSuccess) {
+              throw new Error("Failed to save user details to the database.");
+          }
+      }
+
+      res.send(JSON.stringify(User.schedule));
   } catch (error) {
-    console.error('Failed to calculate schedule:', error);
-    res.status(500).send('Internal Server Error');
+      console.error('Failed to calculate schedule:', error);
+      res.status(500).send('Internal Server Error');
   }
 }
-
 
 
 async function retrieveAndParseUserData(userid) {
