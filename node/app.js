@@ -211,15 +211,18 @@ async function getSchedule(req, res) {
 
 async function retrieveAndParseUserData(userid) {
   try {
+    console.log("Attempting to retrieve user data for userID:", userid);
     const [rows] = await pool.query('SELECT details FROM users WHERE userID = ?', [userid]);
+    console.log("Query executed. Rows found:", rows.length);
     if (rows.length > 0) {
       const userData = JSON.parse(rows[0].details);
-      if (!userData.schedule) {  // Only add default schedule if not present
+      if (!userData.schedule) {
         userData.schedule = { algorithm: 'default', Timeblocks: [], outdated: true };
       }
-      console.log("Retrieved and parsed user data including schedule:", userData.schedule);
+      console.log("Retrieved and parsed user data including schedule:", userData);
       return userData;
     } else {
+      console.log("No user found with userID:", userid);
       throw new Error('No user found with the given ID');
     }
   } catch (error) {
