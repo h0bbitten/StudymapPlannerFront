@@ -30,22 +30,24 @@ async function ensureUserExists(externalUserID) {
 // Save User Details function
 async function saveUserDetails(userId, userDetails) {
   if (!userId || !userDetails) {
-    throw new Error("Invalid user data or ID provided");
+      console.error("Invalid user data or ID:", userId, userDetails);
+      throw new Error("Invalid user data or ID provided");
   }
 
   const detailsJson = JSON.stringify(userDetails);
-  console.log(`Saving details for user ID: ${userId}`);
   try {
-    const [result] = await pool.query('UPDATE users SET details = ? WHERE id = ?', [detailsJson, userId]);
-    if (result.affectedRows === 0) {
-      console.log(`No rows updated for user ID: ${userId}, possible user existence issue`);
-      throw new Error("No rows updated - user may not exist.");
-    }
-    console.log(`User details updated successfully for user ID: ${userId}, Affected Rows: ${result.affectedRows}`);
-    return true;
+      const [result] = await pool.query('UPDATE users SET details = ? WHERE id = ?', [detailsJson, userId]);
+      if (result.affectedRows === 0) {
+          // No rows updated, could mean the user doesn't exist
+          console.error('No rows updated - user may not exist or no new data.');
+          // Optionally, handle the logic to insert the user if they don't exist
+          return { success: false, message: "No rows updated - user may not exist." };
+      }
+      console.log('User details updated successfully for user ID:', userId);
+      return { success: true, message: "User updated successfully." };
   } catch (error) {
-    console.error('Error updating user details:', error);
-    throw error;
+      console.error('Error updating user details:', error);
+      throw error; // Re-throw the error for further handling up the call stack
   }
 }
 
