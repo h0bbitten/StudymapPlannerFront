@@ -384,9 +384,7 @@ function createExamEvents(courses, events, startStudyTime, endStudyTime, prepara
       let overlap = false;
       do {
         const duration = examRepetition.endTime - examRepetition.startTime;
-        let a;
-        let b;
-        [a, b, overlap] = adjustTimesByOverlapFromEvents(
+        [, , overlap] = adjustTimesByOverlapFromEvents(
           true,
           examRepetition.startTime,
           examRepetition.endTime,

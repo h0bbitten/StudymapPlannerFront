@@ -131,25 +131,25 @@ function loadWeekView(timeblocks) {
   document.getElementById('monthDisplay')
  .innerText = `${date.format('MMMM')} ${date.format('D')} - ${date.add(6, 'days').format('D')}, ${date.format('YYYY')} \n`;
 
- if(view === 'week'){ 
- const weekDaysDiv = document.getElementById('weekdays');
- $('#weekdays').css('padding-left', '53px');
- $('#weekdays').css('transform', 'translatex(0px) translatey(0px)');
- $('#weekdays').css('width', '1101px');
- 
-  if (weekDaysDiv) {
-    let dayNameAbbreviated, dateDisplay, dayHeader;
-    for (let i = 0; i < 7; i++) {
-      const weekDay = moment(startOfWeek).add(i, 'days');
-      dayNameAbbreviated = weekDay.format('ddd');
-      dateDisplay = weekDay.format('M/D');
-      dayHeader = weekDaysDiv.children[i];
-      if (dayHeader) {
-        dayHeader.textContent = `${dayNameAbbreviated} ${dateDisplay}`;
+  if (view === 'week') {
+    const weekDaysDiv = document.getElementById('weekdays');
+    $('#weekdays').css('padding-left', '53px');
+    $('#weekdays').css('transform', 'translatex(0px) translatey(0px)');
+    $('#weekdays').css('width', '1101px');
+
+    if (weekDaysDiv) {
+      let dayNameAbbreviated, dateDisplay, dayHeader;
+      for (let i = 0; i < 7; i++) {
+        const weekDay = moment(startOfWeek).add(i, 'days');
+        dayNameAbbreviated = weekDay.format('ddd');
+        dateDisplay = weekDay.format('M/D');
+        dayHeader = weekDaysDiv.children[i];
+        if (dayHeader) {
+          dayHeader.textContent = `${dayNameAbbreviated} ${dateDisplay}`;
+        }
       }
     }
   }
-} 
 
   calendar.innerHTML = '';
 
@@ -177,15 +177,55 @@ function loadWeekView(timeblocks) {
 
   const currentWeekStartTime = getStartOfWeek(weekNumber, yearNumber);
   const currentWeekEndTime = getEndOfWeek(weekNumber, yearNumber);
+  const now = moment().valueOf();
+  if (currentWeekStartTime <= now && now <= currentWeekEndTime) {
+    let weekdayIndex = moment(now).day();
+    weekdayIndex = (weekdayIndex === 0) ? 7 : weekdayIndex;
+    $(`#day${weekdayIndex}`).addClass('currentDay');
+  }
 
   timeblocks.forEach((lecture) => {
     addTimeBlock(lecture.startTime, lecture.endTime, lecture.description, lecture.description, lecture.color);
   });
   console.log(startStudyTime, endStudyTime);
 
+  createLines();
+  createAndMoveNowLine();
   createPopUp();
 }
 
+function createLines() {
+  $('.day').each(function dostuff() {
+    const dayBox = $(this);
+    const boxHeight = 1000 //dayBox.height();
+    const numLines = 24; // Number of lines
+
+    for (let i = 1; i < numLines; i++) {
+      const line = $('<div class="line"></div>');
+      line.css('top', (boxHeight / numLines) * i + 'px');
+      dayBox.append(line);
+    }
+  });
+}
+
+function createAndMoveNowLine() {
+  const currentDay = $('.currentDay');
+  if (currentDay.length > 0) {
+    const nowLine = $('<div class="now-line"></div>');
+    $(currentDay).append(nowLine);
+
+    const updateLinePosition = () => {
+      const theTime = moment();
+      const minutes = minutesIntoDay(theTime);
+      const top = minutes * minutePX;
+      nowLine.css('top', top + 'px');
+    };
+
+    updateLinePosition();
+
+    setInterval(updateLinePosition, 60000); // 1 minute
+  }
+}
 
 function getStartOfWeek(week, year) {
   return moment().year(year).isoWeek(weekNumber).startOf('isoWeek').valueOf();
@@ -211,7 +251,7 @@ function addTimeBlock(startTime, endTime, title, description, color) {
 
     if (endTime <= endOfDay) {
       createTimeBlockSegment(startTime, endTime, dayOfWeek);
-      break; 
+      break;
     } else {
       createTimeBlockSegment(startTime, endOfDay, dayOfWeek);
       startTime = moment(endOfDay + 1); 
