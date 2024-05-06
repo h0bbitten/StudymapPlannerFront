@@ -147,11 +147,16 @@ const routing = function routes(app, upload) {
      *         description: Successful response
      */
   app.post('/saveOptions', async (req, res) => {
-    await saveOptions(req, res).catch((error) => {
+    console.log('Received data:', req.body);
+    try {
+      const user = req.body;  
+      res.status(200).send('Data saved successfully');
+    } catch (error) {
       console.error('Error in saving user options:', error);
       res.status(500).send('Internal Server Error');
-    });
+    }
   });
+  
   app.post('/importIcalFile', upload.array('ics', 5), async (req, res) => {
     await importIcalFile(req, res).catch((error) => {
       console.error('Error in importing ICAL file:', error);

@@ -73,24 +73,25 @@ function displayProfile(profile) {
 }
 
 async function saveUserDataToDB(User) {
-  console.log(User);
+  console.log('Attempting to save:', User);
   try {
     const response = await fetch('http://localhost:3000/saveOptions', {
       method: 'POST',
-      cache: 'no-cache',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(User),
     });
     if (!response.ok) {
-      throw new Error('Network response error');
+      const errorDetail = await response.text();
+      throw new Error(`Server responded with error: ${errorDetail}`);
     }
+    console.log('Save successful:', await response.json());
   } catch (error) {
-    console.error('Error saving setup data:', error);
-    throw error;
+    console.error('Error saving user data:', error);
   }
 }
+
 async function APIpostCall(url, data, errorCallback, contentType = 'application/json') {
   try {
     const response = await fetch(`http://localhost:3000/${url}`, {
