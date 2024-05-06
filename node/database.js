@@ -8,35 +8,40 @@ const pool = mysql.createPool({
   database: 'users',
 });
 
+// Ensure User Exists function
 async function ensureUserExists(externalUserID) {
   try {
-    console.log(`Trying to ensure user exists with ID: ${externalUserID}`);
+    console.log(`Checking existence for user ID: ${externalUserID}`);
     const [user] = await pool.query('SELECT id FROM users WHERE userID = ?', [externalUserID]);
-    console.log("User query result:", user);
     if (user.length === 0) {
-      console.log("No existing user found, creating new user.");
+      console.log(`No user found with ID: ${externalUserID}, creating new user.`);
       const [result] = await pool.query('INSERT INTO users (userID) VALUES (?)', [externalUserID]);
-      console.log(`Inserted new user with ID: ${externalUserID}, new ID in DB: ${result.insertId}`);
+      console.log(`New user inserted with ID: ${result.insertId}`);
       return result.insertId;
     }
-    console.log(`User already exists with ID: ${externalUserID}, user ID in DB: ${user[0].id}`);
+    console.log(`User found with ID: ${externalUserID}, DB ID: ${user[0].id}`);
     return user[0].id;
   } catch (error) {
     console.error('Error ensuring user exists:', error);
     throw error;
   }
 }
-async function saveUserDetails(userId, userDetails) {
-  console.log('Saving details for user:', userId);
-  const detailsJson = JSON.stringify(userDetails);
 
+// Save User Details function
+async function saveUserDetails(userId, userDetails) {
+  if (!userId || !userDetails) {
+    throw new Error("Invalid user data or ID provided");
+  }
+
+  const detailsJson = JSON.stringify(userDetails);
+  console.log(`Saving details for user ID: ${userId}`);
   try {
     const [result] = await pool.query('UPDATE users SET details = ? WHERE id = ?', [detailsJson, userId]);
-    console.log('Affected Rows:', result.affectedRows);
     if (result.affectedRows === 0) {
-      console.error("No rows updated - user may not exist.");
+      console.log(`No rows updated for user ID: ${userId}, possible user existence issue`);
       throw new Error("No rows updated - user may not exist.");
     }
+    console.log(`User details updated successfully for user ID: ${userId}, Affected Rows: ${result.affectedRows}`);
     return true;
   } catch (error) {
     console.error('Error updating user details:', error);
