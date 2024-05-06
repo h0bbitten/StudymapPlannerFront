@@ -194,16 +194,18 @@ async function writeUserToDB(User) {
 
 async function getSchedule(req, res) {
   try {
-    const User = await retrieveAndParseUserData(req.session.userid);
+    const userId = req.session.userid;
+    const User = await retrieveAndParseUserData(userId);
     console.log('User schedule before update:', User.schedule);
 
     let recalculate = req.query.forcerecalculate === 'true' || User.schedule.outDated || User.schedule.algorithm !== req.query.algorithm;
-    console.log('Recalculate condition:', recalculate);
+    console.log('Recalculate condition:', recalculate, 'for user ID:', userId);
 
     if (recalculate) {
-      console.log('Recalculating schedule for algorithm:', req.query.algorithm);
-      User.schedule = await Algorithm(User, req.query.algorithm);  // Make sure this function is defined and imported
-      await saveUserDetails(req.session.userid, User);
+      console.log('Recalculating schedule for algorithm:', req.query.algorithm, 'for user:', userId);
+      User.schedule = await Algorithm(User, req.query.algorithm); // Assuming this is imported correctly
+      User.schedule.outDated = false; // Reset the outdated flag after recalculation
+      await saveUserDetails(userId, User); // Ensure this function also logs the outcome of the save operation
     }
 
     res.send(JSON.stringify(User.schedule));
@@ -212,6 +214,7 @@ async function getSchedule(req, res) {
     res.status(500).send('Internal Server Error');
   }
 }
+
 
 
 async function retrieveAndParseUserData(userid) {
