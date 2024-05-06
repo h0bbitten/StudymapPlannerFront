@@ -142,32 +142,41 @@ async function scrapeModuleLinks(courses, Moodle) {
 async function saveOptions(req, res) {
   try {
     console.log('Saving options');
-    const User = req.body;
-    User.settings.importedCalendars = User.settings.importedCalendars.filter((calendar) => {
+    const User = req.body;  // The entire user object received from the frontend
+
+    // Filter out calendars marked for removal and delete corresponding files if necessary
+    User.settings.importedCalendars = User.settings.importedCalendars.filter(calendar => {
       if (calendar.type === 'remove') {
-        const id = req.session.userid;
+        const id = req.session.userid;  // Assuming the user's ID is stored in the session
         const parentDir = path.resolve(currentDir, '..');
         const filePath = path.join(parentDir, 'database', 'icals', id.toString(), calendar.name);
         if (fs.existsSync(filePath)) {
           fs.unlinkSync(filePath);
           console.log(`File ${calendar.name} removed successfully`);
-          return false;
+          return false;  // Do not include this calendar in the updated settings
         }
         console.log(`File ${calendar.name} does not exist`);
       }
-      return true;
+      return true;  // Include this calendar in the updated settings
     });
-    const goodResponse = await writeUserToDB(User);
-    console.log('goodResponse to saving data:', goodResponse);
-    if (goodResponse) {
+
+    // Confirm user existence and update details
+    const userId = await ensureUserExists(User.userid);
+    const updateResult = await saveUserDetails(userId, User);
+
+    if (updateResult) {
+      console.log('User data updated successfully in MySQL');
       res.status(200).send('User data saved successfully');
     } else {
+      console.log('Failed to update user data');
       res.status(500).send('Error saving User data');
     }
   } catch (err) {
+    console.error('Error in saveOptions:', err);
     res.status(500).send('Internal Server Error');
   }
 }
+
 
 const writeFileAsync = fs.promises.writeFile;
 
@@ -186,22 +195,18 @@ async function writeUserToDB(User) {
 async function getSchedule(req, res) {
   try {
     const User = await retrieveAndParseUserData(req.session.userid);
-    if (!User || !User.schedule) {
-      console.error('User or User schedule is undefined:', User);
-      return res.status(500).send('Error: User data is incomplete');
-    }
+    console.log('User schedule before update:', User.schedule);
 
-    // Proceed if user data is correctly retrieved and formatted
-    let Schedule = User.schedule;
-    const recalculate = req.query.forcerecalculate === 'true' || !Schedule || Schedule.outDated === true;
+    let recalculate = req.query.forcerecalculate === 'true' || User.schedule.outDated || User.schedule.algorithm !== req.query.algorithm;
+    console.log('Recalculate condition:', recalculate);
 
     if (recalculate) {
-      console.log('Recalculating schedule for user:', User.fullname);
-      Schedule = await Algorithm(User, req.query.algorithm);
-      User.schedule = Schedule;
-      await writeUserToDB(User);  // Ensure the updated schedule is saved
+      console.log('Recalculating schedule for algorithm:', req.query.algorithm);
+      User.schedule = await Algorithm(User, req.query.algorithm);  // Make sure this function is defined and imported
+      await saveUserDetails(req.session.userid, User);
     }
-    res.send(JSON.stringify(Schedule));
+
+    res.send(JSON.stringify(User.schedule));
   } catch (error) {
     console.error('Failed to calculate schedule:', error);
     res.status(500).send('Internal Server Error');
@@ -230,9 +235,6 @@ async function retrieveAndParseUserData(userid) {
     throw error;
   }
 }
-
-
-
 
 
 async function getUserData(req, res) {

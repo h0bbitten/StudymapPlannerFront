@@ -27,18 +27,17 @@ async function ensureUserExists(externalUserID) {
   }
 }
 async function saveUserDetails(userId, userDetails) {
-  if (!userId || !userDetails) {
-    console.error("Invalid user data or ID:", userId, userDetails);
-    throw new Error("Invalid user data or ID provided");
-  }
-
+  console.log('Saving details for user:', userId);
   const detailsJson = JSON.stringify(userDetails);
+
   try {
     const [result] = await pool.query('UPDATE users SET details = ? WHERE id = ?', [detailsJson, userId]);
+    console.log('Affected Rows:', result.affectedRows);
     if (result.affectedRows === 0) {
+      console.error("No rows updated - user may not exist.");
       throw new Error("No rows updated - user may not exist.");
     }
-    console.log('User details updated successfully for user ID:', userId);
+    return true;
   } catch (error) {
     console.error('Error updating user details:', error);
     throw error;
