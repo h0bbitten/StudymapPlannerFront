@@ -156,6 +156,7 @@ function Algorithm(params, reverse = false, addaptive = false, mixing = false) {
     }
     return studyStartPoint;
   }
+module.exports = processLectures;
 
   function processLectures(course, startPoint) {
     course.contents.forEach((lecture) => {
