@@ -1,5 +1,5 @@
 import {
-  applyTheme, LoadingScreen, displayProfile, Button, APIgetCall, saveUserDataToDB,
+  applyTheme, LoadingScreen, displayProfile, Button, APIgetCall, saveUserDataToDB, callToastify,
 } from './script.js';
 
 let index = 0;
@@ -69,36 +69,15 @@ function goToNextPage() {
   if (index > 0) {
     const examDate = $(`#datepicker${index - 1}`).val();
     if (examDate === '') {
-      // eslint-disable-next-line no-undef
       // Displays error message if no exam date is selected
-      Toastify({
-        text: 'Please select an exam date for each course.',
-        duration: 1500,
-        close: false,
-        gravity: 'top',
-        position: 'center',
-        style: {
-          background: 'linear-gradient(to right, #ff416c, #ff4b2b)',
-        },
-      }).showToast();
+      callToastify('Please select an exam date for each course.');
       return;
     }
     const currentDate = new Date();
     const selectedDate = new Date(examDate);
 
     if (selectedDate < currentDate) {
-      // eslint-disable-next-line no-undef
-      // Displays error message if selected exam date is before the current moment
-      Toastify({
-        text: 'Please select a future exam date.',
-        duration: 1500,
-        close: false,
-        gravity: 'top',
-        position: 'center',
-        style: {
-          background: 'linear-gradient(to right, #ff416c, #ff4b2b)',
-        },
-      }).showToast();
+      callToastify('Please select a future exam date.');
       return;
     }
     index++;
@@ -115,18 +94,7 @@ function goToNextPage() {
     checkboxes = $('input[type=checkbox]');
     amountOfCourses = $('input[type=checkbox]:checked').length;
     if (amountOfCourses === 0) {
-      // eslint-disable-next-line no-undef
-      // Displays error message if no courses are selected
-      Toastify({
-        text: 'Please select atleast one course.',
-        duration: 1500,
-        close: false,
-        gravity: 'top',
-        position: 'center',
-        style: {
-          background: 'linear-gradient(to right, #ff416c, #ff4b2b)',
-        },
-      }).showToast();
+      callToastify('Please select at least one course.');
       return;
     }
     index++;
@@ -214,17 +182,7 @@ async function saveOptions() {
   const endStudyTime = $('#endStudyTime').val();
 
   if (startStudyTime === endStudyTime || startStudyTime > endStudyTime) {
-    // eslint-disable-next-line no-undef
-    Toastify({
-      text: 'Invalid.',
-      duration: 1500,
-      close: false,
-      gravity: 'top',
-      position: 'center',
-      style: {
-        background: 'linear-gradient(to right, #ff416c, #ff4b2b)',
-      },
-    }).showToast();
+    callToastify('Invalid study time. Please select a valid study time.');
     return;
   }
   checkboxes.each((i, checkbox) => {
@@ -270,6 +228,7 @@ function showCourses(User) {
     });
   }
 }
+
 applyTheme();
 setupInitialization();
 $(document).on('click', '#goToNextPage', goToNextPage);
