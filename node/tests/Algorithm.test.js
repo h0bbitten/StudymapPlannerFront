@@ -1,5 +1,5 @@
 // Import the necessary modules and functions
-import calculateSchedule from '../Algorithm.js'; // Adjust the path
+import calculateSchedule from '../Algorithm.js';
 import moment from 'moment';
 import fs from 'fs';
 import fetch from 'node-fetch';
