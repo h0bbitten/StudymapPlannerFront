@@ -1,9 +1,8 @@
-export default loadCalendar;
+export { loadCalendar, initButtons };
 
 let nav = 0;
 let view = 'week';
 const calendar = document.getElementById('calendar');
-const weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
 const now = moment();
 let weekNumber = now.isoWeek();
@@ -18,76 +17,79 @@ const endStudyTime = 24;//= parseInt(endStudyTimeValue, 10);
 const dayPX = (1000 / 24) * (endStudyTime - startStudyTime);
 const hourPX = dayPX / (endStudyTime - startStudyTime);
 const minutePX = hourPX / 60;
-let Timeblocks = [];
 function loadCalendar(inputTimeblocks) {
-  Timeblocks = inputTimeblocks;
-  console.log(Timeblocks);
-  initButtons();
   if (view === 'week') {
-    loadWeekView();
+    loadWeekView(inputTimeblocks);
   } else {
-    loadMonthView();
+    loadMonthView(inputTimeblocks);
   }
 }
 
-function loadMonthView() {
+function loadMonthView(timeblocks) {
   calendar.classList.remove('week-view');
-  const dt = new Date();
-
-  if (nav !== 0) {
-    dt.setMonth(new Date().getMonth() + nav);
-  }
+  const baseDate = new Date();
+  const dt = new Date(baseDate.getFullYear(), baseDate.getMonth() + nav, 1); 
 
   const month = dt.getMonth();
   const year = dt.getFullYear();
-  const firstDayOfMonth = new Date(year, month, 1);
   const daysInMonth = new Date(year, month + 1, 0).getDate();
 
-  const dateString = firstDayOfMonth.toLocaleDateString('en-gb', {
+  const dateString = dt.toLocaleDateString('en-GB', {
     weekday: 'long',
-    year: 'numeric',
-    month: 'numeric',
-    day: 'numeric',
   });
-  let paddingDays = weekdays.indexOf(dateString.split(', ')[0]);
 
-  if (paddingDays === -1) {
-    paddingDays = 6;
-  }
+  const weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+  let paddingDays = weekdays.indexOf(dateString);
 
-  document.getElementById('monthDisplay').innerText = `${dt.toLocaleDateString('en-us', { month: 'long' })} ${year}`;
-
+  document.getElementById('monthDisplay').innerText = `${dt.toLocaleDateString('en-US', { month: 'long' })} ${year}`;
   calendar.innerHTML = '';
 
-  for (let i = 1; i <= paddingDays + daysInMonth; i++) {
+  const weekDaysDiv = document.getElementById('weekdays');
+  $('#weekdays').css('padding-left', '344px');
+  $('#weekdays').css('transform', 'translatex(0px) translatey(0px)');
+  $('#weekdays').css('width', '1045px');
+
+  weekDaysDiv.innerHTML = '';
+  for (let i = 0; i < 7; i++) {
+    const dayHeader = document.createElement('div');
+    dayHeader.classList.add('day-header');
+    dayHeader.textContent = weekdays[i];
+    weekDaysDiv.appendChild(dayHeader);
+  }
+
+  for (let i = 0; i < paddingDays; i++) {
+    const daySquare = document.createElement('div');
+    daySquare.classList.add('day', 'padding');
+    calendar.appendChild(daySquare);
+  }
+
+  const monthTimeblocks = timeblocks.filter(block => {
+    const blockDate = new Date(block.startTime);
+    return blockDate.getMonth() === month && blockDate.getFullYear() === year;
+  });
+
+  const daysWithTimeblocks = new Set(monthTimeblocks.map(block => new Date(block.startTime).getDate()));
+
+  for (let i = 1; i <= daysInMonth; i++) {
     const daySquare = document.createElement('div');
     daySquare.classList.add('day');
-
-    if (i > paddingDays) {
-      daySquare.innerText = i - paddingDays;
-    } else {
-      daySquare.classList.add('padding');
+    daySquare.innerText = i;
+    
+    if (daysWithTimeblocks.has(i)) {
+      const timeBlockIndicator = document.createElement('div');
+      timeBlockIndicator.style.width = '12px';
+      timeBlockIndicator.style.height = '12px';
+      timeBlockIndicator.style.backgroundColor = '#7c8d85';
+      timeBlockIndicator.style.borderRadius = '50%';
+      daySquare.appendChild(timeBlockIndicator);
     }
-
-    if (i > paddingDays) {
-      const dayNumber = i - paddingDays;
-      daySquare.innerText = dayNumber;
-
-      if (month === 2 && lectureIndex < Timeblocks.length) {
-        const eventPara = document.createElement('p');
-        eventPara.classList.add('event');
-        eventPara.textContent = Timeblocks[lectureIndex++];
-        daySquare.appendChild(eventPara);
-      }
-    } else {
-      daySquare.classList.add('padding');
-    }
-
+    
     calendar.appendChild(daySquare);
   }
 }
 
-function loadWeekView() {
+
+function loadWeekView(timeblocks) {
   calendar.classList.add('week-view');
   const today = new Date();
   today.setDate(today.getDate() + nav);
@@ -95,13 +97,16 @@ function loadWeekView() {
   const dayOfWeek = today.getDay();
   const startOfWeek = new Date(today.setDate(today.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1)));
   const date = moment(startOfWeek);
-  const weekNumber = date.isoWeek();
-
 
   document.getElementById('monthDisplay')
  .innerText = `${date.format('MMMM')} ${date.format('D')} - ${date.add(6, 'days').format('D')}, ${date.format('YYYY')} \n`;
 
-  const weekDaysDiv = document.getElementById('weekdays');
+ if(view === 'week'){ 
+ const weekDaysDiv = document.getElementById('weekdays');
+ $('#weekdays').css('padding-left', '53px');
+ $('#weekdays').css('transform', 'translatex(0px) translatey(0px)');
+ $('#weekdays').css('width', '1101px');
+ 
   if (weekDaysDiv) {
     let dayNameAbbreviated, dateDisplay, dayHeader;
     for (let i = 0; i < 7; i++) {
@@ -114,6 +119,7 @@ function loadWeekView() {
       }
     }
   }
+} 
 
   calendar.innerHTML = '';
 
@@ -130,7 +136,7 @@ function loadWeekView() {
   for (let day = 0; day < 7; day++) {
     $('#calendar').append(`<div class="day-interval-${day + 1}"></div>`);
 
-    $(`.day-interval-${day + 1}`).append(`<div class="day" id="day${day + 1}" style="flex: 1;"></div>`);
+    $(`.day-interval-${day + 1}`).append(`<div class="day" id="day${day + 1}" style="flex: 1"></div>`);
 
     for (let hour = 1; hour <= 24; hour++) {
       $(`.day-interval-${day + 1}`).append(`<div class="hour" id="hour${hour}" style="height: ${hourPX}px;"></div>`);
@@ -141,10 +147,13 @@ function loadWeekView() {
 
   const currentWeekStartTime = getStartOfWeek(weekNumber, yearNumber);
   const currentWeekEndTime = getEndOfWeek(weekNumber, yearNumber);
-  Timeblocks.forEach((lecture) => {
-    addTimeBlock(lecture.startTime, lecture.endTime, lecture.title, lecture.description, lecture.color);
+
+  timeblocks.forEach((lecture) => {
+    addTimeBlock(lecture.startTime, lecture.endTime, lecture.description, lecture.description, lecture.color);
   });
   console.log(startStudyTime, endStudyTime);
+
+  createPopUp();
 }
 
 
@@ -160,7 +169,6 @@ function addTimeBlock(startTime, endTime, title, description, color) {
   const currentWeekStartTime = getStartOfWeek(weekNumber, yearNumber);
   const currentWeekEndTime = getEndOfWeek(weekNumber, yearNumber);
 
-  // Function to add a time block to a specific day.
   function createTimeBlockSegment(start, end, dayOfWeek) {
     if (startTime >= currentWeekStartTime && startTime < currentWeekEndTime) {
       $(`#day${dayOfWeek}`).append(createTimeBlock(start, end, title, description, color));
@@ -189,8 +197,6 @@ function createTimeBlock(startTime, endTime, title, description, color) {
   const top = (minutesIntoDay(startTime) * (1000 / 24 / 60));
   const minuteDuration = (endTime - startTime) / 60000;
   const height = minuteDuration * (1000 / 24 / 60);
-
-  console.log(startTime);
   const html = `
       <div class="timeblock" style="height: ${height}px; background-color: ${color};
       position: absolute; top: ${top}px; width: 130px; font-size: 13px">
@@ -218,38 +224,77 @@ function minutesIntoDay(timestamp) {
   return minutesDifference;
 }
 
-function initButtons() {
+function createPopUp() {
+  $('.timeblock').click(function() {
+    const description = $(this).find('.description').text();
+    const title = $(this).find('.title').text();
+    const time = $(this).find('.time').text();
+
+    const modalContentHTML = `
+      <div class="modal-header">${title}</div>
+      <div class="modal-section">
+        <div class="section-title">Course</div>
+        <div>${description}</div>
+      </div>
+      <div class="modal-section">
+        <div class="section-title">Time</div>
+        <div>${time}</div>
+      </div>
+      <!-- Add more sections as needed -->
+    `;
+    $('#modalContent').html(modalContentHTML);
+    $('#infoModal').css('display', 'flex');
+  });
+
+  $('.close').click(function() {
+    $('#infoModal').css('display', 'none');
+  });
+}
+
+function initButtons(timeblocks) {
   document.getElementById('nextButton').addEventListener('click', () => {
     if (view === 'month') {
       nav++;
-      load();
+      loadCalendar(timeblocks);
     } else {
       nav += 7;
       weekNumber++;
-      loadWeekView();
+      loadWeekView(timeblocks);
     }
   });
 
   document.getElementById('backButton').addEventListener('click', () => {
     if (view === 'month') {
       nav--;
-      loadCalendar();
+      loadCalendar(timeblocks);
     } else {
       nav -= 7;
       weekNumber--;
-      loadWeekView();
+      loadWeekView(timeblocks);
     }
   });
 
   document.getElementById('weekButton').addEventListener('click', () => {
     view = 'week';
     nav = 0;
-    loadCalendar();
+    weekNumber = now.isoWeek();
+    yearNumber = now.year();
+    loadCalendar(timeblocks);
   });
 
   document.getElementById('monthButton').addEventListener('click', () => {
     view = 'month';
     nav = 0;
-    loadCalendar();
+    weekNumber = now.isoWeek();
+    yearNumber = now.year();
+    loadCalendar(timeblocks);
+  });
+
+  document.getElementById('todayButton').addEventListener('click', () => {
+    view = 'week';
+    nav = 0;
+    weekNumber = now.isoWeek();
+    yearNumber = now.year();
+    loadCalendar(timeblocks);
   });
 }

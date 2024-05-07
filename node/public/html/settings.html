@@ -21,16 +21,23 @@
       </div>
     </nav>
 
-    <div id="forms">
-      <div id="form0div">
-        <form id="formSetting">
-        </form>  
+    <h1>Settings</h1>
+    <div id="infoModal" class="modal">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <div id="modalContent"></div>
       </div>
     </div>
+    <div id="modalBackDrop"></div>
+
+    <form id="formSettings">
+    </form>
+
     <div id="buttons">
       <a id="discardBtn" class="btn btn-primary" href="/schedule">Discard Changes</a>
       <button id="saveBtn" class="btn btn-primary">Save Changes</button>
     </div>
+
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="../js/settings.js" type="module"></script>
 </body>

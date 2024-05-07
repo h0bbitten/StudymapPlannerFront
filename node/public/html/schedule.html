@@ -9,10 +9,10 @@
 <body>
 
   <nav id="navbar">
+    <img id="logoCorner" src="../img/Billede1.png">
     <div id="user_profile"></div>
     <div class="navbar-icons">
       <div class="navbar-icon">
-        <img id="dark-mode-btn" src="../img/dark-mode-solid-svgrepo-com.svg" alt="Dark mode">
       </div>
       <div class="navbar-icon">
         <img id="settingsBtn" src="../img/settings-svgrepo-com.svg" alt="Settings">
@@ -20,11 +20,19 @@
     </div>
   </nav>
 
+  <div id="infoModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <div id="modalContent"></div>
+    </div>
+  </div>
   
   <div id="container">
     <div id="monthDisplay"></div>
     <div id="header">
       <div>
+        <button id="recalculateButton">Recalculate</button>
+        <button id="todayButton">Today</button>
         <button id="backButton"><</button>
         <button id="monthButton">Month</button>
         <button id="weekButton">Week</button>

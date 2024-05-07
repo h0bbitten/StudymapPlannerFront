@@ -2,9 +2,9 @@ import mysql from 'mysql2/promise';
 
 // Database connection pool
 const pool = mysql.createPool({
-  host: 'mysql',
+  host: 'localhost',
   user: 'root',
-  password: 'rootyroot',
+  password: 'studymaproot',
   database: 'users',
 });
 
@@ -25,22 +25,14 @@ async function ensureUserExists(externalUserID) {
   }
 }
 
-async function saveUserDetails(userID, userData) {
-  try {
-      const userDetailsJSON = JSON.stringify(userData);
-
-      // Update the user's details in the database
-      const [result] = await pool.query(`
-          UPDATE users SET details = ? WHERE userID = ?`,
-          [userDetailsJSON, userID]
-      );
-
-      console.log('User details saved successfully:', result);
-      return result;
-  } catch (error) {
-      console.error('Error saving user details:', error);
-      throw error;
+// Gemmer ellere opdatere course
+async function saveOrUpdateCourse(userID, courseName, ects) {
+  const [course] = await pool.query('SELECT id FROM courses WHERE userID = ? AND courseName = ?', [userID, courseName]);
+  if (course.length === 0) {
+    await pool.query('INSERT INTO courses (userID, courseName, ects) VALUES (?, ?, ?)', [userID, courseName, ects]);
+  } else {
+    await pool.query('UPDATE courses SET ects = ? WHERE id = ?', [ects, course[0].id]);
   }
 }
 
-export { ensureUserExists, saveUserDetails };
+export { ensureUserExists, saveOrUpdateCourse };

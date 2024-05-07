@@ -1,188 +1,205 @@
 /* Basic Reset */
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
-  
-  body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #f0f0f0; /* Unchanged, suitable for light theme */
-    color: #333; /* Unchanged, good contrast on light background */
-    padding: 20px;
-  }
-  
-  nav {
-    background-color: #ffffff; /* Unchanged, clean look for navbar */
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Unchanged, subtle shadow */
-    padding: 10px 20px;
-    display: flex;
-    justify-content: flex-end;
-  }
-  
-  #navbar img {
-    width: 35px;
-    height: 35px;
-  }
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
-  #user_profile img{
-    display:inline-block;
-    transform:translatex(-45px) translatey(-26px);
-   }
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f0f0f0; /* Unchanged, suitable for light theme */
+  color: #333; /* Unchanged, good contrast on light background */
+  padding: 20px;
+}
 
-   #user_profile{
-    transform:translatex(5px) translatey(11px);
-   }
-  
-  .navbar-icons {
-    display: flex;
-  }
-  
-  .navbar-icon {
-    margin-left: 20px;
-  }
-  
-  .navbar-icon img {
-    width: 24px;
-    height: 24px;
-    cursor: pointer;
-    filter: none; /* Unchanged, normal icon appearance */
-  }
-  
-  #schedule {
-    margin-top: 20px;
-  }
-  
-  h1, h3 {
-    text-align: center;
-    margin: 20px 0;
-  }
-  
-  input[type="text"], input[type="button"] {
-    display: block;
-    width: 100%;
-    max-width: 400px;
-    padding: 10px;
-    margin: 10px auto;
-    border-radius: 5px;
-    border: 1px solid #ccc; /* Slightly lighter border for better blend with light theme */
-    background-color: #fff; /* Unchanged, suitable for inputs */
-    color: #333; /* Unchanged, maintains readability */
-  }
-  
-  input[type="button"] {
-    background-color: #007bff; /* Unchanged, vibrant blue for actions */
-    color: white;
-    cursor: pointer;
-    border: none;
-  }
-  
-  input[type="button"]:hover {
-    background-color: #0056b3; /* Unchanged, provides a good hover effect */
-  }
-  
-  a {
-    display: block;
-    text-align: center;
-    margin-top: 20px;
-    color: #007bff; /* Unchanged, consistent link color */
-    text-decoration: none;
-  }
-  
-  #tokenInput {
-    display: block;
-    width: 100%;
-    max-width: 400px;
-    padding: 10px;
-    margin: 10px auto;
-    border-radius: 5px;
-    border: 1px solid #ccc; /* Adjusted to match other inputs */
-  }
-  
-  a:hover {
-    text-decoration: underline;
-  }
-  
-    /* Container */
-    #container {
-      padding: 20px;
-      width: 1500px;
-      text-align: left;
-      margin-left: auto;
-      margin-right: auto;
-    }
+nav {
+  background-color: #ffffff; /* Unchanged, clean look for navbar */
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Unchanged, subtle shadow */
+  padding: 10px 20px;
+  display: flex;
+  justify-content: flex-end;
+}
 
-    #container #header div{
-      width:742px !important;
-     }
-     
-    
-    #header > div{
-      display: flex;
-      justify-content: flex-end;
-      align-items: center;
-      padding: 10px;
-      transform:translatex(0px) translatey(0px);
-      /*margin-bottom: 20px;*/
-      
-    }
-   /* Month display */
+#logoCorner{
+  position:relative;
+  right:-33px;
+  transform:translatex(-1700px) translatey(0px);
+  min-height:112px;
+  margin-left:0px;
+  width:115px !important;
+ }
+
+#navbar img {
+  width: 35px;
+  height: 35px;
+}
+
+#user_profile img{
+  display:inline-block;
+  transform:translatex(-43px) translatey(-27px);
+}
+
+#user_profile{
+  transform:translatex(5px) translatey(11px);
+}
+
+.navbar-icons {
+  display: flex;
+}
+
+#settingsBtn{
+  display:inline-block;
+  transform:translatex(-8px) translatey(7px);
+ }
+
+ 
+ #dark-mode-btn{
+  display:inline-block;
+  transform:translatex(3px) translatey(7px);
+ }
+
+.navbar-icon {
+  margin-left: 20px;
+}
+
+.navbar-icon img {
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  filter: none; /* Unchanged, normal icon appearance */
+}
+
+#user_profile p{
+  font-size:20px;
+ }
+
+#schedule {
+  margin-top: 20px;
+}
+
+h1, h3 {
+  text-align: center;
+margin: 20px 0;
+}
+
+input[type="text"], input[type="button"] {
+  display: block;
+  width: 100%;
+  max-width: 400px;
+  padding: 10px;
+  margin: 10px auto;
+  border-radius: 5px;
+  border: 1px solid #ccc; /* Slightly lighter border for better blend with light theme */
+  background-color: #fff; /* Unchanged, suitable for inputs */
+  color: #333; /* Unchanged, maintains readability */
+}
+
+input[type="button"] {
+  background-color: #007bff; /* Unchanged, vibrant blue for actions */
+  color: white;
+  cursor: pointer;
+  border: none;
+}
+
+input[type="button"]:hover {
+  background-color: #0056b3; /* Unchanged, provides a good hover effect */
+}
+
+a {
+  display: block;
+  text-align: center;
+  margin-top: 20px;
+  color: #007bff; /* Unchanged, consistent link color */
+  text-decoration: none;
+}
+
+#tokenInput {
+  display: block;
+  width: 100%;
+  max-width: 400px;
+  padding: 10px;
+  margin: 10px auto;
+  border-radius: 5px;
+  border: 1px solid #ccc; /* Adjusted to match other inputs */
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* Container */
+#container {
+  padding: 20px;
+  width: 1500px;
+  text-align: left;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+#container #header div{
+  width:742px !important;
+}
+
+
+#header > div{
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 10px;
+  transform:translatex(0px) translatey(0px);
+  /*margin-bottom: 20px;*/
+}
+/* Month display */
 #monthDisplay{
   font-family:'Arial Black','Arial Bold',Gadget,sans-serif;
   font-size:28px;
-  transform:translatex(-3px) translatey(51px);
- }
- 
-    
-    #header div,
-    #weekdays div {
-      width: 100px;
-      padding: 10px;
-      margin: auto;
-      border-right: 2px solid #000000;
-    }
-    
-    #weekdays {
-      order: 2;
-      background-color: #385280;
-      color: #ffffff;
-      width: 700px;
-      display: flex;
-    }
-    
-    #calendar {
-      order: 2;
-      width: auto;
-      margin-left: auto;
-      display: flex;
-      flex-wrap: wrap;
-      max-height: 500px;
-      overflow: auto;
-    }
-    .day {
-      width: 100px;
-      padding: 10px;
-      height: 100px;
-      cursor: pointer;
-      box-sizing: border-box;
-      background-color: rgb(63, 63, 63);
-      margin: 0;
-      box-shadow: 0px 0px 3px #CBD4C2;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-    }
-    .day:hover {
-      background-color: #233e6d;
-    }
-    
-    .day + #currentDay {
-      background-color:#385280;
-    }
-    .day + #currentDay:hover{
-      background-color: #385280;
-    }
-    
+  transform:translatex(-30px) translatey(51px);
+}
+
+#header div,
+#weekdays div {
+  width: 150px;
+  padding: 10px;
+  margin: auto;
+  border-right: 2px solid #000000;
+  text-align: center;
+  box-shadow: 0 -50px 50px -50px #0829ff;
+}
+
+#weekdays {
+  background-color: transparent;
+  color: #ffffff;
+  width: 1101px;
+  display: flex;
+  justify-content: space-between; /* Evenly distribute weekdays */
+  transform:translatex(0px) translatey(0px);
+  padding-left:51px;
+  order: 2;
+}
+
+.day {
+  width: 100px;
+  padding: 10px;
+  height: 100px;
+  cursor: pointer;
+  box-sizing: border-box;
+  background-color: rgb(63, 63, 63);
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.day:hover {
+  background-color: #233e6d;
+}
+
+.day + #currentDay {
+  background-color:#385280;
+}
+.day + #currentDay:hover{
+  background-color: #385280;
+}
+
 /* Month display */
 #monthDisplay {
   font-family: "Alata", sans-serif;
@@ -208,68 +225,49 @@
   outline: none;
 }
 
-/* Weekday headers */
-#weekdays div {
-  width: 150px;
-  padding: 10px;
-  margin: auto;
-  text-align: center;
-}
-
-#weekdays {
-  background-color: #385280;
-  color: #ffffff;
-  width: 1101px;
-  display: flex;
-  justify-content: space-between; /* Evenly distribute weekdays */
-  transform:translatex(0px) translatey(0px);
-  padding-left:51px;
-}
-
 /* Calendar container */
 #calendar {
+  width: 775px;
+  margin: auto;
+  display: flex;
+  flex-wrap: wrap;
+  order: 2;
+}
+
+#calendar.week-view {
   width: auto;
   margin-left: auto;
   display: flex;
   flex-wrap: wrap;
+  max-height: 500px;
+  overflow: auto;
 }
 
-    #loading {
-      display: none; /* Initially hidden */
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      z-index: 9999;
-    }
-      /* Style for the loading overlay */
-    #loading-overlay {
-      display: none; /* Initially hidden */
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black */
-      z-index: 9998; /* Ensure it's above other elements but below the loading GIF */
-    }
+#loading {
+  display: none; /* Initially hidden */
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 9999;
+}
+/* Style for the loading overlay */
+#loading-overlay {
+  display: none; /* Initially hidden */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black */
+  z-index: 9998; /* Ensure it's above other elements but below the loading GIF */
+}
 
-    .collapsible {
-      background-color: #385280;
-      color: #ffffff;
-      cursor: pointer;
-      padding: 18px;
-      width: 100%;
-      border: none;
-      text-align: left;
-      outline: none;
-      font-size: 15px;
-    }
-    
-    /* Add a background color to the button if it is clicked on (add the .active class with JS), and when you move the mouse over it (hover) */
-    .active, .collapsible:hover {
-      background-color: #243554;
-    }
+#buttons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 
     #buttons {
       display: flex;
@@ -298,13 +296,21 @@
         color: white;
     }
   
+
+    .formsList {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      background-color: grey;
+    } 
+
     .forms {
       display: flex;
       justify-content: center;
       align-items: center;
       flex-direction: column;
-    }
-  
+    } 
     #form0div {
       display: flex;
       justify-content: center;
@@ -323,13 +329,9 @@
       margin-left: 20px;
     }
 
-    .checkbox {
-      margin-top: 5px;
-    }
-    
 #calendar .time-labels .hour{
   height:40px !important;
- }
+}
 
 /* Day styling */
 .day {
@@ -340,12 +342,10 @@
   box-sizing: border-box;
   background-color: rgb(63, 63, 63);
   margin: 0;
-  box-shadow: 0px 0px 3px #cbd4c2;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   border: 1px solid #ccc;
-
 }
 
 .day:hover {
@@ -370,7 +370,7 @@
   background-color: #385280;
 }
 
-.week-view .day + #currentDay {
+.week-view.day + #currentDay {
   background-color: #694d00;
 }
 
@@ -432,216 +432,345 @@
 }
 
 
-  #loading {
-    display: none; /* Initially hidden */
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 9999;
-  }
-  /* Style for the loading overlay */
-  #loading-overlay {
-    display: none; /* Initially hidden */
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black */
-    z-index: 9998; /* Ensure it's above other elements but below the loading GIF */
-  }  
+#loading {
+  display: none; /* Initially hidden */
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 9999;
+}
+/* Style for the loading overlay */
+#loading-overlay {
+  display: none; /* Initially hidden */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black */
+  z-index: 9998; /* Ensure it's above other elements but below the loading GIF */
+}  
 
-  #buttons {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    
-  }
+#buttons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 
-  .btn {
-    background-color: #385280;
-    border: none;
-    color: white;
-    padding: 10px 25px;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 16px;
-    margin-top: 10px;
-    margin-left: 10px;
-    transition-duration: 0.4s;
-    position: center;
-        
-  }
+}
 
-  .btn:hover {
-      background-color: #2b3e60;
-      color: white;
-  }
+.btn {
+  background-color: #385280;
+  border: none;
+  color: white;
+  padding: 10px 25px;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin-top: 10px;
+  margin-left: 10px;
+  transition-duration: 0.4s;
+  position: center;
+  cursor: pointer;
+}
 
-  .forms {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-  }
+.btn:hover {
+  background-color: #2b3e60;
+  color: white;
+}
 
-  #form0div {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-  }
+.forms {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
 
-  
-  #header {
-    text-align: center;
-    justify-content: center;
-  }
+#form0div {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
 
+
+#header {
+  text-align: center;
+  justify-content: center;
+}
   .studyTime {
     margin-top: 20px;
     margin-left: 20px;
-  }
-  
-
-  :root {
-    --text-color: #333;
-    --background-color: #fff;
-    --link-color: #007bff;
+    size: 50%;
   }
 
-  .dark-mode {
-    --text-color: #fff;
-    --background-color: #121212;
-    --link-color: #6c757d;
+  #time{
+    size: 10%;
   }
 
+
+.studyTime {
+  margin-top: 20px;
+  margin-left: 20px;
+}
+
+
+:root {
+  --text-color: #333;
+  --background-color: #fff;
+  --link-color: #007bff;
+}
   body {
     color: var(--text-color);
     background-color: var(--background-color);
   }
   .dark-mode nav {
-    background-color: #1f1f1f; /* Slightly lighter dark shade for navbar */
-    box-shadow: 0 2px 4px rgba(0,0,0,0.5); /* Darker shadow for depth */
+    background-color: #1f1f1f00; /* Slightly lighter dark shade for navbar */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0); /* Darker shadow for depth */
   }
 
-  .dark-mode .navbar-icon img {
-    filter: invert(1);
-  }
+.dark-mode {
+  --text-color: #fff;
+  --background-color: #121212;
+--link-color: #6c757d;
+}
 
-  .timeblock {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: flex-start;
-    padding: 8px;
-    font-size: 0.75rem; /* 14px */
-    font-weight: 500;
-    background-color: #f0f0f0; /* light grey background for contrast */
-    border: 1px solid #ccc; /* subtle border */
-    border-radius: 4px;
-    margin-bottom: 4px;
-    transition: background-color 0.3s ease, box-shadow 0.3s ease;;
-    line-height: 1.2;
-    transition: transform 0.3s ease, z-index 0s linear 0.3s; /* Smooth transition for transform and delayed z-index */
-    transform-origin: top; /* Ensures the block scales from the top edge */
-    z-index: 1; /* Keeps the block under others by default */
-    overflow: hidden;
-  }
-  .timeblock .time {
-    font-weight: bold;
-    color: #333;
-  }
-  
-  .timeblock .title {
-    color: #555;
-    font-size: clamp(0.75rem, 2.5vw, 0.875rem);
-  }
-  
-  .timeblock .description {
-    display: block; /* show the description by default */
-    color: #777;
-  }
-  .timeblock:hover {
-    background-color: #e0e0e0; 
-    box-shadow: 0px 0px 5px #cbd4c2; 
-    z-index: 2; 
-    transform: scale(1.2); 
-    overflow: visible; 
-    white-space: normal; 
-    height: auto;
-    width: auto; 
-    max-width: 100%; 
-    position: absolute;
-  }
-  .collapsible {
-    background-color: #385280;
-    color: #ffffff;
-    cursor: pointer;
-    padding: 18px;
-    width: 100%;
-    border: none;
-    text-align: left;
-    outline: none;
-    font-size: 15px;
-    border: 1px solid black; /* Add slim black outline */
-  }
-/* Style the collapsible content. Note: hidden by default */
-.lecturelist {
-  padding: 0 18px;
-  max-height: 0;
-  display: none;
+body {
+  color: var(--text-color);
+  background-color: var(--background-color);
+}
+.dark-mode nav {
+  background-color: #121e2a; /* Slightly lighter dark shade for navbar */
+  box-shadow: 0 2px 4px rgba(0,0,0,0.5); /* Darker shadow for depth */
+}
+
+.dark-mode .navbar-icon img {
+  filter: invert(1);
+}
+
+.timeblock {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 8px;
+  font-size: 0.75rem; /* 14px */
+  font-weight: 500;
+  background-color: #f0f0f0; /* light grey background for contrast */
+  border: 1px solid #ccc; /* subtle border */
+  border-radius: 4px;
+  margin-bottom: 4px;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;;
+  line-height: 1.2;
+  transition: transform 0.3s ease, z-index 0s linear 0.3s; /* Smooth transition for transform and delayed z-index */
+  transform-origin: top; /* Ensures the block scales from the top edge */
+  z-index: 1; /* Keeps the block under others by default */
   overflow: hidden;
-  align-items: center;
-  background-color: #385280;
-  border: 1px solid black; /* Add slim black outline */
 }
-.lecturelist.active {
-  background-color: #546686;
-  display: block;
-  transition: max-height 0.3s ease-out;
+.timeblock .time {
+  font-weight: bold;
+  color: #333;
 }
 
-/* Add a background color to the button if it is clicked on (add the .active class with JS), and when you move the mouse over it (hover) */
-.active, .collapsible:hover {
+.timeblock .title {
+  color: #555;
+  font-size: clamp(0.75rem, 2.5vw, 0.875rem);
+}
+
+.timeblock .description {
+  display: block; /* show the description by default */
+  color: #777;
+}
+.timeblock:hover {
+  background-color: #e0e0e0; 
+  box-shadow: 0px 0px 5px #cbd4c2; 
+  z-index: 2; 
+  transform: scale(1.2); 
+  overflow: visible; 
+  white-space: normal; 
+  height: auto;
+  width: auto; 
+  max-width: 100%; 
+  position: absolute;
+}
+
+.collapsible-container:has(.lecturelist) {
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  align-items: center;
+}
+
+.collapsible {
+  background-color: #385280;
+  color: #ffffff;
+  cursor: pointer;
+  padding: 18px;
+  width: 100%;
+  border: none;
+  text-align: left;
+  outline: none;
+  font-size: 15px;
+  border: 1px solid black;
+}
+
+.collapsible.active, .collapsible:hover {
   background-color: #243554;
+
 }
 
 .carot-collapsible {
-  width: 24px; /* Adjust according to your design */
-  height: 24px; /* Adjust according to your design */
-  fill: #000; /* Adjust the fill color */
-}
-.collapsible .carot-collapsible {
-  display: inline-block;
   margin-right: 5px;
-  transition: transform 0.3s;
-}
-.optionBlock {
-  margin-bottom: 10px;
-  max-height: 0;
-  display: none;
-  overflow: hidden;
-  align-items: center;
-  background-color: #385280;
-  border: 1px solid black; /* Add slim black outline */
-
-}
-.optionBlock.active{
-  background-color: #546686;
-  display: block;
-  transition: max-height 0.3s ease-in-out;
-}
-.optionBlock.active .optionInput{
-  display: block;
-}
-.checkbox-label {
-  position: relative;
-}
-
-.carot-collapsible {
   float: right;
   margin-left: 20px;
+  transition: transform 0.3s;
+}
+
+.optionBlock {
+  padding: 0 18px;
+  max-height: 0;
+  overflow: hidden;
+  border: 1px solid black;
+  transition: max-height 0.3s ease-out;
+  background-color: #5f7191;
+}
+
+.optionBlock {
+  text-align: center;
+}
+
+.optionInput{
+  display: block;
+}
+
+.plusBtn {
+  width: 100%;
+  max-width: 400px;
+}
+
+.plusBtn span {
+  float: right;
+}
+
+.SyncCalendarInput {
+  padding: 20px 0;
+}
+
+.optionBlockPadding {
+  padding: 10px;
+}
+
+.lecturelist {
+  border: none;
+}
+
+.checkbox-container {
+  text-align: left;
+}
+
+/* Modal Background */
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 10; /* Sit on top */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgba(0,0,0,0.4); /* Black with opacity */
+  align-items: center;
+  justify-content: center;
+}
+
+/* Modal Content Box */
+.modal-content {
+  background-color: #333; /* Dark background */
+  color: white; /* White text color */
+  margin: auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 400px; /* Fixed width */
+  box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+  border-radius: 8px; /* Rounded corners */
+  position: relative; /* For positioning the close button */
+}
+
+/* Close Button */
+.close {
+  color: #aaa;
+  position: absolute;
+  top: 7px;
+  right: 15px;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: white;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+/* Modal Header */
+.modal-header {
+  font-size: 20px;
+  text-align: left;
+  font-weight: bold;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #444; /* Subtle line for header */
+}
+
+/* Content sections */
+.modal-section {
+  padding: 10px 0; /* Spacing between sections */
+  border-bottom: 1px solid #555; /* Subtle line for each section */
+}
+
+/* Last section doesn't have a bottom border */
+.modal-section:last-child {
+  border-bottom: none;
+}
+
+/* Section Title */
+.section-title {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 5px; /* Space between title and content */
+}
+
+/* Modal Footer, if you have any actions */
+.modal-footer {
+  padding-top: 10px;
+  text-align: right;
+}
+
+/* Tooltip container */
+.tooltip {
+  position: relative;
+  display: inline-block;
+  border-bottom: 1px dotted black; /* If you want dots under the hoverable text */
+}
+
+/* Tooltip text */
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: 120px;
+  background-color: black;
+  color: #fff;
+  text-align: center;
+  padding: 5px 0;
+  border-radius: 6px;
+ 
+  /* Position the tooltip text - see examples below! */
+  position: absolute;
+  z-index: 1;
+}
+
+/* Show the tooltip text when you mouse over the tooltip container */
+.tooltip:hover .tooltiptext {
+  visibility: visible;
 }
 
