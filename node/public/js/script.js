@@ -1,5 +1,5 @@
 export {
-  applyTheme, setCookie, getCookie, LoadingScreen, displayProfile, settingsBtn, saveUserDataToDB, Button, APIgetCall, APIpostCall,
+  applyTheme, setCookie, getCookie, LoadingScreen, displayProfile, settingsBtn, saveUserDataToDB, Button, APIgetCall, callToastify,
 };
 
 async function applyTheme() {
@@ -147,4 +147,18 @@ class Button {
   removeButton() {
     $(`#${this.id}`).remove();
   }
+}
+
+function callToastify(message) {
+  // eslint-disable-next-line no-undef
+  Toastify({
+    text: message,
+    duration: 1500,
+    close: false,
+    gravity: 'top',
+    position: 'center',
+    style: {
+      background: 'linear-gradient(to right, #ff416c, #ff4b2b)',
+    },
+  }).showToast();
 }
