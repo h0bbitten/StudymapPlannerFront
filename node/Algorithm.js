@@ -29,6 +29,7 @@ class PreAlgoMethods {
     this.id = User.userid;
     this.syncCalendars = User.settings.syncCalendars;
   }
+  
 
   async init() {
     this.events = await getEvents(this.id, this.syncCalendars);
@@ -104,7 +105,7 @@ async function calculateSchedule(User, algorithm) {
   return Algo.schedule;
 }
 
-module.exports.calculateSchedule = calculateSchedule;
+export { PreAlgoMethods, calculateSchedule };
 
 function getAlgorithmStrategy(algorithm) {
   switch (algorithm) {

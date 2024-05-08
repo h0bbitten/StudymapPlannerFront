@@ -28,9 +28,7 @@
   "author": "",
   "license": "ISC",
   "jest": {
-    "transform": {
-      "^.+\\.m?js$": "babel-jest"
-    },
+    "transform": {},
     "moduleNameMapper": {
       "\\.(css|less)$": "<rootDir>/styleMock.js"
     }

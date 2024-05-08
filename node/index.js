@@ -1,3 +1,5 @@
+const { PreAlgoMethods } = require('./Algorithm.js');
+
 async function calculateSchedule(User, algorithm) {
   const Algo = new PreAlgoMethods(User, algorithm);
   // Try with IIFE async constructor function later
