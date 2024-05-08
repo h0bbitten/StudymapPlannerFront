@@ -104,6 +104,8 @@ async function calculateSchedule(User, algorithm) {
   return Algo.schedule;
 }
 
+module.exports.calculateSchedule = calculateSchedule;
+
 function getAlgorithmStrategy(algorithm) {
   switch (algorithm) {
   case 'emptyFirstComeFirstServe':

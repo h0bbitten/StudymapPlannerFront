@@ -1,5 +1,7 @@
+// Til funktionen der skal importeres må den først exporteres: module.exports = functionName;
+
 // Import the necessary modules and functions
-import calculateSchedule from '../Algorithm.js';
+const calculateSchedule = require("../index.js");
 import moment from 'moment';
 import fs from 'fs';
 import fetch from 'node-fetch';
