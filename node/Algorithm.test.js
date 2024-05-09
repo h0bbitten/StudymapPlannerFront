@@ -224,24 +224,8 @@ function tryWithReducedEventGap(params, courses, events, retryFunction, reverse 
   return retryFunction(params, reverse, true, mixing);
 }
 
-function checkOverlap(reverse, startTime, endTime, eventArray, lectureArray, startStudyTime, endStudyTime, eventGap = HourMilliSec) {
-  const duration = (endTime - startTime);
-
-  let overlapEvents = false;
-  let overlapLectures = false;
-  let outsideStudyInterval = false;
-
-  [startTime, endTime, overlapEvents] = adjustTimesByOverlapFromEvents(reverse, startTime, endTime, duration, eventArray, eventGap);
-
-  [startTime, endTime, overlapLectures] = adjustTimesByOverlapFromEvents(reverse, startTime, endTime, duration, lectureArray, eventGap);
-
-  [startTime, endTime, outsideStudyInterval] = adjustTimesByStudyInterval(reverse, startTime, endTime, duration, startStudyTime, endStudyTime);
-
-  if (overlapEvents || overlapLectures || outsideStudyInterval) {
-    [startTime, endTime] = checkOverlap(reverse, startTime, endTime, eventArray, lectureArray, startStudyTime, endStudyTime, eventGap);
-  }
-
-  return [startTime, endTime];
+function checkOverlap(start1, end1, start2, end2) {
+  return Math.max(start1, start2) < Math.min(end1, end2);
 }
 
 function adjustTimesByStudyInterval(reverse, startTime, endTime, duration, studyStartTime, studyEndTime) {
@@ -508,26 +492,24 @@ async function parseICalFiles(icalURLs) {
   }
 }
 
-import MockDate from 'mockdate';
-
-describe('moment()', () => {
-  beforeEach(() => {
-    MockDate.set('2024-05-10T12:00:00Z');
+describe('checkOverlap', () => {
+  it('should return true if intervals overlap', () => {
+      expect(checkOverlap(10, 20, 15, 25)).toBe(true);
+      expect(checkOverlap(10, 20, 5, 15)).toBe(true);
   });
 
-  afterEach(() => {
-    MockDate.reset();
+  it('should return false if intervals do not overlap', () => {
+      expect(checkOverlap(10, 20, 21, 30)).toBe(false);
+      expect(checkOverlap(10, 20, 0, 5)).toBe(false);
   });
 
-  it('should correctly retrieve the current date and time after being mocked', () => {
-    const now = moment.utc();
-    expect(now.format()).toEqual('2024-05-10T12:00:00Z');
-  
-    expect(now.year()).toEqual(2024);
-    expect(now.month()).toEqual(4);
-    expect(now.date()).toEqual(10);
-    expect(now.hour()).toEqual(12);
-    expect(now.minute()).toEqual(0);
-    expect(now.second()).toEqual(0);
+  it('should return false if intervals touch but do not overlap', () => {
+      expect(checkOverlap(10, 20, 20, 30)).toBe(false);
+      expect(checkOverlap(10, 20, 0, 10)).toBe(false);
+  });
+
+  it('should return true if one interval is completely within another', () => {
+      expect(checkOverlap(10, 20, 12, 18)).toBe(true);
+      expect(checkOverlap(10, 20, 10, 20)).toBe(true); // Exact same interval
   });
 });

@@ -1,19 +1,3 @@
-// Define mock courses with all necessary properties
-const testCourseOne = {
-  chosen: true, 
-  examDate: '2024-12-15', 
-  ECTS: 5, 
-  contents: [
-    { chosen: true, name: 'Lecture 1' }, 
-    { chosen: false, name: 'Lecture 2' }
-  ]
-};
-
-const testCourseTwo = {
-  chosen: true, 
-  examDate: '2024-12-10', 
-  ECTS: 3, 
-  contents: [
     { chosen: true, name: 'Lecture 1' }
   ]
 };
@@ -59,10 +43,12 @@ describe('PreAlgoMethods', () => {
       algo = new PreAlgoMethods(mockUser, 'default');
     });
 
-    it('should correctly sort courses by exam date in ascending order for default algorithm', () => {
-      const sortedCourses = algo.prepCourses(algo.Courses);
-      expect(sortedCourses.map(course => course.examDate)).toEqual(['2024-11-25', '2024-12-10', '2024-12-15']);
-    });
+it('should correctly sort courses by exam date in ascending order for default algorithm', () => {
+  algo.algorithm = 'default'; // Explicitly set to default to avoid ambiguity
+  const sortedCourses = algo.prepCourses(algo.Courses);
+  expect(sortedCourses.map(course => course.examDate)).toEqual(['2024-11-25', '2024-12-10', '2024-12-15']);
+});
+
 
     it('should correctly sort courses by exam date in descending order for non-default algorithms', () => {
       algo.algorithm = 'addaptiveGapNoMixing';
