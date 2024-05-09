@@ -198,11 +198,12 @@ function createLines() {
   $('.day').each(function dostuff() {
     const dayBox = $(this);
     const boxHeight = 1000 //dayBox.height();
-    const numLines = 24; // Number of lines
+    const numLines = 24;
 
     for (let i = 1; i < numLines; i++) {
       const line = $('<div class="line"></div>');
-      line.css('top', (boxHeight / numLines) * i + 'px');
+      const top = (boxHeight / numLines) * i;
+      line.css('top', top + 'px');
       dayBox.append(line);
     }
   });
@@ -254,7 +255,7 @@ function addTimeBlock(startTime, endTime, title, description, color) {
       break;
     } else {
       createTimeBlockSegment(startTime, endOfDay, dayOfWeek);
-      startTime = moment(endOfDay + 1); 
+      startTime = moment(endOfDay + 1);
 
       if (startTime.valueOf() >= currentWeekEndTime) {
         break;

@@ -162,7 +162,6 @@ function Algorithm(params, reverse = false, addaptive = false, mixing = false) {
       if (failed) return;
       let endTime = reverse ? startPoint : startPoint + course.studyPeriodPrLecture;
       let startTime = reverse ? endTime - course.studyPeriodPrLecture : startPoint;
-      // Add overlap check with reverse or not, maybe done
       [startTime, endTime] = checkOverlap(reverse, startTime, endTime, events, lectures, startStudyTime, endStudyTime, eventGap);
 
       if ((startTime < currentTime && reverse) || (!reverse && endTime > moment(course.examDate).startOf('day').valueOf())) {
