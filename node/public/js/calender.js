@@ -27,14 +27,14 @@ function loadCalendar(inputTimeblocks) {
 
 function generatePopupContentForDay(day, timeblocks) {
   // Filter the timeblocks for the selected day
-  const timeblocksForDay = timeblocks.filter(block => {
+  const timeblocksForDay = timeblocks.filter((block) => {
     const blockDate = new Date(block.startTime);
     return blockDate.getDate() === day;
   });
 
   // Generate the HTML content for the popup
   let popupContent = '';
-  timeblocksForDay.forEach(block => {
+  timeblocksForDay.forEach((block) => {
     popupContent += `
       <div class="timeblock">
         <div class="time">${convertToTimeString(block.startTime)} - ${convertToTimeString(block.endTime)}</div>
@@ -50,7 +50,7 @@ function generatePopupContentForDay(day, timeblocks) {
 function loadMonthView(timeblocks) {
   calendar.classList.remove('week-view');
   const baseDate = new Date();
-  const dt = new Date(baseDate.getFullYear(), baseDate.getMonth() + nav, 1); 
+  const dt = new Date(baseDate.getFullYear(), baseDate.getMonth() + nav, 1);
 
   const month = dt.getMonth();
   const year = dt.getFullYear();
@@ -61,7 +61,7 @@ function loadMonthView(timeblocks) {
   });
 
   const weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-  let paddingDays = weekdays.indexOf(dateString);
+  const paddingDays = weekdays.indexOf(dateString);
 
   document.getElementById('monthDisplay').innerText = `${dt.toLocaleDateString('en-US', { month: 'long' })} ${year}`;
   calendar.innerHTML = '';
@@ -85,18 +85,18 @@ function loadMonthView(timeblocks) {
     calendar.appendChild(daySquare);
   }
 
-  const monthTimeblocks = timeblocks.filter(block => {
+  const monthTimeblocks = timeblocks.filter((block) => {
     const blockDate = new Date(block.startTime);
     return blockDate.getMonth() === month && blockDate.getFullYear() === year;
   });
 
-  const daysWithTimeblocks = new Set(monthTimeblocks.map(block => new Date(block.startTime).getDate()));
+  const daysWithTimeblocks = new Set(monthTimeblocks.map((block) => new Date(block.startTime).getDate()));
 
   for (let i = 1; i <= daysInMonth; i++) {
     const daySquare = document.createElement('div');
     daySquare.classList.add('day');
     daySquare.innerText = i;
-    
+
     if (daysWithTimeblocks.has(i)) {
       const timeBlockIndicator = document.createElement('div');
       timeBlockIndicator.style.width = '12px';
@@ -129,7 +129,7 @@ function loadWeekView(timeblocks) {
   const date = moment(startOfWeek);
 
   document.getElementById('monthDisplay')
- .innerText = `${date.format('MMMM')} ${date.format('D')} - ${date.add(6, 'days').format('D')}, ${date.format('YYYY')} \n`;
+    .innerText = `${date.format('MMMM')} ${date.format('D')} - ${date.add(6, 'days').format('D')}, ${date.format('YYYY')} \n`;
 
   if (view === 'week') {
     const weekDaysDiv = document.getElementById('weekdays');
@@ -168,10 +168,7 @@ function loadWeekView(timeblocks) {
 
     $(`.day-interval-${day + 1}`).append(`<div class="day" id="day${day + 1}" style="flex: 1"></div>`);
 
-    for (let hour = 1; hour <= 24; hour++) {
-      $(`.day-interval-${day + 1}`).append(`<div class="hour" id="hour${hour}" style="height: ${hourPX}px;"></div>`);
-    }
-  }
+ }
 
   $('.week-view .day').css('height', dayPX);
 
