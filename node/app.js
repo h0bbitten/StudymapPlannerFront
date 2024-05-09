@@ -2,7 +2,7 @@ import fs from 'fs';
 import { fileURLToPath } from 'url';
 import path, { dirname } from 'path';
 import Webscraper from './scraping.js';
-import Algorithm from './Algorithm.js';
+import calculateSchedule from './Algorithm.js';
 
 export {
   getMoodleInfo, logIn, saveOptions, getUserData, getSchedule, importIcalFile,
@@ -191,7 +191,7 @@ async function getSchedule(req, res) {
     console.log('Recalculate:', recalculate);
     if (recalculate) {
       console.log('Recalculating schedule');
-      Schedule = await Algorithm(User, algorithm);
+      Schedule = await calculateSchedule(User, algorithm);
       User.schedule = Schedule;
       writeUserToDB(User);
     }

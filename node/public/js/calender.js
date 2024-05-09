@@ -25,10 +25,32 @@ function loadCalendar(inputTimeblocks) {
   }
 }
 
+function generatePopupContentForDay(day, timeblocks) {
+  // Filter the timeblocks for the selected day
+  const timeblocksForDay = timeblocks.filter((block) => {
+    const blockDate = new Date(block.startTime);
+    return blockDate.getDate() === day;
+  });
+
+  // Generate the HTML content for the popup
+  let popupContent = '';
+  timeblocksForDay.forEach((block) => {
+    popupContent += `
+      <div class="timeblock">
+        <div class="time">${convertToTimeString(block.startTime)} - ${convertToTimeString(block.endTime)}</div>
+        <div class="title">${block.title}</div>
+        <div class="description">${block.description}</div>
+      </div>
+    `;
+  });
+
+  return popupContent;
+}
+
 function loadMonthView(timeblocks) {
   calendar.classList.remove('week-view');
   const baseDate = new Date();
-  const dt = new Date(baseDate.getFullYear(), baseDate.getMonth() + nav, 1); 
+  const dt = new Date(baseDate.getFullYear(), baseDate.getMonth() + nav, 1);
 
   const month = dt.getMonth();
   const year = dt.getFullYear();
@@ -39,7 +61,7 @@ function loadMonthView(timeblocks) {
   });
 
   const weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-  let paddingDays = weekdays.indexOf(dateString);
+  const paddingDays = weekdays.indexOf(dateString);
 
   document.getElementById('monthDisplay').innerText = `${dt.toLocaleDateString('en-US', { month: 'long' })} ${year}`;
   calendar.innerHTML = '';
@@ -63,18 +85,18 @@ function loadMonthView(timeblocks) {
     calendar.appendChild(daySquare);
   }
 
-  const monthTimeblocks = timeblocks.filter(block => {
+  const monthTimeblocks = timeblocks.filter((block) => {
     const blockDate = new Date(block.startTime);
     return blockDate.getMonth() === month && blockDate.getFullYear() === year;
   });
 
-  const daysWithTimeblocks = new Set(monthTimeblocks.map(block => new Date(block.startTime).getDate()));
+  const daysWithTimeblocks = new Set(monthTimeblocks.map((block) => new Date(block.startTime).getDate()));
 
   for (let i = 1; i <= daysInMonth; i++) {
     const daySquare = document.createElement('div');
     daySquare.classList.add('day');
     daySquare.innerText = i;
-    
+
     if (daysWithTimeblocks.has(i)) {
       const timeBlockIndicator = document.createElement('div');
       timeBlockIndicator.style.width = '12px';
@@ -83,11 +105,19 @@ function loadMonthView(timeblocks) {
       timeBlockIndicator.style.borderRadius = '50%';
       daySquare.appendChild(timeBlockIndicator);
     }
-    
+    daySquare.addEventListener('click', () => {
+      const popupContent = generatePopupContentForDay(i, monthTimeblocks);
+      // Assuming you have a modal with id 'infoModal' and a content container with id 'modalContent'
+      document.getElementById('modalContent').innerHTML = popupContent;
+      document.getElementById('infoModal').style.display = 'flex';
+    });
     calendar.appendChild(daySquare);
   }
 }
 
+document.querySelector('.close').addEventListener('click', function() {
+  document.getElementById('infoModal').style.display = 'none';
+});
 
 function loadWeekView(timeblocks) {
   calendar.classList.add('week-view');
@@ -99,27 +129,27 @@ function loadWeekView(timeblocks) {
   const date = moment(startOfWeek);
 
   document.getElementById('monthDisplay')
- .innerText = `${date.format('MMMM')} ${date.format('D')} - ${date.add(6, 'days').format('D')}, ${date.format('YYYY')} \n`;
+    .innerText = `${date.format('MMMM')} ${date.format('D')} - ${date.add(6, 'days').format('D')}, ${date.format('YYYY')} \n`;
 
- if(view === 'week'){ 
- const weekDaysDiv = document.getElementById('weekdays');
- $('#weekdays').css('padding-left', '53px');
- $('#weekdays').css('transform', 'translatex(0px) translatey(0px)');
- $('#weekdays').css('width', '1101px');
- 
-  if (weekDaysDiv) {
-    let dayNameAbbreviated, dateDisplay, dayHeader;
-    for (let i = 0; i < 7; i++) {
-      const weekDay = moment(startOfWeek).add(i, 'days');
-      dayNameAbbreviated = weekDay.format('ddd');
-      dateDisplay = weekDay.format('M/D');
-      dayHeader = weekDaysDiv.children[i];
-      if (dayHeader) {
-        dayHeader.textContent = `${dayNameAbbreviated} ${dateDisplay}`;
+  if (view === 'week') {
+    const weekDaysDiv = document.getElementById('weekdays');
+    $('#weekdays').css('padding-left', '53px');
+    $('#weekdays').css('transform', 'translatex(0px) translatey(0px)');
+    $('#weekdays').css('width', '1101px');
+
+    if (weekDaysDiv) {
+      let dayNameAbbreviated, dateDisplay, dayHeader;
+      for (let i = 0; i < 7; i++) {
+        const weekDay = moment(startOfWeek).add(i, 'days');
+        dayNameAbbreviated = weekDay.format('ddd');
+        dateDisplay = weekDay.format('M/D');
+        dayHeader = weekDaysDiv.children[i];
+        if (dayHeader) {
+          dayHeader.textContent = `${dayNameAbbreviated} ${dateDisplay}`;
+        }
       }
     }
   }
-} 
 
   calendar.innerHTML = '';
 
@@ -138,24 +168,62 @@ function loadWeekView(timeblocks) {
 
     $(`.day-interval-${day + 1}`).append(`<div class="day" id="day${day + 1}" style="flex: 1"></div>`);
 
-    for (let hour = 1; hour <= 24; hour++) {
-      $(`.day-interval-${day + 1}`).append(`<div class="hour" id="hour${hour}" style="height: ${hourPX}px;"></div>`);
-    }
-  }
+ }
 
   $('.week-view .day').css('height', dayPX);
 
   const currentWeekStartTime = getStartOfWeek(weekNumber, yearNumber);
   const currentWeekEndTime = getEndOfWeek(weekNumber, yearNumber);
+  const now = moment().valueOf();
+  if (currentWeekStartTime <= now && now <= currentWeekEndTime) {
+    let weekdayIndex = moment(now).day();
+    weekdayIndex = (weekdayIndex === 0) ? 7 : weekdayIndex;
+    $(`#day${weekdayIndex}`).addClass('currentDay');
+  }
 
   timeblocks.forEach((lecture) => {
     addTimeBlock(lecture.startTime, lecture.endTime, lecture.description, lecture.description, lecture.color);
   });
   console.log(startStudyTime, endStudyTime);
 
+  createLines();
+  createAndMoveNowLine();
   createPopUp();
 }
 
+function createLines() {
+  $('.day').each(function dostuff() {
+    const dayBox = $(this);
+    const boxHeight = 1000 //dayBox.height();
+    const numLines = 24;
+
+    for (let i = 1; i < numLines; i++) {
+      const line = $('<div class="line"></div>');
+      const top = (boxHeight / numLines) * i;
+      line.css('top', top + 'px');
+      dayBox.append(line);
+    }
+  });
+}
+
+function createAndMoveNowLine() {
+  const currentDay = $('.currentDay');
+  if (currentDay.length > 0) {
+    const nowLine = $('<div class="now-line"></div>');
+    $(currentDay).append(nowLine);
+
+    const updateLinePosition = () => {
+      const theTime = moment();
+      const minutes = minutesIntoDay(theTime);
+      const top = minutes * minutePX;
+      nowLine.css('top', top + 'px');
+    };
+
+    updateLinePosition();
+
+    setInterval(updateLinePosition, 60000); // 1 minute
+  }
+}
 
 function getStartOfWeek(week, year) {
   return moment().year(year).isoWeek(weekNumber).startOf('isoWeek').valueOf();
@@ -181,10 +249,10 @@ function addTimeBlock(startTime, endTime, title, description, color) {
 
     if (endTime <= endOfDay) {
       createTimeBlockSegment(startTime, endTime, dayOfWeek);
-      break; 
+      break;
     } else {
       createTimeBlockSegment(startTime, endOfDay, dayOfWeek);
-      startTime = moment(endOfDay + 1); 
+      startTime = moment(endOfDay + 1);
 
       if (startTime.valueOf() >= currentWeekEndTime) {
         break;
