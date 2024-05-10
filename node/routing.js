@@ -117,6 +117,17 @@ const routing = function routes(app, upload) {
       return res.redirect('/login');
     });
   });
+  /**
+     * @swagger
+     * /getUserData:
+     *   get:
+     *     description: Gets schedule from Moodle server database
+     *     responses:
+     *       200:
+     *         description: Successful response
+     *       500:
+     *         description: Internal server error
+     */
   app.get('/getSchedule', async (req, res) => {
     await getSchedule(req, res).catch((error) => {
       console.error('Error in getting calculating schedule:', error);
@@ -152,6 +163,28 @@ const routing = function routes(app, upload) {
       res.status(500).send('Internal Server Error');
     });
   });
+  /**
+     * @swagger
+     * /importIcalFile:
+     *   post:
+     *     description: Imports ICAL file and saves it in server database
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         application/json:
+     *           schema:
+     *             type: object
+     *             properties:
+     *               option1:
+     *                 type: string
+     *                 description: Description of option1
+     *               option2:
+     *                 type: boolean
+     *                 description: Description of option2
+     *     responses:
+     *       '200':
+     *         description: Successful response
+     */
   app.post('/importIcalFile', upload.array('ics', 5), async (req, res) => {
     await importIcalFile(req, res).catch((error) => {
       console.error('Error in importing ICAL file:', error);
