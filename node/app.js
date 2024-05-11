@@ -285,16 +285,22 @@ function checkIfLecturesDone(Schedule, courses) {
   Schedule.Timeblocks.forEach((timeblock) => {
     if (timeblock.type === 'lecture' && currentTimeMillis > timeblock.endTime) {
       // Uncheck the lecture
-      const course = courses.find((c) => c.id === timeblock.courseID);
-      if (course) {
-        const lecture = course.contents.find((l) => l.id === timeblock.ID);
-        if (lecture) {
-          lecture.chosen = false;
-        }
-      }
+      changeLectureChosenStatus(courses, timeblock.courseID, timeblock.ID, false);
     }
   });
   return courses;
+}
+
+function changeLectureChosenStatus(courses, courseID, lectureID, chosen) {
+  courses.forEach((course) => {
+    if (course.id === courseID) {
+      course.contents.forEach((lecture) => {
+        if (lecture.id === lectureID) {
+          lecture.chosen = chosen;
+        }
+      });
+    }
+  });
 }
 
 function retrieveAndParseUserData(userid) {

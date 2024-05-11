@@ -134,6 +134,8 @@ const routing = function routes(app, upload) {
       res.status(500).send('Internal Server Error');
     });
   });
+
+  app.get('/uncheckLecture')
   // POST Endpoints
   /**
      * @swagger
