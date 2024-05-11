@@ -1,4 +1,4 @@
-import fs from 'fs';
+import fs, { write } from 'fs';
 import { fileURLToPath } from 'url';
 import path, { dirname } from 'path';
 import Webscraper from './scraping.js';
@@ -193,13 +193,108 @@ async function getSchedule(req, res) {
       console.log('Recalculating schedule');
       Schedule = await calculateSchedule(User, algorithm);
       User.schedule = Schedule;
-      writeUserToDB(User);
+    } else {
+      console.log('Using cached schedule');
+      console.log('Updating chosen value for lectures based on time');
+      User.courses = checkIfLecturesDone(Schedule, User.courses);
     }
+    writeUserToDB(User);
     res.send(JSON.stringify(Schedule));
   } catch (error) {
     console.error('Failed to calculate schedule:', error);
     res.status(500).send('Internal Server Error');
   }
+}
+
+const testUser = {
+  courses: [{
+    id: 333,
+    fullname: 'Test Course',
+    contents: [{
+      id: 321,
+      name: 'Test Lecture',
+      chosen: true,
+    }, {
+      id: 322,
+      name: 'Test Lecture 2',
+      chosen: true,
+    }],
+  }, {
+    id: 444,
+    fullname: 'Test Course 2',
+    contents: [{
+      id: 421,
+      name: 'Test Lecture 3',
+      chosen: true,
+    }, {
+      id: 422,
+      name: 'Test Lecture 4',
+      chosen: true,
+    }],
+  }],
+};
+
+const testSchedule = {
+  Timeblocks: [{
+    type: 'lecture',
+    courseID: 333,
+    ID: 321,
+    startTime: 1620000000000,
+    endTime: 1620003600000,
+    description: 'Test Lecture',
+  }, {
+    type: 'lecture',
+    courseID: 333,
+    ID: 322,
+    startTime: 1620007200000,
+    endTime: 1715626742000,
+    description: 'Test Lecture 2',
+  }, {
+    type: 'lecture',
+    courseID: 444,
+    ID: 421,
+    startTime: 1620000000000,
+    endTime: 1620003600000,
+    description: 'Test Lecture 3',
+  }, {
+    type: 'lecture',
+    courseID: 444,
+    ID: 422,
+    startTime: 1620007200000,
+    endTime: 1715626742000,
+    description: 'Test Lecture 4',
+  }],
+};
+
+console.log('Test user before:');
+testUser.courses.forEach((course) => {
+  course.contents.forEach((lecture) => {
+    console.log(lecture.fullname, lecture.id, 'is chosen', lecture.chosen);
+  });
+});
+testUser.courses = checkIfLecturesDone(testSchedule, testUser.courses);
+console.log('Test user after:');
+testUser.courses.forEach((course) => {
+  course.contents.forEach((lecture) => {
+    console.log(lecture.fullname, lecture.id, 'is chosen', lecture.chosen);
+  });
+});
+
+function checkIfLecturesDone(Schedule, courses) {
+  const currentTimeMillis = new Date().getTime();
+  Schedule.Timeblocks.forEach((timeblock) => {
+    if (timeblock.type === 'lecture' && currentTimeMillis > timeblock.endTime) {
+      // Uncheck the lecture
+      const course = courses.find((c) => c.id === timeblock.courseID);
+      if (course) {
+        const lecture = course.contents.find((l) => l.id === timeblock.ID);
+        if (lecture) {
+          lecture.chosen = false;
+        }
+      }
+    }
+  });
+  return courses;
 }
 
 function retrieveAndParseUserData(userid) {
