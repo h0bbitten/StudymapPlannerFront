@@ -23,9 +23,11 @@ async function Webscraper(url, forceUpdate = false) {
     }
   }
 
-  if (!forceUpdate && existingData.hasOwnProperty(url)) {
-    // If the URL is already scraped and forceUpdate is false, skip scraping
-    return;
+  // Check if URL is in existing data and parse ECTS points directly from the file without rescraping
+  if (existingData.hasOwnProperty(url)) {
+    // Return parsed ECTS directly
+    console.log(existingData[url].title, 'ECTS:', existingData[url].ects);
+    return existingData[url].ects; // Assuming ECTS is stored in a suitable format in the file
   }
 
   // Proceed with scraping if the URL is not in existingData or forceUpdate is true
@@ -37,7 +39,7 @@ async function Webscraper(url, forceUpdate = false) {
     const tdElements = Array.from(document.querySelectorAll('td'));
     let titleIndex = tdElements.findIndex(td => td.textContent.includes('Danish title'));
     if (titleIndex === -1) {
-      titleIndex = tdElements.findIndex(td => td.textContent.includes('English title'));
+      titleIndex = tdElements.findIndex(td => td.textContent.includes('Engelsk titel'));
     }
     const ectsIndex = tdElements.findIndex(td => td.textContent.includes('ECTS'));
     const titleValue = titleIndex !== -1 ? tdElements[titleIndex + 1].textContent.trim() : 'title not found';
