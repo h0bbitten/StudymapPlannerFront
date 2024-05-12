@@ -200,6 +200,7 @@ function createLectureTimeBlock(course, lecture, startTime, endTime) {
     type: 'lecture',
     ID: lecture.id,
     courseID: course.id,
+    status: 'active',
   };
 }
 

@@ -1,3 +1,7 @@
+import {
+  APIgetCall,
+} from './script.js';
+
 export { loadCalendar, initButtons };
 
 let nav = 0;
@@ -105,6 +109,7 @@ function loadMonthView(timeblocks) {
       timeBlockIndicator.style.borderRadius = '50%';
       daySquare.appendChild(timeBlockIndicator);
     }
+
     daySquare.addEventListener('click', () => {
       const popupContent = generatePopupContentForDay(i, monthTimeblocks);
       // Assuming you have a modal with id 'infoModal' and a content container with id 'modalContent'
@@ -115,7 +120,7 @@ function loadMonthView(timeblocks) {
   }
 }
 
-document.querySelector('.close').addEventListener('click', function() {
+document.querySelector('.close').addEventListener('click', () => {
   document.getElementById('infoModal').style.display = 'none';
 });
 
@@ -138,7 +143,9 @@ function loadWeekView(timeblocks) {
     $('#weekdays').css('width', '1101px');
 
     if (weekDaysDiv) {
-      let dayNameAbbreviated, dateDisplay, dayHeader;
+      let dayNameAbbreviated;
+      let dateDisplay;
+      let dayHeader;
       for (let i = 0; i < 7; i++) {
         const weekDay = moment(startOfWeek).add(i, 'days');
         dayNameAbbreviated = weekDay.format('ddd');
@@ -167,8 +174,7 @@ function loadWeekView(timeblocks) {
     $('#calendar').append(`<div class="day-interval-${day + 1}"></div>`);
 
     $(`.day-interval-${day + 1}`).append(`<div class="day" id="day${day + 1}" style="flex: 1"></div>`);
-
- }
+  }
 
   $('.week-view .day').css('height', dayPX);
 
@@ -181,14 +187,25 @@ function loadWeekView(timeblocks) {
     $(`#day${weekdayIndex}`).addClass('currentDay');
   }
 
-  timeblocks.forEach((lecture) => {
-    addTimeBlock(lecture.startTime, lecture.endTime, lecture.description, lecture.description, lecture.color);
+  timeblocks.forEach((timeblock) => {
+    addTimeBlock(timeblock.startTime, timeblock.endTime, timeblock.description, timeblock.description, timeblock.color, timeblock.type, timeblock.ID);
   });
   console.log(startStudyTime, endStudyTime);
 
   createLines();
   createAndMoveNowLine();
-  createPopUp();
+  createPopUp(timeblocks);
+  popupBtnListener();
+}
+
+function popupBtnListener() {
+  $(document).on('click', '.popupBtn', async function updateStatus() {
+    const lectureID = $(this).data('lectureid');
+    const courseID = $(this).data('courseid');
+    const chosen = !$(this).hasClass('active');
+    console.log(lectureID, courseID, chosen);
+    await APIgetCall(`changeLectureChosen?lectureID=${lectureID}&courseID=${courseID}&chosen=${chosen}`, 'Error updating lecture status');
+  });
 }
 
 function createLines() {
@@ -233,15 +250,9 @@ function getEndOfWeek(week, year) {
   return moment().year(year).isoWeek(weekNumber).endOf('isoWeek').valueOf();
 }
 
-function addTimeBlock(startTime, endTime, title, description, color) {
+function addTimeBlock(startTime, endTime, title, description, color, type, ID) {
   const currentWeekStartTime = getStartOfWeek(weekNumber, yearNumber);
   const currentWeekEndTime = getEndOfWeek(weekNumber, yearNumber);
-
-  function createTimeBlockSegment(start, end, dayOfWeek) {
-    if (startTime >= currentWeekStartTime && startTime < currentWeekEndTime) {
-      $(`#day${dayOfWeek}`).append(createTimeBlock(start, end, title, description, color));
-    }
-  }
 
   while (startTime < endTime && startTime < currentWeekEndTime) {
     const endOfDay = moment(startTime).endOf('day').valueOf();
@@ -259,14 +270,20 @@ function addTimeBlock(startTime, endTime, title, description, color) {
       }
     }
   }
+
+  function createTimeBlockSegment(start, end, dayOfWeek) {
+    if (startTime >= currentWeekStartTime && startTime < currentWeekEndTime) {
+      $(`#day${dayOfWeek}`).append(createTimeBlock(start, end, title, description, color, type, ID));
+    }
+  }
 }
 
-function createTimeBlock(startTime, endTime, title, description, color) {
+function createTimeBlock(startTime, endTime, title, description, color, type, ID) {
   const top = (minutesIntoDay(startTime) * (1000 / 24 / 60));
   const minuteDuration = (endTime - startTime) / 60000;
   const height = minuteDuration * (1000 / 24 / 60);
   const html = `
-      <div class="timeblock" style="height: ${height}px; background-color: ${color};
+      <div class="timeblock ${type}" ${type === 'lecture' ? `data-lectureID="${ID}"` : ''} style="height: ${height}px; background-color: ${color};
       position: absolute; top: ${top}px; width: 130px; font-size: 13px">
       
       <div class="time">${convertToTimeString(startTime)} - ${convertToTimeString(endTime)}</div>
@@ -292,29 +309,50 @@ function minutesIntoDay(timestamp) {
   return minutesDifference;
 }
 
-function createPopUp() {
-  $('.timeblock').click(function() {
+function createPopUp(timeblocks) {
+  $('.timeblock').click(function popupHandler() {
     const description = $(this).find('.description').text();
     const title = $(this).find('.title').text();
     const time = $(this).find('.time').text();
+    const type = $(this).attr('class').split(' ')[1];
+    const lecture = type === 'lecture';
+    console.log(type);
+    let lectureID;
+    let courseID;
+    let courseLink;
+    let status;
+    if (lecture) {
+      console.log('This is a lecture');
+      lectureID = $(this).data('lectureid');
+      console.log(lectureID);
+      timeblocks.forEach((block) => {
+        if (block.ID === lectureID) {
+          console.log(block);
+          courseID = block.courseID;
+          courseLink = block.courseURL;
+          status = block.status;
+        }
+      });
+    }
 
     const modalContentHTML = `
       <div class="modal-header">${title}</div>
       <div class="modal-section">
         <div class="section-title">Course</div>
         <div>${description}</div>
+        ${lecture ? `<a href="${courseLink}" target="_blank">Go to course</a>` : ''}
       </div>
       <div class="modal-section">
         <div class="section-title">Time</div>
         <div>${time}</div>
       </div>
-      <!-- Add more sections as needed -->
+      ${lecture ? `<button class="btn ${status} popupBtn" data-lectureID="${lectureID}" data-courseID="${courseID}">${status === 'active' ? 'I already studied this subject' : 'I did not study for this subject'}</button>` : ''}
     `;
     $('#modalContent').html(modalContentHTML);
     $('#infoModal').css('display', 'flex');
   });
 
-  $('.close').click(function() {
+  $('.close').click(() => {
     $('#infoModal').css('display', 'none');
   });
 }

@@ -5,7 +5,7 @@ import Webscraper from './scraping.js';
 import calculateSchedule from './Algorithm.js';
 
 export {
-  getMoodleInfo, logIn, saveOptions, getUserData, getSchedule, importIcalFile,
+  getMoodleInfo, logIn, saveOptions, getUserData, getSchedule, importIcalFile, changeLectureChosen,
 };
 
 const currentFilename = fileURLToPath(import.meta.url);
@@ -192,12 +192,12 @@ async function getSchedule(req, res) {
     if (recalculate) {
       console.log('Recalculating schedule');
       Schedule = await calculateSchedule(User, algorithm);
-      User.schedule = Schedule;
     } else {
       console.log('Using cached schedule');
       console.log('Updating chosen value for lectures based on time');
-      User.courses = checkIfLecturesDone(Schedule, User.courses);
+      [Schedule, User.courses] = checkIfLecturesDone(Schedule, User.courses);
     }
+    User.schedule = Schedule;
     writeUserToDB(User);
     res.send(JSON.stringify(Schedule));
   } catch (error) {
@@ -206,7 +206,7 @@ async function getSchedule(req, res) {
   }
 }
 
-const testUser = {
+/* const testUser = {
   courses: [{
     id: 333,
     fullname: 'Test Course',
@@ -234,14 +234,15 @@ const testUser = {
   }],
 };
 
-const testSchedule = {
+let testSchedule = {
   Timeblocks: [{
     type: 'lecture',
     courseID: 333,
     ID: 321,
     startTime: 1620000000000,
     endTime: 1620003600000,
-    description: 'Test Lecture',
+    description: 'Test Lecture 1',
+    status: 'active',
   }, {
     type: 'lecture',
     courseID: 333,
@@ -249,6 +250,7 @@ const testSchedule = {
     startTime: 1620007200000,
     endTime: 1715626742000,
     description: 'Test Lecture 2',
+    status: 'active',
   }, {
     type: 'lecture',
     courseID: 444,
@@ -256,6 +258,7 @@ const testSchedule = {
     startTime: 1620000000000,
     endTime: 1620003600000,
     description: 'Test Lecture 3',
+    status: 'active',
   }, {
     type: 'lecture',
     courseID: 444,
@@ -263,32 +266,42 @@ const testSchedule = {
     startTime: 1620007200000,
     endTime: 1715626742000,
     description: 'Test Lecture 4',
+    status: 'active',
   }],
 };
 
 console.log('Test user before:');
 testUser.courses.forEach((course) => {
   course.contents.forEach((lecture) => {
-    console.log(lecture.fullname, lecture.id, 'is chosen', lecture.chosen);
+    console.log(lecture.name, lecture.id, 'is chosen', lecture.chosen);
   });
 });
-testUser.courses = checkIfLecturesDone(testSchedule, testUser.courses);
+console.log('Test schedule before:');
+testSchedule.Timeblocks.forEach((timeblock) => {
+  console.log(timeblock.description, timeblock.ID, 'status is:', timeblock.status);
+});
+[testSchedule, testUser.courses] = checkIfLecturesDone(testSchedule, testUser.courses);
 console.log('Test user after:');
 testUser.courses.forEach((course) => {
   course.contents.forEach((lecture) => {
-    console.log(lecture.fullname, lecture.id, 'is chosen', lecture.chosen);
+    console.log(lecture.name, lecture.id, 'is chosen', lecture.chosen);
   });
 });
-
+console.log('Test schedule after:');
+testSchedule.Timeblocks.forEach((timeblock) => {
+  console.log(timeblock.description, timeblock.ID, 'status is:', timeblock.status);
+});
+ */
 function checkIfLecturesDone(Schedule, courses) {
   const currentTimeMillis = new Date().getTime();
   Schedule.Timeblocks.forEach((timeblock) => {
     if (timeblock.type === 'lecture' && currentTimeMillis > timeblock.endTime) {
       // Uncheck the lecture
       changeLectureChosenStatus(courses, timeblock.courseID, timeblock.ID, false);
+      timeblock.status = 'done';
     }
   });
-  return courses;
+  return [Schedule, courses];
 }
 
 function changeLectureChosenStatus(courses, courseID, lectureID, chosen) {
@@ -484,5 +497,30 @@ async function importIcalFile(req, res) {
   } catch (error) {
     console.error('Failed to import ICAL file:', error);
     res.status(500).send('Internal Server Error');
+  }
+}
+
+async function changeLectureChosen(req, res) {
+  try {
+    const courseID = Number(req.query.courseID);
+    const lectureID = Number(req.query.lectureID);
+    const chosen = req.query.chosen === 'true';
+    console.log('Changing lecture chosen status', courseID, lectureID, chosen);
+    const User = await retrieveAndParseUserData(req.session.userid);
+    changeLectureChosenStatus(User.courses, courseID, lectureID, chosen);
+    await writeUserToDB(User);
+    res.status(200).json({
+      success: true,
+      message: 'Lecture chosen status changed successfully',
+      lectureID: lectureID,
+      courseID: courseID,
+      chosen: chosen,
+    });
+  } catch (error) {
+    console.error('Failed to change lecture chosen status:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Internal Server Error',
+    });
   }
 }
