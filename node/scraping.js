@@ -25,9 +25,15 @@ async function Webscraper(url, forceUpdate = false) {
 
   // Check if URL is in existing data and parse ECTS points directly from the file without rescraping
   if (existingData.hasOwnProperty(url)) {
-    // Return parsed ECTS directly
-    console.log(existingData[url].title, 'ECTS:', existingData[url].ects);
-    return existingData[url].ects; // Assuming ECTS is stored in a suitable format in the file
+    // Extract numerical value from ECTS string using regular expression
+    const ectsNumeric = existingData[url].ects.match(/\d+/);  // Matches first sequence of digits in the string
+    if (ectsNumeric) {
+      console.log(existingData[url].title, 'ECTS:', ectsNumeric[0]);
+      return ectsNumeric[0]; // Return the numerical part of the ECTS
+    } else {
+      console.error('No ECTS points found in the data for URL:', url);
+      return null;
+    }
   }
 
   // Proceed with scraping if the URL is not in existingData or forceUpdate is true
