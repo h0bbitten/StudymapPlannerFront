@@ -108,6 +108,17 @@ const routing = function routes(app, upload) {
       res.status(500).send('Internal Server Error');
     });
   });
+  /**
+     * @swagger
+     * /getUserData:
+     *   get:
+     *     description: Gets user data from server database
+     *     responses:
+     *       200:
+     *         description: Successful response
+     *       500:
+     *         description: Internal server error
+     */
   app.get('/logout', (req, res) => {
     req.session.destroy((err) => {
       if (err) {
@@ -119,7 +130,7 @@ const routing = function routes(app, upload) {
   });
   /**
      * @swagger
-     * /getUserData:
+     * /getSchedule:
      *   get:
      *     description: Gets schedule from Moodle server database
      *     responses:
