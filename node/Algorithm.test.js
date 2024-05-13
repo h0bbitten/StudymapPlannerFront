@@ -492,24 +492,29 @@ async function parseICalFiles(icalURLs) {
   }
 }
 
-describe('checkOverlap', () => {
-  it('should return true if intervals overlap', () => {
-      expect(checkOverlap(10, 20, 15, 25)).toBe(true);
-      expect(checkOverlap(10, 20, 5, 15)).toBe(true);
-  });
+describe('createLectureTimeBlock', () => {
+  it('should create a lecture time block with the correct properties eg. title, description...', () => {
+    const course = {
+      fullname: 'IWP - Lecture 4',
+      color: '#00FF00',
+      viewurl: 'https://www.youtube.com/watch?v=QrvV-R3y2xY&ab_channel=Virej'
+    };
+    const lecture = {
+      name: 'Lecture 4: How legens center divs'
+    };
+    const startTime = '2024-01-01T09:00:00Z';
+    const endTime = '2024-01-01T10:00:00Z';
 
-  it('should return false if intervals do not overlap', () => {
-      expect(checkOverlap(10, 20, 21, 30)).toBe(false);
-      expect(checkOverlap(10, 20, 0, 5)).toBe(false);
-  });
+    const result = createLectureTimeBlock(course, lecture, startTime, endTime);
 
-  it('should return false if intervals touch but do not overlap', () => {
-      expect(checkOverlap(10, 20, 20, 30)).toBe(false);
-      expect(checkOverlap(10, 20, 0, 10)).toBe(false);
-  });
-
-  it('should return true if one interval is completely within another', () => {
-      expect(checkOverlap(10, 20, 12, 18)).toBe(true);
-      expect(checkOverlap(10, 20, 10, 20)).toBe(true); // Exact same interval
+    expect(result).toEqual({
+      title: 'IWP - Lecture 4',
+      description: 'Lecture 4: How legens center divs',
+      startTime: '2024-01-01T09:00:00Z',
+      endTime: '2024-01-01T10:00:00Z',
+      color: '#00FF00',
+      courseURL: 'https://www.youtube.com/watch?v=QrvV-R3y2xY&ab_channel=Virej',
+      type: 'lecture'
+    });
   });
 });
