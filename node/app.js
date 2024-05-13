@@ -2,7 +2,7 @@ import fs, { write } from 'fs';
 import { fileURLToPath } from 'url';
 import path, { dirname } from 'path';
 import Webscraper from './scraping.js';
-import calculateSchedule from './Algorithm.js';
+import { calculateSchedule } from './Algorithm.js';
 
 export {
   getMoodleInfo, logIn, saveOptions, getUserData, getSchedule, importIcalFile, changeLectureChosen, deleteAllUserData,

@@ -5,7 +5,7 @@ import path, { dirname, parse } from 'path';
 import ICAL from 'ical.js';
 import fetch from 'node-fetch';
 
-export default calculateSchedule;
+export { calculateSchedule, createLectureTimeBlock, PreAlgoMethods, checkOverlap };
 
 const { promises: fsPromises } = fs;
 

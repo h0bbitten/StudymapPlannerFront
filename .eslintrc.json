@@ -3,7 +3,8 @@
         "browser": true,
         "es2021": true,
         "node": true,
-        "jquery": true
+        "jquery": true,
+        "jest": true
     },
     "extends": "airbnb-base",
     "parserOptions": {
