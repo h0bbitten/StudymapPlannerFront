@@ -2,7 +2,7 @@ import { fileURLToPath } from 'url';
 import path, { dirname } from 'path';
 import swaggerDocs from './swagger.js';
 import {
-  getMoodleInfo, logIn, saveOptions, getUserData, getSchedule, importIcalFile, changeLectureChosen,
+  getMoodleInfo, logIn, saveOptions, getUserData, getSchedule, importIcalFile, changeLectureChosen, deleteAllUserData,
 } from './app.js';
 
 const currentFilename = fileURLToPath(import.meta.url);
@@ -207,6 +207,13 @@ const routing = function routes(app, upload) {
   app.post('/importIcalFile', upload.array('ics', 5), async (req, res) => {
     await importIcalFile(req, res).catch((error) => {
       console.error('Error in importing ICAL file:', error);
+      res.status(500).send('Internal Server Error');
+    });
+  });
+  // DELETE Endpoints
+  app.delete('/deleteAllUserData', async (req, res) => {
+    await deleteAllUserData(req, res).catch((error) => {
+      console.error('Error in deleting user data:', error);
       res.status(500).send('Internal Server Error');
     });
   });

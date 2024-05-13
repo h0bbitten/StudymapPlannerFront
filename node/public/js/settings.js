@@ -122,7 +122,7 @@ function displayAccountSettings(id, settings) {
       </label>
       <label class="optionInput" for="logout&removeData">
         <a id="logout" class="btn btn-primary" href="/logout">Logout</a>
-        <button id="removedata" class="btn btn-primary" href="/removeData">Delete all stored data</button>                            
+        <button id="removedata" class="btn btn-primary">Delete all stored data</button>                            
       </label>
     </div>
   `);
@@ -436,6 +436,25 @@ function mergeArrays(oldArray, newArray) {
   return oldArray;
 }
 
+function deleteBtnListener() {
+  $('#removedata').on('click', async () => {
+    try {
+      const response = await fetch(`http://localhost:3000/deleteAllUserData`, {
+        method: 'DELETE',
+        cache: 'no-cache',
+      });
+      if (!response.ok) {
+        toastifyError('Error deleting user data');
+        throw new Error('Network response error');
+      }
+      window.location.href = '/logout';
+    } catch (error) {
+      console.error(errorCallback, error);
+      throw error;
+    }
+  });
+}
+
 const User = await APIgetCall('getUserData', 'Error fetching user data');
 console.log(User);
 
@@ -447,4 +466,5 @@ checkboxListener();
 plusButtonListener();
 removeButtonListener(User.settings.importedCalendars);
 infoBoxListener();
+deleteBtnListener();
 saveOptions(User);

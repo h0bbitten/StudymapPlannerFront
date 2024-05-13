@@ -5,7 +5,7 @@ import Webscraper from './scraping.js';
 import calculateSchedule from './Algorithm.js';
 
 export {
-  getMoodleInfo, logIn, saveOptions, getUserData, getSchedule, importIcalFile, changeLectureChosen,
+  getMoodleInfo, logIn, saveOptions, getUserData, getSchedule, importIcalFile, changeLectureChosen, deleteAllUserData,
 };
 
 const currentFilename = fileURLToPath(import.meta.url);
@@ -522,5 +522,18 @@ async function changeLectureChosen(req, res) {
       success: false,
       error: 'Internal Server Error',
     });
+  }
+}
+
+async function deleteAllUserData(req, res) {
+  try {
+    const userDataDirectory = `./database/${req.session.userid}.json`;
+    fs.unlinkSync(userDataDirectory);
+    const icalsDirectory = `./database/icals/${req.session.userid}`;
+    fs.rmSync(icalsDirectory, { recursive: true });
+    res.status(200).send('User data deleted successfully');
+  } catch (error) {
+    console.error('Failed to delete user data:', error);
+    res.status(500).send('Internal Server Error');
   }
 }
