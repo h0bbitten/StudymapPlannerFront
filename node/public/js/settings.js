@@ -13,6 +13,7 @@ async function displaySettings(User) {
   $('input[type="checkbox"]').each(subCheckboxChange);
   $('.optionBlock').prepend('<div class="optionBlockPadding"></div>');
   $('.optionBlock').append('<div class="optionBlockPadding"></div>');
+  displayError();
   LoadingScreen.hide();
 }
 
@@ -83,7 +84,7 @@ function displayScheduleOptions(settings, algorithm, preferEarly, wantPrep) {
         <span>End study time</span>              
       </label>
       <div class="optionInput">
-        <label for="algorithm">Change Algorithm:</label>
+        <label for="algorithm">Change Scheduling strategy:</label>
         <select name="algorithm" id="algorithm">
           <option value="emptyFirstComeFirstServe">First Come First Serve</option>
           <option value="fiveDayStudyPlan">5 Day Study Plan</option>
@@ -92,7 +93,7 @@ function displayScheduleOptions(settings, algorithm, preferEarly, wantPrep) {
         </select>
         <div class="tooltip">
           <span id="algoInfo">?</span>
-          <span class="tooltiptext">Algorithm info</span>
+          <span class="tooltiptext">Scheduling strategy info</span>
         </div>
       </div>
       <div class="optionInput">
@@ -228,6 +229,25 @@ function collapseListener() {
       }
     }
   });
+}
+
+function displayError() {
+  const url = window.location.href;
+  const error = url.split('?error=')[1];
+  if (error) console.error(error);
+  if (error === 'notEnoughtTimeToStudyForLectures') {
+    // eslint-disable-next-line no-undef
+    Toastify({
+      text: 'Not enough time to study for all lectures. Please either allocate more study-time, change schedule strategy or select fewer lectures.',
+      close: true,
+      duration: -1,
+      gravity: 'top',
+      position: 'center',
+      style: {
+        background: 'linear-gradient(to right, #ff416c, #ff4b2b)',
+      },
+    }).showToast();
+  }
 }
 
 function titleCheckboxChange() {

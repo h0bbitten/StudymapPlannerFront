@@ -54,7 +54,7 @@ class PreAlgoMethods {
         return new Date(a.examDate) - new Date(b.examDate);
       })
       .map((course) => {
-        // ECTS point hardcoded to 5
+        // ECTS point hardcoded to 5 if not present
         course.studyPeriodTotal = 10 * (course.ECTS ?? 5) * HourMilliSec; // 10 timer pr. ECTS point
         course.studyPeriodPrLecture = Math.ceil(course.studyPeriodTotal / course.contents.length);
         course.contents = course.contents.filter((lecture) => lecture.chosen === true);
@@ -83,7 +83,7 @@ class PreAlgoMethods {
       startStudyTime: this.StartStudyTime,
       endStudyTime: this.EndStudyTime,
       preferEarlyLectures: this.EarlyLectures,
-      eventGap: this.freeTimePrDay,
+      eventGap: (this.freeTimePrDay * 2),
     };
   }
 }
@@ -97,10 +97,15 @@ async function calculateSchedule(User, algorithm) {
 
   const AlgorithmStrategy = getAlgorithmStrategy(Algo.algorithm);
 
-  Algo.schedule.Timeblocks = AlgorithmStrategy(Algo.params());
-
+  const result = AlgorithmStrategy(Algo.params());
+  if (result.error) {
+    console.log('Error in schedule:', result);
+    Algo.schedule.error = result.error;
+    Algo.schedule.redirect = result.redirect;
+    return Algo.schedule;
+  }
+  Algo.schedule.Timeblocks = result;
   Algo.schedule.Timeblocks = Algo.schedule.Timeblocks.concat(Algo.events);
-
   return Algo.schedule;
 }
 
@@ -118,7 +123,6 @@ function getAlgorithmStrategy(algorithm) {
     return (params) => Algorithm(params, true, true, false);
   }
 }
-
 function Algorithm(params, reverse = false, addaptive = false, mixing = false) {
   const {
     courses,
@@ -143,8 +147,7 @@ function Algorithm(params, reverse = false, addaptive = false, mixing = false) {
 
   tryAdaptiveGap();
   adjustLectures();
-
-  console.log('Returning lectures:', lectures.length);
+  console.log('Returning lectures:', lectures.length, lectures.error);
   return lectures;
 
   function calcStartPoint(examDate, courseIndex) {
@@ -178,12 +181,20 @@ function Algorithm(params, reverse = false, addaptive = false, mixing = false) {
   function tryAdaptiveGap() {
     if (addaptive && failed && eventGap > (HourMilliSec / 4)) {
       lectures = tryWithReducedEventGap(params, originalCourses, events, Algorithm, reverse, mixing);
+    } else if ((addaptive && eventGap <= (HourMilliSec / 4)) || (!addaptive && failed)) {
+      console.log('Failed to create schedule, not enough time to study for lectures');
+      console.log(!lectures.error);
+      lectures = {
+        error: 'Failed to create schedule, not enough time to study for lectures',
+        redirect: '/settings?error=notEnoughtTimeToStudyForLectures',
+      };
+      console.log(lectures, !lectures.error);
     }
   }
 
   function adjustLectures() {
     // add logic to group lectures together pr day
-    if (preferEarlyLectures) {
+    if (preferEarlyLectures && !lectures.error) {
       lectures = prioritiseEarlyDayLectures(lectures, events, startStudyTime, endStudyTime);
     }
   }

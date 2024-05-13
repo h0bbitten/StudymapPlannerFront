@@ -192,7 +192,7 @@ async function getSchedule(req, res) {
     if (recalculate) {
       console.log('Recalculating schedule');
       Schedule = await calculateSchedule(User, algorithm);
-    } else {
+    } else if (!Schedule.error) {
       console.log('Using cached schedule');
       console.log('Updating chosen value for lectures based on time');
       [Schedule, User.courses] = checkIfLecturesDone(Schedule, User.courses);
@@ -201,7 +201,7 @@ async function getSchedule(req, res) {
     writeUserToDB(User);
     res.send(JSON.stringify(Schedule));
   } catch (error) {
-    console.error('Failed to calculate schedule:', error);
+    console.error('Failed to calculate schedule---------------------------------------------:', error);
     res.status(500).send('Internal Server Error');
   }
 }
