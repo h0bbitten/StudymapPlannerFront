@@ -198,6 +198,9 @@ function createLectureTimeBlock(course, lecture, startTime, endTime) {
     color: course.color,
     courseURL: course.viewurl,
     type: 'lecture',
+    ID: lecture.id,
+    courseID: course.id,
+    status: 'active',
   };
 }
 

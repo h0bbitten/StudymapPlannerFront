@@ -799,3 +799,10 @@ body {
 .currentDay {
   background-color: #c5c7c5;
 }
+
+.btn.active {
+  background-color: green;
+}
+.btn.done {
+  background-color: red;
+}

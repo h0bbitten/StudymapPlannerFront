@@ -33,7 +33,9 @@ async function recalculateListener() {
   document.getElementById('recalculateButton').addEventListener('click', async () => {
     const User = await APIgetCall('getUserData', 'Error fetching user data');
     const Schedule = await APIgetCall(`getSchedule?algorithm=${User.schedule.algorithm}&forcerecalculate=${true}`, 'Error calculating schedule');
+    console.log(Schedule);
     loadCalendar(Schedule.Timeblocks);
+    initButtons(Schedule.Timeblocks);
     // $('#container').empty();
     // displayCal(User.schedule, true);
   });
