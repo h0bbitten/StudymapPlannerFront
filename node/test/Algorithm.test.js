@@ -1,4 +1,4 @@
-import { createLectureTimeBlock, PreAlgoMethods, checkOverlap } from '../Algorithm.js';
+import { createLectureTimeBlock, PreAlgoMethods, getUNIXfromTimeOfDay } from '../Algorithm.js';
 
 describe('createLectureTimeBlock', () => {
   it('should create a lecture time block with the correct properties eg. title, description...', () => {
@@ -122,31 +122,43 @@ describe('PreAlgoMethods', () => {
     it('should calculate correct study period per lecture based on ECTS points', () => {
       const sortedCourses = algo.prepCourses(algo.Courses);
       sortedCourses.forEach((course) => {
-        const expectedStudyPeriod = Math.ceil(10 * (course.ECTS ?? 5) * HourMilliSec / course.contents.length);
+        const expectedStudyPeriod = Math.ceil((10 * (course.ECTS ?? 5) * HourMilliSec) / course.contents.length);
         expect(course.studyPeriodPrLecture).toBe(expectedStudyPeriod);
       });
     });
   });
 });
 
-describe('checkOverlap', () => {
-  it('should return true if intervals overlap', () => {
-    expect(checkOverlap(10, 20, 15, 25)).toBe(true);
-    expect(checkOverlap(10, 20, 5, 15)).toBe(true);
+describe('getUNIXfromTimeOfDay function', () => {
+  // Test case 1: Test with a time before the original timestamp
+  test('Returns correct timestamp for time before original timestamp', () => {
+    const originalTimestamp = 1621000000000; // Example original timestamp (in milliseconds)
+    const timeOfDay = '05:30'; // Example time of day
+    const expectedTimestamp = 1620963000000; // Expected timestamp for the given time of day
+    expect(getUNIXfromTimeOfDay(originalTimestamp, timeOfDay)).toBe(expectedTimestamp);
   });
 
-  it('should return false if intervals do not overlap', () => {
-    expect(checkOverlap(10, 20, 21, 30)).toBe(false);
-    expect(checkOverlap(10, 20, 0, 5)).toBe(false);
+  // Test case 2: Test with a time after the original timestamp
+  test('Returns correct timestamp for time after original timestamp', () => {
+    const originalTimestamp = 1621000000000; // Example original timestamp (in milliseconds)
+    const timeOfDay = '15:45'; // Example time of day
+    const expectedTimestamp = 1620999900000; // Expected timestamp for the given time of day
+    expect(getUNIXfromTimeOfDay(originalTimestamp, timeOfDay)).toBe(expectedTimestamp);
   });
 
-  it('should return false if intervals touch but do not overlap', () => {
-    expect(checkOverlap(10, 20, 20, 30)).toBe(false);
-    expect(checkOverlap(10, 20, 0, 10)).toBe(false);
+  // Test case 3: Test with a time on the same day as the original timestamp
+  test('Returns correct timestamp for time on the same day as original timestamp', () => {
+    const originalTimestamp = 1621000000000;
+    const timeOfDay = '12:00';
+    const expectedTimestamp = 1620986400000;
+    expect(getUNIXfromTimeOfDay(originalTimestamp, timeOfDay)).toBe(expectedTimestamp);
   });
-
-  it('should return true if one interval is completely within another', () => {
-    expect(checkOverlap(10, 20, 12, 18)).toBe(true);
-    expect(checkOverlap(10, 20, 10, 20)).toBe(true); // Exact same interval
+  // Test case 4: Test with a time as the same time as the original timestamp
+  test('Returns correct timestamp for time as the same time as original timestamp', () => {
+    const originalTimestamp = 1725000000000;
+    const timeOfDay = '08:40';
+    const expectedTimestamp = 1725000000000;
+    expect(getUNIXfromTimeOfDay(originalTimestamp, timeOfDay)).toBe(expectedTimestamp);
   });
+  // Add more test cases as needed to cover different scenarios
 });
