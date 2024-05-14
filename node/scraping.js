@@ -25,17 +25,17 @@ async function Webscraper(url, forceUpdate = false) {
 
   // Check if URL is in existing data and parse ECTS points directly from the file without rescraping
   if (existingData.hasOwnProperty(url)) {
-    // Extract numerical value from ECTS string using regular expression
+    // Extract numerical value from ECTS string using regular expression and convert to integer
     const ectsNumeric = existingData[url].ects.match(/\d+/);  // Matches first sequence of digits in the string
     if (ectsNumeric) {
-      console.log(existingData[url].title, 'ECTS:', ectsNumeric[0]);
-      return ectsNumeric[0]; // Return the numerical part of the ECTS
+      const ectsAsNumber = parseInt(ectsNumeric[0], 10); // Convert the string to a number
+      console.log(existingData[url].title, 'ECTS:', ectsAsNumber);
+      return ectsAsNumber; // Return the ECTS points as a number
     } else {
       console.error('No ECTS points found in the data for URL:', url);
       return null;
     }
   }
-
   // Proceed with scraping if the URL is not in existingData or forceUpdate is true
   const browser = await puppeteer.launch();
   const page = await browser.newPage();
