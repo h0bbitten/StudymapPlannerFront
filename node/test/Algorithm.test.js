@@ -73,6 +73,66 @@ const testCourseFour = {
 const HourMilliSec = 3600000;
 
 describe('PreAlgoMethods', () => {
+  describe('constructor', () => {
+    const mockUser = {
+      userid: '123',
+      fullname: 'John Doe',
+      schedule: {
+        preferEarly: false,
+        wantPrep: true,
+      },
+      settings: {
+        startStudyTime: '08:00',
+        endStudyTime: '18:00',
+        syncCalendars: [],
+      },
+      courses: [testCourseOne, testCourseTwo, testCourseThree, testCourseFour],
+    };
+    const algo = new PreAlgoMethods(mockUser, 'emptyFirstComeFirstServe');
+    it('should set construcer properties correctly', () => {
+      expect(algo.algorithm).toBe('emptyFirstComeFirstServe');
+      expect(algo.EarlyLectures).toBe(false);
+      expect(algo.preparation).toBe(true);
+      expect(algo.StartStudyTime).toBe('08:00');
+      expect(algo.EndStudyTime).toBe('18:00');
+      expect(algo.studyTimePrDay).toBe(10 * HourMilliSec);
+      expect(algo.freeTimePrDay).toBe(14 * HourMilliSec);
+      expect(algo.theTime).toBeGreaterThan(0);
+      expect(algo.id).toBe('123');
+      expect(algo.syncCalendars).toEqual([]);
+      // expect(algo.schedule).toEqual([]);
+      // expect(algo.Courses).toEqual([testCourseOne, testCourseTwo, testCourseThree, testCourseFour]);
+    });
+  });
+  describe('prepSchedule', () => {
+    it('should correctly create and return a schedule object with the correct properties', () => {
+      const mockUser = {
+        userid: '123',
+        fullname: 'John Doe',
+        schedule: {
+          preferEarly: false,
+          wantPrep: true,
+        },
+        settings: {
+          startStudyTime: '08:00',
+          endStudyTime: '18:00',
+          syncCalendars: [],
+        },
+        courses: [testCourseOne, testCourseTwo, testCourseThree, testCourseFour],
+      };
+      const algo = new PreAlgoMethods(mockUser, 'emptyFirstComeFirstServe');
+      const schedule = algo.prepSchedule(algo.Courses);
+
+      expect(schedule).toEqual({
+        algorithm: 'emptyFirstComeFirstServe',
+        preferEarly: false,
+        wantPrep: true,
+        Timeblocks: [],
+        CreateDate: algo.theTime,
+        outdated: false,
+      });
+    });
+  });
   describe('prepCourses', () => {
     let algo;
 
@@ -91,16 +151,16 @@ describe('PreAlgoMethods', () => {
         },
         courses: [testCourseOne, testCourseTwo, testCourseThree, testCourseFour],
       };
-      algo = new PreAlgoMethods(mockUser, 'default');
+      algo = new PreAlgoMethods(mockUser, 'emptyFirstComeFirstServe');
     });
 
-    it('should correctly sort courses by exam date in ascending order for default algorithm', () => {
-      algo.algorithm = 'default'; // Explicitly set to default to avoid ambiguity
+    it('should correctly sort courses by exam date in ascending order for emptyFirstComeFirstServe algorithm', () => {
+      algo.algorithm = 'emptyFirstComeFirstServe'; // Explicitly set to default to avoid ambiguity
       const sortedCourses = algo.prepCourses(algo.Courses);
       expect(sortedCourses.map((course) => course.examDate)).toEqual(['2024-11-25', '2024-12-10', '2024-12-15']);
     });
 
-    it('should correctly sort courses by exam date in descending order for non-default algorithms', () => {
+    it('should correctly sort courses by exam date in descending order for reverse algorithms', () => {
       algo.algorithm = 'addaptiveGapNoMixing';
       const sortedCourses = algo.prepCourses(algo.Courses);
       expect(sortedCourses.map((course) => course.examDate)).toEqual(['2024-12-15', '2024-12-10', '2024-11-25']);

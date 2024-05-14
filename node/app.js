@@ -2,7 +2,7 @@ import fs, { write } from 'fs';
 import { fileURLToPath } from 'url';
 import path, { dirname } from 'path';
 import Webscraper from './scraping.js';
-import { calculateSchedule } from './Algorithm.js';
+import calculateSchedule from './Algorithm.js';
 
 // Normal exports
 export {
@@ -10,7 +10,7 @@ export {
 };
 
 // Jest exports
-export { checkIfLecturesDone };
+export { checkIfLecturesDone, findModulelink, };
 
 const currentFilename = fileURLToPath(import.meta.url);
 const currentDir = dirname(currentFilename);
@@ -261,14 +261,15 @@ async function findModulelink(pages) {
 
   let linkPart = null;
 
-  pages.forEach((page) => {
+  for (const page of pages) {
     const { content } = page;
     const match = regex.exec(content);
     if (match) {
       const [, linkPartMatch] = match;
       linkPart = linkPartMatch;
+      break;
     }
-  });
+  }
 
   return linkPart !== null ? `https://moduler.aau.dk/course/${linkPart}?lang=en-GB` : undefined;
 }
@@ -445,10 +446,26 @@ async function changeLectureChosen(req, res) {
 
 async function deleteAllUserData(req, res) {
   try {
-    const userDataDirectory = `./database/${req.session.userid}.json`;
-    fs.unlinkSync(userDataDirectory);
+    const userDataFile = `./database/${req.session.userid}.json`;
+    try {
+      await fs.promises.access(userDataFile);
+      await fs.promises.unlink(userDataFile);
+    } catch (error) {
+      if (error.code !== 'ENOENT') {
+        throw error;
+      }
+    }
+
     const icalsDirectory = `./database/icals/${req.session.userid}`;
-    fs.rmSync(icalsDirectory, { recursive: true });
+    try {
+      await fs.promises.access(icalsDirectory);
+      await fs.promises.rm(icalsDirectory, { recursive: true });
+    } catch (error) {
+      if (error.code !== 'ENOENT') {
+        throw error;
+      }
+    }
+
     res.status(200).send('User data deleted successfully');
   } catch (error) {
     console.error('Failed to delete user data:', error);

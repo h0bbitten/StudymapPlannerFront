@@ -9,7 +9,7 @@ async function displaySettings(User) {
   displayCourses(User.courses);
   displaySyncCalendar(User.userid, User.settings);
   displayImportExport(User.userid, User.settings);
-  displayAccountSettings(User.userid, User.settings);
+  displayAccountSettings();
   $('input[type="checkbox"]').each(subCheckboxChange);
   $('.optionBlock').prepend('<div class="optionBlockPadding"></div>');
   $('.optionBlock').append('<div class="optionBlockPadding"></div>');
@@ -101,7 +101,7 @@ function displayScheduleOptions(settings, algorithm, preferEarly, wantPrep) {
         <input type="checkbox" id="preferEarly" name="preferEarly"/>
       </div>
       <div class="optionInput">
-        <label for="wantPrep">Have a preparation day for each exam, as close the exam as possible:</label>
+        <label for="wantPrep">Have a preparation day for each exam, as close to the exam as possible:</label>
         <input type="checkbox" id="wantPrep" name="wantPrep"/>
       </div>  
     </div>
@@ -111,15 +111,10 @@ function displayScheduleOptions(settings, algorithm, preferEarly, wantPrep) {
   $('#wantPrep').prop('checked', wantPrep);
 }
 
-function displayAccountSettings(id, settings) {
+function displayAccountSettings() {
   $('#formSettings').append(createCollapsible('Account', 'accountSettings'));
   $('#accountSettings').append(`
     <div class="optionBlock" id="accountSettingsInputs">
-      <label class="optionInput" for="email">
-        <span>Change Email</span>              
-        <input type="email" id="useremail" name="email" placeholder"example@gmail.com"
-        value="${settings.email || ''}" ${!settings.email ? 'required="false"' : ''}/>
-      </label>
       <label class="optionInput" for="logout&removeData">
         <a id="logout" class="btn btn-primary" href="/logout">Logout</a>
         <button id="removedata" class="btn btn-primary">Delete all stored data</button>                            
@@ -297,6 +292,7 @@ function plusButtonListener() {
   $('#syncCalendarPlus').on('click', () => {
     const syncCalendarInputs = $('#syncCalendarInputs .SyncCalendarInput');
     let valid = true;
+    // eslint-disable-next-line consistent-return
     syncCalendarInputs.each((index, input) => {
       const url = $(input).find(`#syncCalendarUrl${index}`).val();
       const name = $(input).find(`#syncCalendarName${index}`).val();
@@ -322,7 +318,7 @@ function recalculateOptionBlockHeight() {
 
 function removeButtonListener(importedCalendars) {
   const removeIcalFileBtn = $('.removeIcalFileBtn');
-  removeIcalFileBtn.on('click', function listener(event) {
+  removeIcalFileBtn.on('click', function listener() {
     const Filename = $(this).parent().find('span').text();
     console.log('Removing iCal file:', Filename);
     const removeFile = {
@@ -409,7 +405,6 @@ async function saveOptions(User) {
       ...User.settings,
       startStudyTime: Scheduleinputs.startStudyTime,
       endStudyTime: Scheduleinputs.endStudyTime,
-      email: $('#useremail').val(),
     };
     User.schedule.algorithm = Scheduleinputs.algorithm;
     User.schedule.preferEarly = Scheduleinputs.preferEarly;
@@ -451,7 +446,7 @@ function deleteBtnListener() {
       }
       window.location.href = '/logout';
     } catch (error) {
-      console.error(errorCallback, error);
+      console.error(error);
       throw error;
     }
   });
