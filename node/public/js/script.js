@@ -1,5 +1,5 @@
 export {
-  applyTheme, setCookie, getCookie, LoadingScreen, displayProfile, settingsBtn, saveUserDataToDB, Button, APIgetCall, APIpostCall,
+  applyTheme, setCookie, getCookie, LoadingScreen, displayProfile, settingsBtn, saveUserDataToDB, Button, APIgetCall, APIpostCall, callToastify, infoBoxListener,
 };
 
 async function applyTheme() {
@@ -147,5 +147,76 @@ class Button {
 
   removeButton() {
     $(`#${this.id}`).remove();
+  }
+}
+
+function callToastify(message) {
+  // eslint-disable-next-line no-undef
+  Toastify({
+    text: message,
+    duration: 1500,
+    close: false,
+    gravity: 'top',
+    position: 'center',
+    style: {
+      background: 'linear-gradient(to right, #ff416c, #ff4b2b)',
+    },
+  }).showToast();
+}
+
+function infoBoxListener() {
+  $(document).on('click', '#algoInfo', () => {
+    console.log('info clicked');
+    const modalContentHTML = `
+      <div class="modal-header">Scheduling strategies</div>
+      <div class="modal-section">
+        <div class="section-title">First come first serve</div>
+        <div>
+          This scheduling strategy will create a schedule that has dumped the chosen lectures of each course,
+          sorted by exam date, with a 1 gap between each lecture.
+        </div>
+        <img src="../img/AllAlgosGridEvent-FirstComeFirstServeSketch.drawio.png" alt="First come first serve" style="width: 100%">
+      </div>
+      <div class="modal-section">
+        <div class="section-title">5 Day Study Plan</div>
+        <div>
+          The 5 Day Study Plan will create a schedule that will try to lay the lectures of each course as close to the exam date as possible,
+           with a 1 hour gap between each lecture.
+        </div>
+        <img src="../img/AllAlgosGridEvent-5DayStudyScheduleSketch.drawio.png" alt="5 Day Study Plan" style="width: 100%">
+      </div>
+      <div class="modal-section">
+        <div class="section-title">Strected Schedule (Mixing Allowed)</div>
+        <div>
+          This scheduling strategy will make use of as much of the time available as possible, with a variable gap between each lecture,
+           with a mix of lectures from different courses.
+        </div>
+        <img src="../img/AllAlgosGridEvent-StrectchedMixSketch.drawio.png" alt="Strected schedule" style="width: 100%">
+      </div>
+      <div class="modal-section">
+        <div class="section-title">Strected Schedule (Mixing Disallowed)</div>
+        <div>
+          This scheduling strategy will make use of as much of the time available as possible, with a variable gap between each lecture,
+           with no mixing of lectures from different courses.
+        </div>
+        <img src="../img/AllAlgosGridEvent-StrectchedNoMixSketch.drawio.png" alt="Strected schedule" style="width: 100%">
+      </div>
+    `;
+    $('#modalContent').html(modalContentHTML);
+    $('#infoModal').css('display', 'flex');
+    $('.modal-content').css({
+      width: '60vw',
+      'overflow-y': 'auto',
+      height: '60vh',
+    });
+  });
+  $(document).keydown((event) => {
+    if (event.key === 'Escape') {
+      closePopup();
+    }
+  });
+  $('.close').on('click', closePopup);
+  function closePopup() {
+    $('#infoModal').css('display', 'none');
   }
 }

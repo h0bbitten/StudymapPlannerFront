@@ -1,18 +1,19 @@
 import {
-  applyTheme, LoadingScreen, displayProfile, saveUserDataToDB, APIgetCall, APIpostCall,
+  applyTheme, LoadingScreen, displayProfile, saveUserDataToDB, APIgetCall, APIpostCall, infoBoxListener,
 } from './script.js';
 
 async function displaySettings(User) {
   LoadingScreen.add();
   LoadingScreen.show();
+  displayScheduleOptions(User.settings, User.schedule.algorithm, User.schedule.preferEarly, User.schedule.wantPrep);
   displayCourses(User.courses);
-  displayScheduleOptions(User.settings, User.schedule.algorithm, User.schedule.preferEarly);
   displaySyncCalendar(User.userid, User.settings);
   displayImportExport(User.userid, User.settings);
   displayAccountSettings(User.userid, User.settings);
   $('input[type="checkbox"]').each(subCheckboxChange);
   $('.optionBlock').prepend('<div class="optionBlockPadding"></div>');
   $('.optionBlock').append('<div class="optionBlockPadding"></div>');
+  displayError();
   LoadingScreen.hide();
 }
 
@@ -70,7 +71,7 @@ function addCourseOptions(index, course) {
   `);
 }
 
-function displayScheduleOptions(settings, algorithm, preferEarly) {
+function displayScheduleOptions(settings, algorithm, preferEarly, wantPrep) {
   $('#formSettings').append(createCollapsible('Schedule', 'scheduleOptions'));
   $('#scheduleOptions').append(`
     <div class="optionBlock">
@@ -83,7 +84,7 @@ function displayScheduleOptions(settings, algorithm, preferEarly) {
         <span>End study time</span>              
       </label>
       <div class="optionInput">
-        <label for="algorithm">Change Algorithm:</label>
+        <label for="algorithm">Change Scheduling strategy:</label>
         <select name="algorithm" id="algorithm">
           <option value="emptyFirstComeFirstServe">First Come First Serve</option>
           <option value="fiveDayStudyPlan">5 Day Study Plan</option>
@@ -92,7 +93,7 @@ function displayScheduleOptions(settings, algorithm, preferEarly) {
         </select>
         <div class="tooltip">
           <span id="algoInfo">?</span>
-          <span class="tooltiptext">Algorithm info</span>
+          <span class="tooltiptext">Scheduling strategy info</span>
         </div>
       </div>
       <div class="optionInput">
@@ -107,6 +108,7 @@ function displayScheduleOptions(settings, algorithm, preferEarly) {
   `);
   $('#algorithm').val(algorithm);
   $('#preferEarly').prop('checked', preferEarly);
+  $('#wantPrep').prop('checked', wantPrep);
 }
 
 function displayAccountSettings(id, settings) {
@@ -120,7 +122,7 @@ function displayAccountSettings(id, settings) {
       </label>
       <label class="optionInput" for="logout&removeData">
         <a id="logout" class="btn btn-primary" href="/logout">Logout</a>
-        <button id="removedata" class="btn btn-primary" href="/removeData">Delete all stored data</button>                            
+        <button id="removedata" class="btn btn-primary">Delete all stored data</button>                            
       </label>
     </div>
   `);
@@ -229,6 +231,25 @@ function collapseListener() {
   });
 }
 
+function displayError() {
+  const url = window.location.href;
+  const error = url.split('?error=')[1];
+  if (error) console.error(error);
+  if (error === 'notEnoughtTimeToStudyForLectures') {
+    // eslint-disable-next-line no-undef
+    Toastify({
+      text: 'Not enough time to study for all lectures. Please either allocate more study-time, change schedule strategy or select fewer lectures.',
+      close: true,
+      duration: -1,
+      gravity: 'top',
+      position: 'center',
+      style: {
+        background: 'linear-gradient(to right, #ff416c, #ff4b2b)',
+      },
+    }).showToast();
+  }
+}
+
 function titleCheckboxChange() {
   const $checkbox = $(this);
   if ($checkbox.hasClass('checkboxTitle')) {
@@ -323,58 +344,6 @@ function allFilesRemoved(importedCalendars) {
   return importedCalendars.every((file) => file.type === 'remove');
 }
 
-function infoBoxListener() {
-  $('#algoInfo').on('click', () => {
-    const modalContentHTML = `
-      <div class="modal-header">Algorithms</div>
-      <div class="modal-section">
-        <div class="section-title">First come first serve</div>
-        <div>
-          This algorithm will create a schedule that has dumped the chosen lectures of each course,
-          sorted by exam date, with a 1 gap between each lecture.
-        </div>
-        <img src="../img/AllAlgosGridEvent-FirstComeFirstServeSketch.drawio.png" alt="First come first serve" style="width: 100%">
-      </div>
-      <div class="modal-section">
-        <div class="section-title">5 Day Study Plan</div>
-        <div>
-          The 5 Day Study Plan will create a schedule that will try to lay the lectures of each course as close to the exam date as possible,
-           with a 1 hour gap between each lecture.
-        </div>
-        <img src="../img/AllAlgosGridEvent-5DayStudyScheduleSketch.drawio.png" alt="5 Day Study Plan" style="width: 100%">
-      </div>
-      <div class="modal-section">
-        <div class="section-title">Strected Schedule (Mixing Allowed)</div>
-        <div>
-          This algorithm will make use of as much of the time available as possible, with a variable gap between each lecture,
-           with a mix of lectures from different courses.
-        </div>
-        <img src="../img/AllAlgosGridEvent-StrectchedMixSketch.drawio.png" alt="Strected schedule" style="width: 100%">
-      </div>
-      <div class="modal-section">
-        <div class="section-title">Strected Schedule (Mixing Disallowed)</div>
-        <div>
-          This algorithm will make use of as much of the time available as possible, with a variable gap between each lecture,
-           with no mixing of lectures from different courses.
-        </div>
-        <img src="../img/AllAlgosGridEvent-StrectchedNoMixSketch.drawio.png" alt="Strected schedule" style="width: 100%">
-      </div>
-    `;
-    $('#modalContent').html(modalContentHTML);
-    $('#infoModal').css('display', 'flex');
-    $('.modal-content').css({
-      width: '60vw',
-      'overflow-y': 'auto',
-      height: '60vh',
-    });
-  });
-  $(document).keydown(closePopup);
-  $('.close').on('click', closePopup);
-  function closePopup() {
-    $('#infoModal').css('display', 'none');
-  }
-}
-
 async function saveOptions(User) {
   $('#saveBtn').on('click', async () => {
     User.courses.forEach((course, index) => {
@@ -423,16 +392,26 @@ async function saveOptions(User) {
     User.settings.syncCalendars = newSyncCalendars;
     User.settings.importedCalendars = mergeArrays(User.settings.importedCalendars, newImportedCalendars);
 
-    User.settings = {
-      ...User.settings,
+    const Scheduleinputs = {
       startStudyTime: $('#startStudyTime').val(),
       endStudyTime: $('#endStudyTime').val(),
+      algorithm: $('#algorithm').val(),
+      preferEarly: $('#preferEarly').is(':checked'),
+      wantPrep: $('#wantPrep').is(':checked'),
+    };
+    if (
+      Object.keys(Scheduleinputs).some((key) => Scheduleinputs[key] !== User.schedule[key] && Scheduleinputs[key] !== User.settings[key])
+    ) User.schedule.outDated = true;
+
+    User.settings = {
+      ...User.settings,
+      startStudyTime: Scheduleinputs.startStudyTime,
+      endStudyTime: Scheduleinputs.endStudyTime,
       email: $('#useremail').val(),
     };
-    const algorithm = $('#algorithm').val();
-    if (algorithm !== User.schedule.algorithm) User.schedule.outDated = true;
-    User.schedule.algorithm = algorithm;
-    User.schedule.preferEarly = $('#preferEarly').is(':checked');
+    User.schedule.algorithm = Scheduleinputs.algorithm;
+    User.schedule.preferEarly = Scheduleinputs.preferEarly;
+    User.schedule.wantPrep = Scheduleinputs.wantPrep;
 
     console.log(User.settings);
 
@@ -457,6 +436,25 @@ function mergeArrays(oldArray, newArray) {
   return oldArray;
 }
 
+function deleteBtnListener() {
+  $('#removedata').on('click', async () => {
+    try {
+      const response = await fetch(`http://localhost:3000/deleteAllUserData`, {
+        method: 'DELETE',
+        cache: 'no-cache',
+      });
+      if (!response.ok) {
+        toastifyError('Error deleting user data');
+        throw new Error('Network response error');
+      }
+      window.location.href = '/logout';
+    } catch (error) {
+      console.error(errorCallback, error);
+      throw error;
+    }
+  });
+}
+
 const User = await APIgetCall('getUserData', 'Error fetching user data');
 console.log(User);
 
@@ -468,4 +466,5 @@ checkboxListener();
 plusButtonListener();
 removeButtonListener(User.settings.importedCalendars);
 infoBoxListener();
+deleteBtnListener();
 saveOptions(User);

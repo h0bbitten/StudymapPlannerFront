@@ -2,7 +2,7 @@ import { fileURLToPath } from 'url';
 import path, { dirname } from 'path';
 import swaggerDocs from './swagger.js';
 import {
-  getMoodleInfo, logIn, saveOptions, getUserData, getSchedule, importIcalFile,
+  getMoodleInfo, logIn, saveOptions, getUserData, getSchedule, importIcalFile, changeLectureChosen, deleteAllUserData,
 } from './app.js';
 
 const currentFilename = fileURLToPath(import.meta.url);
@@ -108,6 +108,17 @@ const routing = function routes(app, upload) {
       res.status(500).send('Internal Server Error');
     });
   });
+  /**
+     * @swagger
+     * /getUserData:
+     *   get:
+     *     description: Gets user data from server database
+     *     responses:
+     *       200:
+     *         description: Successful response
+     *       500:
+     *         description: Internal server error
+     */
   app.get('/logout', (req, res) => {
     req.session.destroy((err) => {
       if (err) {
@@ -117,12 +128,31 @@ const routing = function routes(app, upload) {
       return res.redirect('/login');
     });
   });
+  /**
+     * @swagger
+     * /getSchedule:
+     *   get:
+     *     description: Gets schedule from Moodle server database
+     *     responses:
+     *       200:
+     *         description: Successful response
+     *       500:
+     *         description: Internal server error
+     */
   app.get('/getSchedule', async (req, res) => {
     await getSchedule(req, res).catch((error) => {
       console.error('Error in getting calculating schedule:', error);
       res.status(500).send('Internal Server Error');
     });
   });
+
+  app.get('/changeLectureChosen', async (req, res) => {
+    await changeLectureChosen(req, res).catch((error) => {
+      console.error('Error in changing value of chosen for lecture:', error);
+      res.status(500).send('Internal Server Error');
+    });
+  });
+
   // POST Endpoints
   /**
      * @swagger
@@ -156,10 +186,38 @@ const routing = function routes(app, upload) {
       res.status(500).send('Internal Server Error');
     }
   });
-  
+  /**
+     * @swagger
+     * /importIcalFile:
+     *   post:
+     *     description: Imports ICAL file and saves it in server database
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         application/json:
+     *           schema:
+     *             type: object
+     *             properties:
+     *               option1:
+     *                 type: string
+     *                 description: Description of option1
+     *               option2:
+     *                 type: boolean
+     *                 description: Description of option2
+     *     responses:
+     *       '200':
+     *         description: Successful response
+     */
   app.post('/importIcalFile', upload.array('ics', 5), async (req, res) => {
     await importIcalFile(req, res).catch((error) => {
       console.error('Error in importing ICAL file:', error);
+      res.status(500).send('Internal Server Error');
+    });
+  });
+  // DELETE Endpoints
+  app.delete('/deleteAllUserData', async (req, res) => {
+    await deleteAllUserData(req, res).catch((error) => {
+      console.error('Error in deleting user data:', error);
       res.status(500).send('Internal Server Error');
     });
   });

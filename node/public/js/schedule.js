@@ -25,6 +25,10 @@ async function displayCal(schedule, ForceRecalculate = false) {
   const Algorithm = schedule.algorithm;
   const Schedule = await APIgetCall(`getSchedule?algorithm=${Algorithm}&forcerecalculate=${ForceRecalculate}`, 'Error calculating schedule');
   console.log(Schedule);
+  if (Schedule.error) {
+    console.error(Schedule.error);
+    window.location.href = Schedule.redirect;
+  }
   initButtons(Schedule.Timeblocks);
   loadCalendar(Schedule.Timeblocks);
 }
@@ -33,8 +37,15 @@ async function recalculateListener() {
   document.getElementById('recalculateButton').addEventListener('click', async () => {
     const User = await APIgetCall('getUserData', 'Error fetching user data');
     const Schedule = await APIgetCall(`getSchedule?algorithm=${User.schedule.algorithm}&forcerecalculate=${true}`, 'Error calculating schedule');
+    console.log(Schedule);
+    if (Schedule.error) {
+      console.error(Schedule.error);
+      window.location.href = Schedule.redirect;
+    }
     loadCalendar(Schedule.Timeblocks);
-    //displayCal(User.schedule, true);
+    initButtons(Schedule.Timeblocks);
+    // $('#container').empty();
+    // displayCal(User.schedule, true);
   });
 }
 

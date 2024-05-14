@@ -1,4 +1,4 @@
-import { applyTheme, APIgetCall } from './script.js';
+import { applyTheme, APIgetCall, callToastify } from './script.js';
 
 // Login function
 function handleLogin() {
@@ -19,16 +19,7 @@ async function validToken(token) {
   // Check if the token input field is empty
   if (token.trim() === '') {
     // eslint-disable-next-line no-undef
-    Toastify({
-      text: 'Please enter a valid token.',
-      duration: 1500,
-      close: false,
-      gravity: 'top',
-      position: 'center',
-      style: {
-        background: 'linear-gradient(to right, #ff416c, #ff4b2b)',
-      },
-    }).showToast();
+    callToastify('Please enter a valid token.');
     return false;
   }
   // Check if token is valid
@@ -37,17 +28,7 @@ async function validToken(token) {
     const response = await APIgetCall(`getLogIn?token=${token}`, 'Error fetching token validity');
     console.log(response.validity);
     if (response.validity === 'Invalid Token') {
-      // eslint-disable-next-line no-undef
-      Toastify({
-        text: 'Invalid Token.',
-        duration: 1500,
-        close: false,
-        gravity: 'top',
-        position: 'center',
-        style: {
-          background: 'linear-gradient(to right, #ff416c, #ff4b2b)',
-        },
-      }).showToast();
+      callToastify('Invalid Token.');
       return false;
     }
 

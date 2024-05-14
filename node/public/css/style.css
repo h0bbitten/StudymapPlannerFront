@@ -774,3 +774,35 @@ body {
   visibility: visible;
 }
 
+.now-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: red;
+}
+
+.line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: repeating-linear-gradient(
+    90deg,
+    rgba(0, 0, 0, 0.5),
+    rgba(0, 0, 0, 0.5) 1px,
+    transparent 1px,
+    transparent 2px
+  );
+}
+
+.currentDay {
+  background-color: #c5c7c5;
+}
+
+.btn.active {
+  background-color: green;
+}
+.btn.done {
+  background-color: red;
+}

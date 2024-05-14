@@ -1,5 +1,5 @@
 import {
-  applyTheme, LoadingScreen, displayProfile, Button, APIgetCall, saveUserDataToDB,
+  applyTheme, LoadingScreen, displayProfile, Button, APIgetCall, saveUserDataToDB, callToastify, infoBoxListener,
 } from './script.js';
 
 let index = 0;
@@ -20,7 +20,7 @@ async function setupInitialization() {
     console.log(User);
 
     displayProfile(User);
-    showCourses(User);
+    showCourses(User.courses);
 
     previous.addButton();
     next.addButton();
@@ -35,7 +35,7 @@ async function setupInitialization() {
 }
 
 function resetForm() {
-  for (let i = 1; i <= amountOfCourses; i++) {
+  for (let i = 1; i <= amountOfCourses + 2; i++) {
     $(`#form${i}div`).remove();
   }
 
@@ -62,7 +62,12 @@ function goToPreviousPage() {
     previous.hideButton();
     resetForm();
   }
-  console.log(`index is ${index}`);
+  if (index === amountOfCourses + 1) {
+    $('#header').text('Choose Study Time');
+  }
+  if (index > amountOfCourses + 1 && index !== 0) {
+    $('#header').text('Which lectures do you want to study for the exam?');
+  }
 }
 
 function goToNextPage() {
@@ -70,35 +75,14 @@ function goToNextPage() {
     const examDate = $(`#datepicker${index - 1}`).val();
     if (examDate === '') {
       // Displays error message if no exam date is selected
-      // eslint-disable-next-line no-undef
-      Toastify({
-        text: 'Please select an exam date for each course.',
-        duration: 1500,
-        close: false,
-        gravity: 'top',
-        position: 'center',
-        style: {
-          background: 'linear-gradient(to right, #ff416c, #ff4b2b)',
-        },
-      }).showToast();
+      callToastify('Please select an exam date for each course.');
       return;
     }
     const currentDate = new Date();
     const selectedDate = new Date(examDate);
 
     if (selectedDate < currentDate) {
-      // Displays error message if selected exam date is before the current moment
-      // eslint-disable-next-line no-undef
-      Toastify({
-        text: 'Please select a future exam date.',
-        duration: 1500,
-        close: false,
-        gravity: 'top',
-        position: 'center',
-        style: {
-          background: 'linear-gradient(to right, #ff416c, #ff4b2b)',
-        },
-      }).showToast();
+      callToastify('Please select a future exam date.');
       return;
     }
     index++;
@@ -108,70 +92,64 @@ function goToNextPage() {
     if (index === amountOfCourses + 2) {
       next.hideButton();
       save.showButton();
-      return;
     }
   }
+
   if (index === 0) {
     checkboxes = $('input[type=checkbox]');
     amountOfCourses = $('input[type=checkbox]:checked').length;
     if (amountOfCourses === 0) {
-      // Displays error message if no courses are selected
-      // eslint-disable-next-line no-undef
-      Toastify({
-        text: 'Please select atleast one course.',
-        duration: 1500,
-        close: false,
-        gravity: 'top',
-        position: 'center',
-        style: {
-          background: 'linear-gradient(to right, #ff416c, #ff4b2b)',
-        },
-      }).showToast();
+      callToastify('Please select at least one course.');
       return;
     }
     index++;
     console.log(`index is ${index}`);
-    let index2 = 0;
+    let formIndex = 1;
     checkboxes.each((i, checkbox) => {
+      createCourseForm(checkbox, i, formIndex);
       if (checkbox.checked) {
-        index2++;
-        // Appends a form for each course
-        $('#forms').append(`
-              <div id="form${index2}div" class="forms">
-              <form id="form${index2}" style="display: none;">
-              <h3 id="${User.courses[i].id}">${User.courses[i].fullnamedisplay}</h3>
-
-             
-              </form>
-              </div>
-          `);
-           // Appends a datepicker to each course form
-          $(`#form${index2}`).append(`
-            <div class="datepicker-container">
-              <label for="datepicker${i}">Exam date:</label>
-              <input type="date" id="datepicker${i}" class="datepicker" name="datepicker" required>
-            </div>
-            `);
-
-            // Save the chosen exam date for each course
-            $(`#datepicker${i}`).change(function() {
-            const examDate = $(this).val();
-            User.courses[i].examDate = examDate;
-            });
-          // Initialize datepicker
-          // Appends a checkbox for each lecture
-        User.courses[i].contents.forEach((lecture, j) => {
-          $(`#form${index2}`).append(`
-            <div class="checkbox lecture-container">
-              <label class="lectureLabel" for="lecture${j}">
-                <input type="checkbox" id="lecture${j}" name="type" value="${j}" checked>
-                <span id="lecture${j}Text">${lecture.name}</span>
-              </label>
-            </div>
-          `);
-        });
+        formIndex++;
       }
     });
+
+    // Show study time form
+    $('#header').text('Choose Study Time');
+    $('#forms').append(`
+      <div id="form${amountOfCourses + 1}div" class="forms">
+        <form id="form${amountOfCourses + 1}" style="display: none;">                   
+            <input type="time" class="studyTime" id="startStudyTime" name="appt" min="01:00" max="00:00" value="08:00" required/>
+            <input type="time" class="studyTime" id="endStudyTime" name="appt" min="01:00" max="00:00" value="16:00" required/>
+        </form>
+      </div>        
+    `);
+
+    // Show scheduling strategy form
+    $('#forms').append(`
+    <div id="form${amountOfCourses + 2}div">
+      <form id="form${amountOfCourses + 2}" style="display: none;">
+        <label for="algorithm">Select scheduling strategy:</label>
+        <select name="algorithm" id="algorithm">
+          <option value="emptyFirstComeFirstServe">First Come First Serve</option>
+          <option value="fiveDayStudyPlan">5 Day Study Plan</option>
+          <option value="addaptiveGapWithMixing">Fill From The End (mixing allowed)</option>
+          <option value="addaptiveGapNoMixing">Fill From The End (no mixing)</option>
+        </select>
+        <div class="tooltip">
+          <span id="algoInfo">?</span>
+          <span class="tooltiptext">Strategy info</span>
+        </div>
+        <div class="optionInput">
+          <label for="preferEarly">Schedule lectures as early as possible in the day; else as late as possible:</label>
+          <input type="checkbox" id="preferEarly" name="preferEarly" checked/>
+        </div>
+        <div class="optionInput">
+          <label for="wantPrep">Have a preparation day for each exam, as close the exam as possible:</label>
+          <input type="checkbox" id="wantPrep" name="wantPrep" checked/>
+        </div>  
+      </form>
+    </div>
+    `);
+
     // Shows the first course form and hides the course selection form
     $('#form0').hide();
     $('#form1').show();
@@ -179,23 +157,51 @@ function goToNextPage() {
     previous.showButton();
   }
 
-  console.log(amountOfCourses);
-
-  // Shows study time form if index is equal to amount of courses + 1
   if (index === amountOfCourses + 1) {
+    $('#header').text('Choose Study Time');
+  }
+
+  if (index === amountOfCourses + 2) {
+    $('#header').text('Select scheduling strategy');
+  }
+}
+
+function createCourseForm(checkbox, i, formIndex) {
+  if (checkbox.checked) {
+    console.log(`index2 is ${formIndex}`);
+    // Appends a form for each course
     $('#forms').append(`
-            <div id="form${index + 1}div" class="forms">
-                <form id="form${index + 1}" style="display: none;">
-                    <h2>Choose Study Time</h2>
-                   
-                    <input type="time" class="studyTime" id="startStudyTime" name="appt" min="01:00" max="00:00" value="08:00" required/>
-                    
-                    <input type="time" class="studyTime" id="endStudyTime" name="appt" min="01:00" max="00:00" value="16:00" required/>
-        `);
-    $(`#form${index}`).hide();
-    $(`#form${index + 1}`).show();
-    next.hideButton();
-    save.showButton();
+        <div id="form${formIndex}div" class="forms">
+          <form id="form${formIndex}" style="display: none;">
+            <h3 id="${User.courses[i].id}">${User.courses[i].fullnamedisplay}</h3>
+          </form>
+        </div>
+      `);
+    // Appends a datepicker to each course form
+    $(`#form${formIndex}`).append(`
+        <div class="datepicker-container">
+          <label for="datepicker${i}">Exam date:</label>
+          <input type="date" id="datepicker${i}" class="datepicker" name="datepicker" required>
+        </div>
+      `);
+
+    // Save the chosen exam date for each course
+    $(`#datepicker${i}`).change(function() {
+      const examDate = $(this).val();
+      User.courses[i].examDate = examDate;
+    });
+    // Initialize datepicker
+    // Appends a checkbox for each lecture
+    User.courses[i].contents.forEach((lecture, j) => {
+      $(`#form${formIndex}`).append(`
+        <div class="checkbox lecture-container">
+          <label class="lectureLabel" for="lecture${j}">
+            <input type="checkbox" id="lecture${j}" name="type" value="${j}" checked>
+            <span id="lecture${j}Text">${lecture.name}</span>
+          </label>
+        </div>
+      `);
+    });
   }
 }
 
@@ -207,17 +213,7 @@ async function saveOptions() {
   const endStudyTime = $('#endStudyTime').val();
 
   if (startStudyTime === endStudyTime || startStudyTime > endStudyTime) {
-    // eslint-disable-next-line no-undef
-    Toastify({
-      text: 'Invalid.',
-      duration: 1500,
-      close: false,
-      gravity: 'top',
-      position: 'center',
-      style: {
-        background: 'linear-gradient(to right, #ff416c, #ff4b2b)',
-      },
-    }).showToast();
+    callToastify('Invalid study time. Please select a valid study time.');
     return;
   }
   checkboxes.each((i, checkbox) => {
@@ -243,34 +239,40 @@ async function saveOptions() {
   User.settings.importedCalendars = [];
 
   User.schedule = {};
-  User.schedule.preferEarly = true;
   User.schedule.outDated = true;
-  User.schedule.algorithm = 'default';
+  User.schedule.algorithm = $('#algorithm').val();
+  User.schedule.preferEarly = $('#preferEarly').is(':checked');
+  User.schedule.wantPrep = $('#wantPrep').is(':checked');
 
   User.settings.setupDone = true;
 
   await saveUserDataToDB(User);
+  console.log('User saved to DB:', User);
 
   window.location.href = 'schedule';
 }
 
-function showCourses(User) {
-  if (User.courses.length === 0) {
+function showCourses(Courses) {
+  if (Courses.length === 0) {
     $('#header').text('You are not enrolled in any courses.');
   } else {
-    User.courses.forEach((course, index) => {
+    Courses.forEach((course, i) => {
       $('#form0').append(`
-            <div class="form0">
-            <label class="checkbox-label" for="checkbox${index}">
-               <input type="checkbox" id="checkbox${index}" name="type" value="${index}" checked/>
-                 <span id="checkbox${index}Text">${course.fullnamedisplay}</span>              
-             </label>
+          <div class="form0">
+            <label class="checkbox-label" for="checkbox${i}">
+              <input type="checkbox" id="checkbox${i}" name="type" value="${i}" checked/>
+              <span id="checkbox${i}Text">${course.fullnamedisplay}</span>              
+            </label>
           </div>`);
     });
   }
 }
+
 applyTheme();
 setupInitialization();
-$(document).on('click', '#goToNextPage', goToNextPage);
-$(document).on('click', '#goToPreviousPage', goToPreviousPage);
-$(document).on('click', '#save', saveOptions);
+$(document).ready(() => {
+  infoBoxListener();
+  $(document).on('click', '#goToNextPage', goToNextPage);
+  $(document).on('click', '#goToPreviousPage', goToPreviousPage);
+  $(document).on('click', '#save', saveOptions);
+});
