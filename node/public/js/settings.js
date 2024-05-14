@@ -349,7 +349,9 @@ async function saveOptions(User) {
     User.courses.forEach((course, index) => {
       course.chosen = $(`#checkboxTitle${index}`).is(':checked');
       course.color = $(`#color${index}`).val();
-      course.examDate = $(`#date${index}`).val();
+      const newExamDate = $(`#date${index}`).val();
+      if (newExamDate !== course.examDate) User.schedule.outDated = true;
+      course.examDate = newExamDate;
       course.contents.forEach((lecture, k) => {
         lecture.chosen = $(`#checkbox${k}-forList${index}`).is(':checked');
       });
@@ -439,7 +441,7 @@ function mergeArrays(oldArray, newArray) {
 function deleteBtnListener() {
   $('#removedata').on('click', async () => {
     try {
-      const response = await fetch(`http://localhost:3000/deleteAllUserData`, {
+      const response = await fetch('http://localhost:3000/deleteAllUserData', {
         method: 'DELETE',
         cache: 'no-cache',
       });
