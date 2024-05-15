@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS courses (
     courseName VARCHAR(255) NOT NULL,
     ects INT NOT NULL,
     createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (userID) REFERENCES users(id) -- Correctly reference 'id' here
+    FOREIGN KEY (userID) REFERENCES users(id) 
 );
 
 ALTER TABLE courses
