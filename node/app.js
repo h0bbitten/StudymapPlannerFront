@@ -145,18 +145,29 @@ async function scrapeModuleLinks(courses, Moodle) {
 
 async function saveOptions(req, res) {
   if (!req.body) {
+    console.error('No data received in request body');
     return res.status(400).send('No data provided');
   }
+
   const userData = req.body;  // Received user data from frontend
 
+  if (!userData.userid) {
+    console.error('User ID is missing');
+    return res.status(400).send('User ID is required');
+  }
+
   try {
-    const userId = await ensureUserExists(userData.userid);
+    console.log('Attempting to ensure user exists in database');
+    const userId = await ensureUserExists(userData.userid); // Ensures the user exists or creates a new one
     const detailsJson = JSON.stringify(userData);  // Serialize user data into JSON
+    console.log(`Attempting to save details for user ID: ${userId}`);
     const updateResult = await saveUserDetails(userId, detailsJson);  // Attempt to save or update user details in MySQL
 
     if (updateResult) {
+      console.log('User data saved successfully');
       res.status(200).send('User data saved successfully');
     } else {
+      console.error('Failed to update user data');
       res.status(500).send('Failed to update user data');
     }
   } catch (error) {
