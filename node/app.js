@@ -262,11 +262,19 @@ async function retrieveAndParseUserData(userid) {
       return null;
     }
     console.log(`User data retrieved successfully for user ID: ${userid}`);
+    
+    let details;
+    if (typeof rows[0].details === 'object') {
+      details = rows[0].details;
+    } else {
+      details = JSON.parse(rows[0].details);
+    }
+
     // Assuming 'details' column contains JSON data
     const userData = {
       id: rows[0].id,
       userID: rows[0].userID,
-      details: JSON.parse(rows[0].details)
+      details: details
     };
     console.log(`User data parsed successfully for user ID: ${userid}`);
     console.log(userData); // Log the parsed user data
@@ -276,6 +284,7 @@ async function retrieveAndParseUserData(userid) {
     throw error;
   }
 }
+
 
 
 
