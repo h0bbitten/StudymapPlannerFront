@@ -97,9 +97,9 @@ async function APIpostCall(url, data, errorCallback, contentType = 'application/
     const response = await fetch(`http://localhost:3000/${url}`, {
       method: 'POST',
       cache: 'no-cache',
-/*       headers: {
+      headers: {
         'Content-Type': contentType,
-      }, */
+      },
       body: data,
     });
     if (!response.ok) {

@@ -186,7 +186,7 @@ function createCourseForm(checkbox, i, formIndex) {
       `);
 
     // Save the chosen exam date for each course
-    $(`#datepicker${i}`).change(function() {
+    $(`#datepicker${i}`).change(function assignDate() {
       const examDate = $(this).val();
       User.courses[i].examDate = examDate;
     });
@@ -208,7 +208,6 @@ function createCourseForm(checkbox, i, formIndex) {
 async function saveOptions() {
   console.log('Saving options');
   console.log(User);
-  let index = 0;
   const startStudyTime = $('#startStudyTime').val();
   const endStudyTime = $('#endStudyTime').val();
 
@@ -216,6 +215,7 @@ async function saveOptions() {
     callToastify('Invalid study time. Please select a valid study time.');
     return;
   }
+  let checkboxIndex = 0;
   checkboxes.each((i, checkbox) => {
     User.courses[i].chosen = checkbox.checked;
     if (User.courses[i].chosen === false) {
@@ -223,8 +223,8 @@ async function saveOptions() {
         lecture.chosen = false;
       });
     } else {
-      index++;
-      $(`#form${index} input[type=checkbox]`).each((j, subcheckbox) => {
+      checkboxIndex++;
+      $(`#form${checkboxIndex} input[type=checkbox]`).each((j, subcheckbox) => {
         console.log('i is', i, 'j is', j);
         User.courses[i].contents[j].chosen = subcheckbox.checked;
       });

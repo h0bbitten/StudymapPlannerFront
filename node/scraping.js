@@ -24,11 +24,19 @@ async function Webscraper(url, forceUpdate = false) {
     }
   }
 
-  if (!forceUpdate && existingData.hasOwnProperty(url)) {
-    // If the URL is already scraped and forceUpdate is false, skip scraping
-    return;
+  // Check if URL is in existing data and parse ECTS points directly from the file without rescraping
+  if (existingData.hasOwnProperty(url)) {
+    // Extract numerical value from ECTS string using regular expression and convert to integer
+    const ectsNumeric = existingData[url].ects.match(/\d+/);  // Matches first sequence of digits in the string
+    if (ectsNumeric) {
+      const ectsAsNumber = parseInt(ectsNumeric[0], 10); // Convert the string to a number
+      console.log(existingData[url].title, 'ECTS:', ectsAsNumber);
+      return ectsAsNumber; // Return the ECTS points as a number
+    } else {
+      console.error('No ECTS points found in the data for URL:', url);
+      return null;
+    }
   }
-
   // Proceed with scraping if the URL is not in existingData or forceUpdate is true
   const browser = await puppeteer.launch();
   const page = await browser.newPage();
@@ -38,7 +46,7 @@ async function Webscraper(url, forceUpdate = false) {
     const tdElements = Array.from(document.querySelectorAll('td'));
     let titleIndex = tdElements.findIndex(td => td.textContent.includes('Danish title'));
     if (titleIndex === -1) {
-      titleIndex = tdElements.findIndex(td => td.textContent.includes('English title'));
+      titleIndex = tdElements.findIndex(td => td.textContent.includes('Engelsk titel'));
     }
     const ectsIndex = tdElements.findIndex(td => td.textContent.includes('ECTS'));
     const titleValue = titleIndex !== -1 ? tdElements[titleIndex + 1].textContent.trim() : 'title not found';

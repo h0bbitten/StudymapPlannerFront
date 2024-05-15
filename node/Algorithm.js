@@ -1,11 +1,14 @@
 import moment from 'moment';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
-import path, { dirname, parse } from 'path';
+import path, { dirname } from 'path';
 import ICAL from 'ical.js';
 import fetch from 'node-fetch';
 
 export default calculateSchedule;
+
+// Jest test exports
+export { createLectureTimeBlock, PreAlgoMethods, getUNIXfromTimeOfDay };
 
 const { promises: fsPromises } = fs;
 
@@ -361,7 +364,7 @@ function groupEventsByDay(events) {
 function getUNIXfromTimeOfDay(originalTimestamp, timeOfDay) {
   const originalMoment = moment(originalTimestamp);
   const originalDate = originalMoment.format('YYYY-MM-DD');
-  const combinedDateTime = originalDate + ' ' + timeOfDay;
+  const combinedDateTime = `${originalDate} ${timeOfDay}`;
   const combinedMoment = moment(combinedDateTime, 'YYYY-MM-DD HH:mm');
   const newTimestamp = combinedMoment.unix() * 1000; // Multiply by 1000 to get milliseconds
   // console.log('Original timestamp:', originalTimestamp, 'Time of day:', timeOfDay, 'New timestamp:', newTimestamp);
@@ -423,7 +426,7 @@ function darkenColor(color, amount) {
   g = Math.floor(g * (1 - amount));
   b = Math.floor(b * (1 - amount));
 
-  return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+  return `#${((256 ** 3) + (r * 256 ** 2) + (g * 256) + b).toString(16).slice(1)}`;
 }
 
 async function getEvents(userid, syncCalendars) {
@@ -475,7 +478,7 @@ async function parseICalFiles(icalURLs) {
   try {
     console.log('Parsing ICAL files:', icalURLs);
 
-    const eventPromises = icalURLs.map(async (url, index) => {
+    const eventPromises = icalURLs.map(async (url) => {
       try {
         console.log('Parsing ICAL file:', url.url);
         let icalData;

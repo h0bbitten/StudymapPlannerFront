@@ -5,9 +5,13 @@ import Webscraper from './scraping.js';
 import Algorithm from './Algorithm.js';
 import { ensureUserExists, saveUserDetails, pool} from './database.js';
 
+// Normal exports
 export {
   getMoodleInfo, logIn, saveOptions, getUserData, getSchedule, importIcalFile, changeLectureChosen, deleteAllUserData,
 };
+
+// Jest exports
+export { checkIfLecturesDone, findModulelink, };
 
 const currentFilename = fileURLToPath(import.meta.url);
 const currentDir = dirname(currentFilename);
@@ -224,7 +228,29 @@ async function getSchedule(req, res) {
   }
 }
 
+function checkIfLecturesDone(Schedule, courses) {
+  const currentTimeMillis = new Date().getTime();
+  Schedule.Timeblocks.forEach((timeblock) => {
+    if (timeblock.type === 'lecture' && currentTimeMillis > timeblock.endTime) {
+      // Uncheck the lecture
+      changeLectureChosenStatus(courses, timeblock.courseID, timeblock.ID, false);
+      timeblock.status = 'done';
+    }
+  });
+  return [Schedule, courses];
+}
 
+function changeLectureChosenStatus(courses, courseID, lectureID, chosen) {
+  courses.forEach((course) => {
+    if (course.id === courseID) {
+      course.contents.forEach((lecture) => {
+        if (lecture.id === lectureID) {
+          lecture.chosen = chosen;
+        }
+      });
+    }
+  });
+}
 
 async function retrieveAndParseUserData(userid) {
   try {
@@ -264,14 +290,15 @@ async function findModulelink(pages) {
 
   let linkPart = null;
 
-  pages.forEach((page) => {
+  for (const page of pages) {
     const { content } = page;
     const match = regex.exec(content);
     if (match) {
       const [, linkPartMatch] = match;
       linkPart = linkPartMatch;
+      break;
     }
-  });
+  }
 
   return linkPart !== null ? `https://moduler.aau.dk/course/${linkPart}?lang=en-GB` : undefined;
 }
@@ -417,6 +444,60 @@ async function importIcalFile(req, res) {
     res.status(200).send('Files uploaded successfully.');
   } catch (error) {
     console.error('Failed to import ICAL file:', error);
+    res.status(500).send('Internal Server Error');
+  }
+}
+
+async function changeLectureChosen(req, res) {
+  try {
+    const courseID = Number(req.query.courseID);
+    const lectureID = Number(req.query.lectureID);
+    const chosen = req.query.chosen === 'true';
+    console.log('Changing lecture chosen status', courseID, lectureID, chosen);
+    const User = await retrieveAndParseUserData(req.session.userid);
+    changeLectureChosenStatus(User.courses, courseID, lectureID, chosen);
+    await writeUserToDB(User);
+    res.status(200).json({
+      success: true,
+      message: 'Lecture chosen status changed successfully',
+      lectureID: lectureID,
+      courseID: courseID,
+      chosen: chosen,
+    });
+  } catch (error) {
+    console.error('Failed to change lecture chosen status:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Internal Server Error',
+    });
+  }
+}
+
+async function deleteAllUserData(req, res) {
+  try {
+    const userDataFile = `./database/${req.session.userid}.json`;
+    try {
+      await fs.promises.access(userDataFile);
+      await fs.promises.unlink(userDataFile);
+    } catch (error) {
+      if (error.code !== 'ENOENT') {
+        throw error;
+      }
+    }
+
+    const icalsDirectory = `./database/icals/${req.session.userid}`;
+    try {
+      await fs.promises.access(icalsDirectory);
+      await fs.promises.rm(icalsDirectory, { recursive: true });
+    } catch (error) {
+      if (error.code !== 'ENOENT') {
+        throw error;
+      }
+    }
+
+    res.status(200).send('User data deleted successfully');
+  } catch (error) {
+    console.error('Failed to delete user data:', error);
     res.status(500).send('Internal Server Error');
   }
 }
