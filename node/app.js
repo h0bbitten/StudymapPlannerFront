@@ -254,13 +254,28 @@ function changeLectureChosenStatus(courses, courseID, lectureID, chosen) {
 }
 
 async function retrieveAndParseUserData(userid) {
-  const [rows] = await pool.query('SELECT * FROM users WHERE id = ?', [userid]);
-  if (rows.length === 0) {
-    return null;
+  try {
+    console.log(`Retrieving and parsing user data for user ID: ${userid}`);
+    const [rows] = await pool.query('SELECT id, userID, details FROM users WHERE id = ?', [userid]);
+    if (rows.length === 0) {
+      console.log(`No user found with ID: ${userid}`);
+      return null;
+    }
+    console.log(`User data retrieved successfully for user ID: ${userid}`);
+    // Assuming 'details' column contains JSON data
+    const userData = {
+      id: rows[0].id,
+      userID: rows[0].userID,
+      details: JSON.parse(rows[0].details)
+    };
+    console.log(`User data parsed successfully for user ID: ${userid}`);
+    console.log(userData); // Log the parsed user data
+    return userData;
+  } catch (error) {
+    console.error('Error retrieving and parsing user data:', error);
+    throw error;
   }
-  return rows[0]; // Assumes user data is stored directly in columns, adjust as needed
 }
-
 
 
 async function getUserData(req, res) {
