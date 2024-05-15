@@ -28,11 +28,10 @@ async function ensureUserExists(externalUserID) {
 }
 
 // Save User Details function
-async function saveUserDetails(userId, userDetails) {
+async function saveUserDetails(userId, userDetailsJson) {
   try {
-      const detailsJson = JSON.stringify(userDetails);
-      console.log('Saving these details to MySQL:', detailsJson);
-      const [result] = await pool.query('UPDATE users SET details = ? WHERE userID = ?', [detailsJson, userId]);
+      console.log('Saving these details to MySQL:', userDetailsJson);
+      const [result] = await pool.query('UPDATE users SET details = ? WHERE id = ?', [userDetailsJson, userId]);
       if (result.affectedRows === 0) {
           console.error('No rows updated, possible user does not exist');
           return false; // Indicate that the save operation was unsuccessful
@@ -43,6 +42,7 @@ async function saveUserDetails(userId, userDetails) {
       return false;  // Indicate that the save operation failed
   }
 }
+
 
 
 

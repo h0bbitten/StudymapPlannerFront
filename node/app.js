@@ -147,36 +147,38 @@ async function saveOptions(req, res) {
   console.log('Received request to save options');
 
   if (!req.body) {
-    console.error('No data received in the request body');
-    return res.status(400).send('No data provided');
+      console.error('No data received in the request body');
+      return res.status(400).send('No data provided');
   }
 
   const User = req.body;  // The entire user object received from the frontend
   console.log('Received user data for saving:', User);
 
   if (!User.userid) {
-    console.error('User ID is missing from the data');
-    return res.status(400).send('User ID is required');
+      console.error('User ID is missing from the data');
+      return res.status(400).send('User ID is required');
   }
 
   try {
-    console.log(`Attempting to ensure existence of user ID: ${User.userid}`);
-    const userId = await ensureUserExists(User.userid);
-    console.log(`User ID ${userId} confirmed in the database, updating details`);
+      console.log(`Attempting to ensure existence of user ID: ${User.userid}`);
+      const userId = await ensureUserExists(User.userid);
+      console.log(`User ID ${userId} confirmed in the database, updating details`);
 
-    const updateResult = await saveUserDetails(userId, User);
-    if (updateResult) {
-      console.log('User data updated successfully in MySQL');
-      res.status(200).send('User data saved successfully');
-    } else {
-      console.error('Failed to update user data in MySQL');
-      res.status(500).send('Error saving User data');
-    }
+      const detailsJson = JSON.stringify(User);  // Serialize the user object into JSON
+      const updateResult = await saveUserDetails(userId, detailsJson);
+      if (updateResult) {
+          console.log('User data updated successfully in MySQL');
+          res.status(200).send('User data saved successfully');
+      } else {
+          console.error('Failed to update user data in MySQL');
+          res.status(500).send('Error saving User data');
+      }
   } catch (err) {
-    console.error('Error in saveOptions:', err);
-    res.status(500).send('Internal Server Error');
+      console.error('Error in saveOptions:', err);
+      res.status(500).send('Internal Server Error');
   }
 }
+
 
 
 
