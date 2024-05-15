@@ -179,13 +179,28 @@ const routing = function routes(app, upload) {
   app.post('/saveOptions', async (req, res) => {
     console.log('Received data:', req.body);
     try {
-      const user = req.body;  
-      res.status(200).send('Data saved successfully');
+      const userData = req.body;
+      
+      // Ensure the user exists or create a new one
+      const userId = await ensureUserExists(userData.userid);
+      
+      // Serialize the user data into JSON for storing in the database
+      const userDetailsJson = JSON.stringify(userData);
+      
+      // Save or update the user details in the database
+      const saveResult = await saveUserDetails(userId, userDetailsJson);
+
+      if (saveResult) {
+        res.status(200).send('User data saved successfully');
+      } else {
+        res.status(500).send('Failed to update user data');
+      }
     } catch (error) {
       console.error('Error in saving user options:', error);
       res.status(500).send('Internal Server Error');
     }
   });
+
   /**
      * @swagger
      * /importIcalFile:
