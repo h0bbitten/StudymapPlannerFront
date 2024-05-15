@@ -158,15 +158,20 @@ async function saveOptions(req, res) {
 
     // Confirm user existence and update details
     const userId = await ensureUserExists(User.userid);
-    console.log(`User ID confirmed in database: ${userId}`);
+    if (!userId) {
+      console.error(`Failed to ensure user exists: ${User.userid}`);
+      return res.status(500).send('Error ensuring user exists');
+    }
 
+    console.log(`User confirmed or created in database with ID: ${userId}`);
+
+    // Update user details in the database
     const updateResult = await saveUserDetails(userId, User);
-
     if (updateResult) {
       console.log('User data updated successfully in MySQL');
       res.status(200).send('User data saved successfully');
     } else {
-      console.log('Failed to update user data');
+      console.error('Failed to update user data in MySQL');
       res.status(500).send('Error saving User data');
     }
   } catch (err) {
