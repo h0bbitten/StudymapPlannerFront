@@ -263,7 +263,7 @@ function Export() {
       // Convert calendar to string
       const calendarString = cal.toString();
 
-      // Save the iCal file (you may need to adjust this part)
+      // Save the iCal file
       console.log('Saving iCal file...');
       const blob = new Blob([calendarString], { type: 'text/calendar' });
       const url = URL.createObjectURL(blob);
