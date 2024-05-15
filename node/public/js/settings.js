@@ -185,7 +185,7 @@ function displayImportExport(userid, settings) {
     </div>
   `);
   $(document).ready(function() {
-    $('#exportCalendarButton').on('click', (event) => {
+    $('#exportIcalFile').on('click', (event) => {
       event.preventDefault();
       // Call the function from script.js
       Export();
