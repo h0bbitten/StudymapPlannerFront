@@ -1,5 +1,5 @@
 import {
-  applyTheme, LoadingScreen, displayProfile, saveUserDataToDB, APIgetCall, APIpostCall, infoBoxListener,
+  applyTheme, LoadingScreen, displayProfile, saveUserDataToDB, APIgetCall, APIpostCall, infoBoxListener, Export,
 } from './script.js';
 
 async function displaySettings(User) {
@@ -180,10 +180,17 @@ function displayImportExport(userid, settings) {
       <div class="optionInput" id="importedIcalFiles">
       </div>
       <label class="optionInput" id="exportIcalFile">
-        <a id="exportIcalFile" class="btn btn-primary" href="/exportIcalFile">Export Calendar</a>                            
+        <button id="exportIcalFile" class="btn btn-primary" href="/exportIcalFile">Export Calendar</button>                            
       </label>
     </div>
   `);
+  $(document).ready(function() {
+    $('#exportCalendarButton').on('click', (event) => {
+      event.preventDefault();
+      // Call the function from script.js
+      Export();
+    });
+  });
   if (settings.importedCalendars.length > 0) {
     $('#importedIcalFiles').append('<span>Imported Calendars</span>');
     displayImportedCalendars(settings.importedCalendars);
