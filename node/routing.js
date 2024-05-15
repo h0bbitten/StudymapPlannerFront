@@ -40,6 +40,7 @@ const routing = function routes(app, upload) {
     if (req.session.loggedIn === true) {
       res.sendFile(path.join(currentDir, 'public', 'html', 'schedule.html'));
     } else {
+      console.log('User is not logged in: ', req.session.loggedIn);
       res.redirect('/login');
     }
   });

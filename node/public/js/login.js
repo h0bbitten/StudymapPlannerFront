@@ -9,6 +9,7 @@ function handleLogin() {
     const token = $('#tokenInput').val();
     const answer = await validToken(token);
     if (answer.validity) {
+      console.log(answer.redirect);
       window.location.href = answer.redirect;
     }
   });

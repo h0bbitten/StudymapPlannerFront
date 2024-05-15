@@ -55,6 +55,7 @@ class WSfunctions {
     return WSfunctions.getMoodleData(url, 'Error fetching course pages:');
   }
 }
+
 async function logIn(req, res) {
   const test = new WSfunctions(req.query.token);
   const answer = {};
@@ -85,6 +86,7 @@ async function logIn(req, res) {
     console.error('Failed loggin in:', error);
   }
 }
+
 async function getMoodleInfo(req, res) {
   try {
     const token = req.session.token;
