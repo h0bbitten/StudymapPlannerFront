@@ -8,15 +8,19 @@ async function scheduleInitialization() {
   LoadingScreen.show();
   try {
     const User = await APIgetCall('getUserData', 'Error fetching user data');
-    console.log(User);
+    console.log('User data:', User);
 
-    displayProfile(User);
-    displayCal(User.schedule);
+    if (User && User.schedule) {
+      console.log('User schedule:', User.schedule);
+      displayProfile(User);
+      displayCal(User.schedule);
+    } else {
+      console.error('User data or schedule is missing or incomplete.');
+    }
 
     LoadingScreen.hide();
   } catch (error) {
     LoadingScreen.hide();
-
     console.error('Failed to display profile info:', error);
   }
 }
