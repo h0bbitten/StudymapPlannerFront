@@ -144,42 +144,26 @@ async function scrapeModuleLinks(courses, Moodle) {
 }
 
 async function saveOptions(req, res) {
-  console.log('Received request to save options');
-
   if (!req.body) {
-      console.error('No data received in the request body');
-      return res.status(400).send('No data provided');
+    return res.status(400).send('No data provided');
   }
-
-  const User = req.body;  // The entire user object received from the frontend
-  console.log('Received user data for saving:', User);
-
-  if (!User.userid) {
-      console.error('User ID is missing from the data');
-      return res.status(400).send('User ID is required');
-  }
+  const userData = req.body;  // Received user data from frontend
 
   try {
-      console.log(`Attempting to ensure existence of user ID: ${User.userid}`);
-      const userId = await ensureUserExists(User.userid);
-      console.log(`User ID ${userId} confirmed in the database, updating details`);
+    const userId = await ensureUserExists(userData.userid);
+    const detailsJson = JSON.stringify(userData);  // Serialize user data into JSON
+    const updateResult = await saveUserDetails(userId, detailsJson);  // Attempt to save or update user details in MySQL
 
-      const detailsJson = JSON.stringify(User);  // Serialize the user object into JSON
-      const updateResult = await saveUserDetails(userId, detailsJson);
-      if (updateResult) {
-          console.log('User data updated successfully in MySQL');
-          res.status(200).send('User data saved successfully');
-      } else {
-          console.error('Failed to update user data in MySQL');
-          res.status(500).send('Error saving User data');
-      }
-  } catch (err) {
-      console.error('Error in saveOptions:', err);
-      res.status(500).send('Internal Server Error');
+    if (updateResult) {
+      res.status(200).send('User data saved successfully');
+    } else {
+      res.status(500).send('Failed to update user data');
+    }
+  } catch (error) {
+    console.error('Error in saveOptions:', error);
+    res.status(500).send('Internal Server Error');
   }
 }
-
-
 
 
 const writeFileAsync = fs.promises.writeFile;
@@ -254,25 +238,19 @@ function changeLectureChosenStatus(courses, courseID, lectureID, chosen) {
 
 async function retrieveAndParseUserData(userid) {
   try {
-    console.log("Attempting to retrieve user data for userID:", userid);
     const [rows] = await pool.query('SELECT details FROM users WHERE userID = ?', [userid]);
-    console.log("Query executed. Rows found:", rows.length);
     if (rows.length > 0) {
-      const userData = JSON.parse(rows[0].details);
-      if (!userData.schedule) {
-        userData.schedule = { algorithm: 'default', Timeblocks: [], outdated: true };
-      }
-      console.log("Retrieved and parsed user data including schedule:", userData);
+      const userData = JSON.parse(rows[0].details);  // Assuming user data is stored as a JSON string
       return userData;
     } else {
-      console.log("No user found with userID:", userid);
       throw new Error('No user found with the given ID');
     }
   } catch (error) {
-    console.error('Failed to retrieve or parse user data from database:', error);
+    console.error('Failed to retrieve user data:', error);
     throw error;
   }
 }
+
 
 
 async function getUserData(req, res) {
