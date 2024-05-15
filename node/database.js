@@ -11,21 +11,27 @@ const pool = mysql.createPool({
 // Ensure User Exists function
 async function ensureUserExists(externalUserID) {
   try {
-    console.log(`Checking existence for user ID: ${externalUserID}`);
-    const [user] = await pool.query('SELECT id FROM users WHERE userID = ?', [externalUserID]);
-    if (user.length === 0) {
-      console.log(`No user found with ID: ${externalUserID}, creating new user.`);
-      const [result] = await pool.query('INSERT INTO users (userID) VALUES (?)', [externalUserID]);
-      console.log(`New user inserted with ID: ${result.insertId}`);
-      return result.insertId;
-    }
-    console.log(`User found with ID: ${externalUserID}, DB ID: ${user[0].id}`);
-    return user[0].id;
+      console.log(`Checking existence for user ID: ${externalUserID}`);
+      const [user] = await pool.query('SELECT id FROM users WHERE userID = ?', [externalUserID]);
+      if (user.length === 0) {
+          console.log(`No user found with ID: ${externalUserID}, creating new user.`);
+          const [result] = await pool.query('INSERT INTO users (userID) VALUES (?)', [externalUserID]);
+          if (result.insertId) {
+              console.log(`New user inserted with ID: ${result.insertId}`);
+              return result.insertId;
+          } else {
+              console.log(`Failed to insert new user with ID: ${externalUserID}`);
+          }
+      } else {
+          console.log(`User found with ID: ${externalUserID}, DB ID: ${user[0].id}`);
+          return user[0].id;
+      }
   } catch (error) {
-    console.error('Error ensuring user exists:', error);
-    throw error;
+      console.error('Error ensuring user exists:', error);
+      throw error;
   }
 }
+
 
 // Save User Details function
 async function saveUserDetails(userId, userDetailsJson) {
