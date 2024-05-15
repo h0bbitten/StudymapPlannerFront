@@ -256,7 +256,7 @@ function changeLectureChosenStatus(courses, courseID, lectureID, chosen) {
 async function retrieveAndParseUserData(userid) {
   try {
     console.log(`Retrieving and parsing user data for user ID: ${userid}`);
-    const [rows] = await pool.query('SELECT id, userID, details FROM users WHERE id = ?', [userid]);
+    const [rows] = await pool.query('SELECT id, userID, details FROM users WHERE userID = ?', [userid]);
     if (rows.length === 0) {
       console.log(`No user found with ID: ${userid}`);
       return null;
@@ -276,6 +276,8 @@ async function retrieveAndParseUserData(userid) {
     throw error;
   }
 }
+
+
 
 
 async function getUserData(req, res) {
