@@ -3,10 +3,11 @@ import { fileURLToPath } from 'url';
 import path, { dirname } from 'path';
 import Webscraper from './scraping.js';
 import calculateSchedule from './Algorithm.js';
+import generateIcal from './exportIcal.js';
 
 // Normal exports
 export {
-  getMoodleInfo, logIn, saveOptions, getUserData, getSchedule, importIcalFile, changeLectureChosen, deleteAllUserData,
+  getMoodleInfo, logIn, saveOptions, getUserData, getSchedule, importIcalFile, changeLectureChosen, deleteAllUserData, exportIcalSchedule,
 };
 
 // Jest exports
@@ -54,6 +55,7 @@ class WSfunctions {
     return WSfunctions.getMoodleData(url, 'Error fetching course pages:');
   }
 }
+
 async function logIn(req, res) {
   const test = new WSfunctions(req.query.token);
   const answer = {};
@@ -84,6 +86,7 @@ async function logIn(req, res) {
     console.error('Failed loggin in:', error);
   }
 }
+
 async function getMoodleInfo(req, res) {
   try {
     const token = req.session.token;
@@ -469,6 +472,24 @@ async function deleteAllUserData(req, res) {
     res.status(200).send('User data deleted successfully');
   } catch (error) {
     console.error('Failed to delete user data:', error);
+    res.status(500).send('Internal Server Error');
+  }
+}
+
+async function exportIcalSchedule(req, res) {
+  try {
+    const UserID = req.query.userID;
+    if (!UserID) throw new Error('No user ID provided');
+    console.log('Exporting iCal schedule for user:', UserID, typeof UserID);
+    const User = await retrieveAndParseUserData(UserID);
+    if (!User.schedule.Timeblocks) throw new Error('No schedule found');
+    const filteredTimeblocks = User.schedule.Timeblocks.filter((Timeblock) => ['lecture', 'exam', 'examRepetition'].includes(Timeblock.type));
+    const ical = generateIcal(filteredTimeblocks);
+    res.setHeader('Content-disposition', 'attachment; filename=StudySchedule.ics');
+    res.setHeader('Content-type', 'text/calendar');
+    res.send(ical);
+  } catch (error) {
+    console.error('Failed to export iCal schedule:', error);
     res.status(500).send('Internal Server Error');
   }
 }

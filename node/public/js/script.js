@@ -1,5 +1,5 @@
 export {
-  applyTheme, setCookie, getCookie, LoadingScreen, displayProfile, settingsBtn, saveUserDataToDB, Button, APIgetCall, APIpostCall, callToastify, infoBoxListener,
+  applyTheme, setCookie, getCookie, LoadingScreen, displayProfile, settingsBtn, saveUserDataToDB, Button, APIgetCall, APIpostCall, callToastify, infoBoxListener, Export,
 };
 
 async function applyTheme() {
@@ -218,4 +218,65 @@ function infoBoxListener() {
   function closePopup() {
     $('#infoModal').css('display', 'none');
   }
+}
+
+function Export() {
+  console.log('Starting script...');
+
+  // Fetch the JSON file
+  console.log('Fetching JSON file...');
+  fetch('/database/147291.json')
+    .then(response => response.json())
+    .then(data => {
+      console.log('Reading JSON file...');
+
+      // Extract schedule information
+      console.log('Creating calendar...');
+      const cal = ical({ name: 'Course Schedule' });
+
+      console.log('Extracting schedule information...');
+      data.courses.forEach(course => {
+        course.contents.forEach(module => {
+          if (module.summary) {
+            const summary = module.summary;
+            const startTimeMatch = summary.match(/startTime:\s*([^\s,]+)/);
+            const endTimeMatch = summary.match(/endTime:\s*([^\s,]+)/);
+
+            if (startTimeMatch && endTimeMatch) {
+              const startTime = new Date(startTimeMatch[1]);
+              const endTime = new Date(endTimeMatch[1]);
+              const title = module.name || 'No Title';
+
+              console.log(`Adding event: ${title} from ${startTime} to ${endTime}`);
+
+              // Add event to the calendar
+              cal.createEvent({
+                start: startTime,
+                end: endTime,
+                summary: title
+              });
+            }
+          }
+        });
+      });
+
+      // Convert calendar to string
+      const calendarString = cal.toString();
+
+      // Save the iCal file
+      console.log('Saving iCal file...');
+      const blob = new Blob([calendarString], { type: 'text/calendar' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', 'schedule.ics');
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      console.log('iCal file created successfully');
+    })
+    .catch(error => {
+      console.error('Error fetching JSON file:', error);
+    });
 }

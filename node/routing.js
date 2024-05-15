@@ -2,7 +2,7 @@ import { fileURLToPath } from 'url';
 import path, { dirname } from 'path';
 import swaggerDocs from './swagger.js';
 import {
-  getMoodleInfo, logIn, saveOptions, getUserData, getSchedule, importIcalFile, changeLectureChosen, deleteAllUserData,
+  getMoodleInfo, logIn, saveOptions, getUserData, getSchedule, importIcalFile, changeLectureChosen, deleteAllUserData, exportIcalSchedule,
 } from './app.js';
 
 const currentFilename = fileURLToPath(import.meta.url);
@@ -40,6 +40,7 @@ const routing = function routes(app, upload) {
     if (req.session.loggedIn === true) {
       res.sendFile(path.join(currentDir, 'public', 'html', 'schedule.html'));
     } else {
+      console.log('User is not logged in: ', req.session.loggedIn);
       res.redirect('/login');
     }
   });
@@ -148,6 +149,13 @@ const routing = function routes(app, upload) {
 
   app.get('/changeLectureChosen', async (req, res) => {
     await changeLectureChosen(req, res).catch((error) => {
+      console.error('Error in changing value of chosen for lecture:', error);
+      res.status(500).send('Internal Server Error');
+    });
+  });
+
+  app.get('/exportIcalSchedule', async (req, res) => {
+    await exportIcalSchedule(req, res).catch((error) => {
       console.error('Error in changing value of chosen for lecture:', error);
       res.status(500).send('Internal Server Error');
     });

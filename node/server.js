@@ -7,6 +7,7 @@ import routing from './routing.js';
 const app = express();
 
 const upload = multer({ dest: './database/icals/' });
+
 // Session middleware setup
 app.use(session({
   secret: process.env.SESSION_SECRET || 'secret_key',
@@ -20,14 +21,13 @@ app.use(session({
   },
 }));
 
-app.use(express.json({ limit: '10mb' }));
 app.use(cors());
-app.use(express.json());
+
+app.use(express.json({ limit: '10mb' }));
 
 const PORT = process.env.PORT || 3000;
 
 app.use(express.static('node/public'));
-app.use(cors());
 
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
