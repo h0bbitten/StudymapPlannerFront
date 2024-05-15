@@ -144,28 +144,26 @@ async function scrapeModuleLinks(courses, Moodle) {
 }
 
 async function saveOptions(req, res) {
+  console.log('Received request to save options');
+
+  if (!req.body) {
+    console.error('No data received in the request body');
+    return res.status(400).send('No data provided');
+  }
+
+  const User = req.body;  // The entire user object received from the frontend
+  console.log('Received user data for saving:', User);
+
+  if (!User.userid) {
+    console.error('User ID is missing from the data');
+    return res.status(400).send('User ID is required');
+  }
+
   try {
-    console.log('Saving options');
-    const User = req.body;  // The entire user object received from the frontend
-
-    // Ensure the user ID is available and valid
-    if (!User || !User.userid) {
-      console.error('Invalid or missing user ID.');
-      return res.status(400).send('Invalid user data');
-    }
-
-    console.log(`User ID received for saving options: ${User.userid}`);
-
-    // Confirm user existence and update details
+    console.log(`Attempting to ensure existence of user ID: ${User.userid}`);
     const userId = await ensureUserExists(User.userid);
-    if (!userId) {
-      console.error(`Failed to ensure user exists: ${User.userid}`);
-      return res.status(500).send('Error ensuring user exists');
-    }
+    console.log(`User ID ${userId} confirmed in the database, updating details`);
 
-    console.log(`User confirmed or created in database with ID: ${userId}`);
-
-    // Update user details in the database
     const updateResult = await saveUserDetails(userId, User);
     if (updateResult) {
       console.log('User data updated successfully in MySQL');
@@ -179,6 +177,7 @@ async function saveOptions(req, res) {
     res.status(500).send('Internal Server Error');
   }
 }
+
 
 
 const writeFileAsync = fs.promises.writeFile;
