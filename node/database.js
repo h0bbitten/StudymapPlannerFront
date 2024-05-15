@@ -31,6 +31,7 @@ async function ensureUserExists(externalUserID) {
 async function saveUserDetails(userId, userDetails) {
   try {
       const detailsJson = JSON.stringify(userDetails);
+      console.log('Saving these details to MySQL:', detailsJson);
       const [result] = await pool.query('UPDATE users SET details = ? WHERE userID = ?', [detailsJson, userId]);
       if (result.affectedRows === 0) {
           console.error('No rows updated, possible user does not exist');

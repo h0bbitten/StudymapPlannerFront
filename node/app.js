@@ -148,24 +148,18 @@ async function saveOptions(req, res) {
     console.log('Saving options');
     const User = req.body;  // The entire user object received from the frontend
 
-    // Filter out calendars marked for removal and delete corresponding files if necessary
-    User.settings.importedCalendars = User.settings.importedCalendars.filter(calendar => {
-      if (calendar.type === 'remove') {
-        const id = req.session.userid;  // Assuming the user's ID is stored in the session
-        const parentDir = path.resolve(currentDir, '..');
-        const filePath = path.join(parentDir, 'database', 'icals', id.toString(), calendar.name);
-        if (fs.existsSync(filePath)) {
-          fs.unlinkSync(filePath);
-          console.log(`File ${calendar.name} removed successfully`);
-          return false;  // Do not include this calendar in the updated settings
-        }
-        console.log(`File ${calendar.name} does not exist`);
-      }
-      return true;  // Include this calendar in the updated settings
-    });
+    // Ensure the user ID is available and valid
+    if (!User || !User.userid) {
+      console.error('Invalid or missing user ID.');
+      return res.status(400).send('Invalid user data');
+    }
+
+    console.log(`User ID received for saving options: ${User.userid}`);
 
     // Confirm user existence and update details
     const userId = await ensureUserExists(User.userid);
+    console.log(`User ID confirmed in database: ${userId}`);
+
     const updateResult = await saveUserDetails(userId, User);
 
     if (updateResult) {
@@ -474,25 +468,26 @@ async function changeLectureChosen(req, res) {
 }
 
 async function deleteAllUserData(req, res) {
-  try {
-    const userDataFile = `./database/${req.session.userid}.json`;
-    try {
-      await fs.promises.access(userDataFile);
-      await fs.promises.unlink(userDataFile);
-    } catch (error) {
-      if (error.code !== 'ENOENT') {
-        throw error;
-      }
-    }
+  const userID = req.session.userid;
 
-    const icalsDirectory = `./database/icals/${req.session.userid}`;
-    try {
-      await fs.promises.access(icalsDirectory);
-      await fs.promises.rm(icalsDirectory, { recursive: true });
-    } catch (error) {
-      if (error.code !== 'ENOENT') {
-        throw error;
-      }
+  try {
+    // Delete user files
+    const userDataFile = `./database/${userID}.json`;
+    const icalsDirectory = `./database/icals/${userID}`;
+
+    await Promise.all([
+      fs.promises.unlink(userDataFile).catch((error) => {
+        if (error.code !== 'ENOENT') throw error;
+      }),
+      fs.promises.rm(icalsDirectory, { recursive: true }).catch((error) => {
+        if (error.code !== 'ENOENT') throw error;
+      })
+    ]);
+
+    // Delete user data from MySQL
+    const [result] = await pool.query('DELETE FROM users WHERE userID = ?', [userID]);
+    if (result.affectedRows === 0) {
+      throw new Error('No user found with the given ID in the database');
     }
 
     res.status(200).send('User data deleted successfully');
