@@ -1,8 +1,9 @@
-import fs, { write } from 'fs';
+import fs from 'fs';
 import { fileURLToPath } from 'url';
 import path, { dirname } from 'path';
 import Webscraper from './scraping.js';
-import calculateSchedule from './Algorithm.js';
+import Algorithm from './Algorithm.js';
+import { ensureUserExists, saveUserDetails, pool} from './database.js';
 
 export {
   getMoodleInfo, logIn, saveOptions, getUserData, getSchedule, importIcalFile, changeLectureChosen, deleteAllUserData,
@@ -68,7 +69,7 @@ async function logIn(req, res) {
 
       try {
         const User = await retrieveAndParseUserData(req.session.userid);
-        answer.redirect = User.settings.setupDone === true ? 'schedule' : 'setup';
+        answer.redirect = User.settings.setupDone ? 'schedule' : 'setup';
       } catch (error) {
         console.log('User not found, redirecting to setup');
         answer.redirect = 'setup';
@@ -77,7 +78,7 @@ async function logIn(req, res) {
     console.log('answer is:', answer);
     res.send(JSON.stringify(answer));
   } catch (error) {
-    console.error('Failed loggin in:', error);
+    console.error('Failed logging in:', error);
   }
 }
 async function getMoodleInfo(req, res) {
@@ -193,150 +194,47 @@ async function writeUserToDB(User) {
 async function getSchedule(req, res) {
   try {
     const userId = req.session.userid;
-    console.log(`Fetching user data for user ID: ${userId}`);
     const User = await retrieveAndParseUserData(userId);
-    const requestedAlgorithm = req.query.algorithm;
-    const forceRecalculate = req.query.forcerecalculate === 'true';
-    const currentAlgorithm = User.schedule.algorithm;
+    let Schedule = User.schedule;
+    const algorithm = req.query.algorithm || User.schedule.algorithm; // Default to current algorithm if not specified
+    const ForceRecalculate = req.query.forcerecalculate === 'true';
+    const algorithmChanged = User.schedule.algorithm !== algorithm;
+    
+    // Check if recalculation is needed because of the recalculate flag, outdated data, or algorithm change
+    const recalculate = ForceRecalculate || Schedule.outDated || algorithmChanged;
 
-    // Determine if we need to recalculate the schedule
-    let recalculate = forceRecalculate || User.schedule.outDated || requestedAlgorithm !== currentAlgorithm;
-    console.log(`Recalculate: ${recalculate}, Force: ${forceRecalculate}, Outdated: ${User.schedule.outDated}, Algorithm change: ${requestedAlgorithm !== currentAlgorithm}`);
+    console.log(`Recalculate condition met: ${recalculate}, due to force recalculate: ${ForceRecalculate}, outdated: ${Schedule.outDated}, algorithm change: ${algorithmChanged}`);
 
     if (recalculate) {
-      console.log('Recalculating schedule');
-      Schedule = await calculateSchedule(User, algorithm);
-    } else if (!Schedule.error) {
-      console.log('Using cached schedule');
-      console.log('Updating chosen value for lectures based on time');
-      [Schedule, User.courses] = checkIfLecturesDone(Schedule, User.courses);
+      console.log(`Recalculating schedule using algorithm: ${algorithm}`);
+      Schedule = await Algorithm(User, algorithm);
+      User.schedule = Schedule;
+      User.schedule.algorithm = algorithm; // Update the algorithm to the new one
+      User.schedule.outDated = false; // Mark the schedule as up-to-date
+
+      const saveSuccess = await saveUserDetails(userId, User); // Save the updated user details to MySQL
+      if (!saveSuccess) {
+          throw new Error("Failed to save user details to the database.");
+      }
     }
-    User.schedule = Schedule;
-    writeUserToDB(User);
-    res.send(JSON.stringify(Schedule));
+    res.send(JSON.stringify(User.schedule));
   } catch (error) {
-    console.error('Failed to calculate schedule---------------------------------------------:', error);
+    console.error('Failed to calculate schedule:', error);
     res.status(500).send('Internal Server Error');
   }
 }
 
-/* const testUser = {
-  courses: [{
-    id: 333,
-    fullname: 'Test Course',
-    contents: [{
-      id: 321,
-      name: 'Test Lecture',
-      chosen: true,
-    }, {
-      id: 322,
-      name: 'Test Lecture 2',
-      chosen: true,
-    }],
-  }, {
-    id: 444,
-    fullname: 'Test Course 2',
-    contents: [{
-      id: 421,
-      name: 'Test Lecture 3',
-      chosen: true,
-    }, {
-      id: 422,
-      name: 'Test Lecture 4',
-      chosen: true,
-    }],
-  }],
-};
 
-let testSchedule = {
-  Timeblocks: [{
-    type: 'lecture',
-    courseID: 333,
-    ID: 321,
-    startTime: 1620000000000,
-    endTime: 1620003600000,
-    description: 'Test Lecture 1',
-    status: 'active',
-  }, {
-    type: 'lecture',
-    courseID: 333,
-    ID: 322,
-    startTime: 1620007200000,
-    endTime: 1715626742000,
-    description: 'Test Lecture 2',
-    status: 'active',
-  }, {
-    type: 'lecture',
-    courseID: 444,
-    ID: 421,
-    startTime: 1620000000000,
-    endTime: 1620003600000,
-    description: 'Test Lecture 3',
-    status: 'active',
-  }, {
-    type: 'lecture',
-    courseID: 444,
-    ID: 422,
-    startTime: 1620007200000,
-    endTime: 1715626742000,
-    description: 'Test Lecture 4',
-    status: 'active',
-  }],
-};
 
-console.log('Test user before:');
-testUser.courses.forEach((course) => {
-  course.contents.forEach((lecture) => {
-    console.log(lecture.name, lecture.id, 'is chosen', lecture.chosen);
-  });
-});
-console.log('Test schedule before:');
-testSchedule.Timeblocks.forEach((timeblock) => {
-  console.log(timeblock.description, timeblock.ID, 'status is:', timeblock.status);
-});
-[testSchedule, testUser.courses] = checkIfLecturesDone(testSchedule, testUser.courses);
-console.log('Test user after:');
-testUser.courses.forEach((course) => {
-  course.contents.forEach((lecture) => {
-    console.log(lecture.name, lecture.id, 'is chosen', lecture.chosen);
-  });
-});
-console.log('Test schedule after:');
-testSchedule.Timeblocks.forEach((timeblock) => {
-  console.log(timeblock.description, timeblock.ID, 'status is:', timeblock.status);
-});
- */
-function checkIfLecturesDone(Schedule, courses) {
-  const currentTimeMillis = new Date().getTime();
-  Schedule.Timeblocks.forEach((timeblock) => {
-    if (timeblock.type === 'lecture' && currentTimeMillis > timeblock.endTime) {
-      // Uncheck the lecture
-      changeLectureChosenStatus(courses, timeblock.courseID, timeblock.ID, false);
-      timeblock.status = 'done';
-    }
-  });
-  return [Schedule, courses];
-}
-
-function changeLectureChosenStatus(courses, courseID, lectureID, chosen) {
-  courses.forEach((course) => {
-    if (course.id === courseID) {
-      course.contents.forEach((lecture) => {
-        if (lecture.id === lectureID) {
-          lecture.chosen = chosen;
-        }
-      });
-    }
-  });
-}
-
-function retrieveAndParseUserData(userid) {
-  return new Promise((resolve, reject) => {
-    fs.readFile(`./database/${userid}.json`, (err, data) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(JSON.parse(data));
+async function retrieveAndParseUserData(userid) {
+  try {
+    console.log("Attempting to retrieve user data for userID:", userid);
+    const [rows] = await pool.query('SELECT details FROM users WHERE userID = ?', [userid]);
+    console.log("Query executed. Rows found:", rows.length);
+    if (rows.length > 0) {
+      const userData = JSON.parse(rows[0].details);
+      if (!userData.schedule) {
+        userData.schedule = { algorithm: 'default', Timeblocks: [], outdated: true };
       }
       console.log("Retrieved and parsed user data including schedule:", userData);
       return userData;
@@ -519,44 +417,6 @@ async function importIcalFile(req, res) {
     res.status(200).send('Files uploaded successfully.');
   } catch (error) {
     console.error('Failed to import ICAL file:', error);
-    res.status(500).send('Internal Server Error');
-  }
-}
-
-async function changeLectureChosen(req, res) {
-  try {
-    const courseID = Number(req.query.courseID);
-    const lectureID = Number(req.query.lectureID);
-    const chosen = req.query.chosen === 'true';
-    console.log('Changing lecture chosen status', courseID, lectureID, chosen);
-    const User = await retrieveAndParseUserData(req.session.userid);
-    changeLectureChosenStatus(User.courses, courseID, lectureID, chosen);
-    await writeUserToDB(User);
-    res.status(200).json({
-      success: true,
-      message: 'Lecture chosen status changed successfully',
-      lectureID: lectureID,
-      courseID: courseID,
-      chosen: chosen,
-    });
-  } catch (error) {
-    console.error('Failed to change lecture chosen status:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Internal Server Error',
-    });
-  }
-}
-
-async function deleteAllUserData(req, res) {
-  try {
-    const userDataDirectory = `./database/${req.session.userid}.json`;
-    fs.unlinkSync(userDataDirectory);
-    const icalsDirectory = `./database/icals/${req.session.userid}`;
-    fs.rmSync(icalsDirectory, { recursive: true });
-    res.status(200).send('User data deleted successfully');
-  } catch (error) {
-    console.error('Failed to delete user data:', error);
     res.status(500).send('Internal Server Error');
   }
 }
