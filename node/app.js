@@ -195,23 +195,28 @@ async function getSchedule(req, res) {
     const userId = req.session.userid;
     const User = await retrieveAndParseUserData(userId);
     let Schedule = User.schedule;
-    const algorithm = req.query.algorithm || User.schedule.algorithm; // Default to current algorithm if not specified
+    const algorithm = req.query.algorithm || User.schedule.algorithm; 
     const ForceRecalculate = req.query.forcerecalculate === 'true';
     const algorithmChanged = User.schedule.algorithm !== algorithm;
     
-    // Check if recalculation is needed because of the recalculate flag, outdated data, or algorithm change
+    
     const recalculate = ForceRecalculate || Schedule.outDated || algorithmChanged;
 
     console.log(`Recalculate condition met: ${recalculate}, due to force recalculate: ${ForceRecalculate}, outdated: ${Schedule.outDated}, algorithm change: ${algorithmChanged}`);
 
     if (recalculate) {
       console.log(`Recalculating schedule using algorithm: ${algorithm}`);
-      Schedule = await Algorithm(User, algorithm);
-      User.schedule = Schedule;
-      User.schedule.algorithm = algorithm; // Update the algorithm to the new one
-      User.schedule.outDated = false; // Mark the schedule as up-to-date
 
-      const saveSuccess = await saveUserDetails(userId, User); // Save the updated user details to MySQL
+      
+      Schedule = await calculateSchedule(User, algorithm);
+
+      
+      User.schedule = Schedule;
+      User.schedule.algorithm = algorithm; 
+      User.schedule.outDated = false; 
+
+      
+      const saveSuccess = await saveUserDetails(userId, User); 
       if (!saveSuccess) {
           throw new Error("Failed to save user details to the database.");
       }
@@ -222,6 +227,7 @@ async function getSchedule(req, res) {
     res.status(500).send('Internal Server Error');
   }
 }
+
 
 function checkIfLecturesDone(Schedule, courses) {
   const currentTimeMillis = new Date().getTime();
@@ -248,26 +254,23 @@ function changeLectureChosenStatus(courses, courseID, lectureID, chosen) {
 }
 
 async function retrieveAndParseUserData(userid) {
-  try {
-    const [rows] = await pool.query('SELECT details FROM users WHERE userID = ?', [userid]);
-    if (rows.length > 0) {
-      const userData = JSON.parse(rows[0].details);  // Assuming user data is stored as a JSON string
-      return userData;
-    } else {
-      throw new Error('No user found with the given ID');
-    }
-  } catch (error) {
-    console.error('Failed to retrieve user data:', error);
-    throw error;
+  const [rows] = await pool.query('SELECT * FROM users WHERE id = ?', [userid]);
+  if (rows.length === 0) {
+    return null;
   }
+  return rows[0]; // Assumes user data is stored directly in columns, adjust as needed
 }
 
 
 
 async function getUserData(req, res) {
   try {
-    const User = await retrieveAndParseUserData(req.session.userid);
-    res.send(User);
+    const userId = req.session.userid;
+    const user = await retrieveAndParseUserData(userId);
+    if (!user) {
+      return res.status(404).send('User not found');
+    }
+    res.json(user);
   } catch (error) {
     console.error('Failed to get User data:', error);
     res.status(500).send('Internal Server Error');
@@ -425,17 +428,42 @@ async function importIcalFile(req, res) {
       fs.mkdirSync(directory, { recursive: true });
     }
 
-    files.forEach((file) => {
+    files.forEach(async (file) => {
       const filePath = path.join(directory, file.originalname);
+
+      
+      const icalData = await fsPromises.readFile(file.path, 'utf-8');
+
+      
+      const jcalData = ICAL.parse(icalData);
+      const vcalendar = new ICAL.Component(jcalData);
+      const vevents = vcalendar.getAllSubcomponents();
+      const events = vevents.map((vevent) => {
+        return {
+          title: vevent.getFirstPropertyValue('summary'),
+          description: vevent.getFirstPropertyValue('description'),
+          startTime: vevent.getFirstPropertyValue('dtstart').toUnixTime() * 1000,
+          endTime: vevent.getFirstPropertyValue('dtend').toUnixTime() * 1000,
+          color: '#FF0000', 
+          type: 'event',
+        };
+      });
+
+      
+      const jsonDataFilePath = path.join(directory, `${file.originalname}.json`);
+      await fsPromises.writeFile(jsonDataFilePath, JSON.stringify(events));
+
+      
       fs.renameSync(file.path, filePath);
     });
 
     res.status(200).send('Files uploaded successfully.');
   } catch (error) {
-    console.error('Failed to import ICAL file:', error);
+    console.error('Failed to import iCal file:', error);
     res.status(500).send('Internal Server Error');
   }
 }
+
 
 async function changeLectureChosen(req, res) {
   try {

@@ -5,8 +5,9 @@ const pool = mysql.createPool({
   host: 'mysql',
   user: 'root',
   password: 'rootyroot',
-  database: 'users',
+  database: 'userData',
 });
+
 
 // Ensure User Exists function
 async function ensureUserExists(externalUserID) {
