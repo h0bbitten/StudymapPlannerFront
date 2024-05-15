@@ -22,6 +22,10 @@ async function scheduleInitialization() {
 }
 
 async function displayCal(schedule, ForceRecalculate = false) {
+  if (!schedule || !schedule.algorithm) {
+    console.error('Schedule data is missing or incomplete.');
+    return;
+  }
   const Algorithm = schedule.algorithm;
   const Schedule = await APIgetCall(`getSchedule?algorithm=${Algorithm}&forcerecalculate=${ForceRecalculate}`, 'Error calculating schedule');
   console.log(Schedule);
@@ -32,6 +36,7 @@ async function displayCal(schedule, ForceRecalculate = false) {
   initButtons(Schedule.Timeblocks);
   loadCalendar(Schedule.Timeblocks);
 }
+
 
 async function recalculateListener() {
   document.getElementById('recalculateButton').addEventListener('click', async () => {
