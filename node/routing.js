@@ -4,6 +4,7 @@ import swaggerDocs from './swagger.js';
 import {
   getMoodleInfo, logIn, saveOptions, getUserData, getSchedule, importIcalFile, changeLectureChosen, deleteAllUserData,
 } from './app.js';
+import { ensureUserExists, saveUserDetails } from './database.js';
 
 const currentFilename = fileURLToPath(import.meta.url);
 const currentDir = dirname(currentFilename);
