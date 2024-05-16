@@ -1,4 +1,4 @@
-import fs, { write } from 'fs';
+import fs from 'fs';
 import { fileURLToPath } from 'url';
 import path, { dirname } from 'path';
 import Webscraper from './scraping.js';
@@ -11,7 +11,7 @@ export {
 };
 
 // Jest exports
-export { checkIfLecturesDone, findModulelink, };
+export { checkIfLecturesDone, findModulelink };
 
 const currentFilename = fileURLToPath(import.meta.url);
 const currentDir = dirname(currentFilename);
@@ -132,13 +132,13 @@ async function scrapeModuleLinks(courses, Moodle) {
       console.error('Pages structure not as expected:', pages);
     }
 
-    let ECTS = undefined;
+    let ECTS;
     if (modulelink) {
       ECTS = await Webscraper(modulelink);
     }
 
     return {
-      ...course, contents, pages: pages.pages, color, modulelink, ECTS
+      ...course, contents, pages: pages.pages, color, modulelink, ECTS,
     };
   });
 

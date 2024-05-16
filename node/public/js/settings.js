@@ -1,5 +1,5 @@
 import {
-  applyTheme, LoadingScreen, displayProfile, saveUserDataToDB, APIgetCall, APIpostCall, infoBoxListener, Export,
+  applyTheme, LoadingScreen, displayProfile, saveUserDataToDB, APIgetCall, APIpostCall, infoBoxListener,
 } from './script.js';
 
 async function displaySettings(User) {
@@ -169,7 +169,7 @@ function plusButton(id, text = '') {
   return HTML;
 }
 
-function displayImportExport(userid, settings) {
+function displayImportExport(userID, settings) {
   $('#formSettings').append(createCollapsible('Import/Export iCal file', 'importExport'));
   $('#importExport').append(`
     <div class="optionBlock" id="importExportInputs">
@@ -179,18 +179,11 @@ function displayImportExport(userid, settings) {
       </div>
       <div class="optionInput" id="importedIcalFiles">
       </div>
-      <label class="optionInput" id="exportIcalFile">
-        <button id="exportIcalFile" class="btn btn-primary" href="/exportIcalFile">Export Calendar</button>                            
+      <label class="optionInput" for="exportIcalFile">
+        <a id="exportIcalLink" class="btn btn-primary" href="/exportIcalSchedule?userID=${userID}" download>Export Calendar</a>                            
       </label>
     </div>
   `);
-  $(document).ready(function() {
-    $('#exportIcalFile').on('click', (event) => {
-      event.preventDefault();
-      // Call the function from script.js
-      Export();
-    });
-  });
   if (settings.importedCalendars.length > 0) {
     $('#importedIcalFiles').append('<span>Imported Calendars</span>');
     displayImportedCalendars(settings.importedCalendars);
