@@ -96,9 +96,9 @@ async function APIpostCall(url, data, errorCallback, contentType = 'application/
     const response = await fetch(`http://localhost:3000/${url}`, {
       method: 'POST',
       cache: 'no-cache',
-/*       headers: {
+      headers: {
         'Content-Type': contentType,
-      }, */
+      },
       body: data,
     });
     if (!response.ok) {
@@ -167,11 +167,11 @@ function infoBoxListener() {
   $(document).on('click', '#algoInfo', () => {
     console.log('info clicked');
     const modalContentHTML = `
-      <div class="modal-header">Algorithms</div>
+      <div class="modal-header">Scheduling strategies</div>
       <div class="modal-section">
         <div class="section-title">First come first serve</div>
         <div>
-          This algorithm will create a schedule that has dumped the chosen lectures of each course,
+          This scheduling strategy will create a schedule that has dumped the chosen lectures of each course,
           sorted by exam date, with a 1 gap between each lecture.
         </div>
         <img src="../img/AllAlgosGridEvent-FirstComeFirstServeSketch.drawio.png" alt="First come first serve" style="width: 100%">
@@ -187,7 +187,7 @@ function infoBoxListener() {
       <div class="modal-section">
         <div class="section-title">Strected Schedule (Mixing Allowed)</div>
         <div>
-          This algorithm will make use of as much of the time available as possible, with a variable gap between each lecture,
+          This scheduling strategy will make use of as much of the time available as possible, with a variable gap between each lecture,
            with a mix of lectures from different courses.
         </div>
         <img src="../img/AllAlgosGridEvent-StrectchedMixSketch.drawio.png" alt="Strected schedule" style="width: 100%">
@@ -195,7 +195,7 @@ function infoBoxListener() {
       <div class="modal-section">
         <div class="section-title">Strected Schedule (Mixing Disallowed)</div>
         <div>
-          This algorithm will make use of as much of the time available as possible, with a variable gap between each lecture,
+          This scheduling strategy will make use of as much of the time available as possible, with a variable gap between each lecture,
            with no mixing of lectures from different courses.
         </div>
         <img src="../img/AllAlgosGridEvent-StrectchedNoMixSketch.drawio.png" alt="Strected schedule" style="width: 100%">

@@ -380,6 +380,7 @@ function initButtons(timeblocks) {
     }
   });
 
+  // weekButton don't work as intended now because of the weekNumber and yearNumber
   document.getElementById('weekButton').addEventListener('click', () => {
     view = 'week';
     nav = 0;

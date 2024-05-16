@@ -9,10 +9,11 @@ async function displaySettings(User) {
   displayCourses(User.courses);
   displaySyncCalendar(User.userid, User.settings);
   displayImportExport(User.userid, User.settings);
-  displayAccountSettings(User.userid, User.settings);
+  displayAccountSettings();
   $('input[type="checkbox"]').each(subCheckboxChange);
   $('.optionBlock').prepend('<div class="optionBlockPadding"></div>');
   $('.optionBlock').append('<div class="optionBlockPadding"></div>');
+  displayError();
   LoadingScreen.hide();
 }
 
@@ -83,7 +84,7 @@ function displayScheduleOptions(settings, algorithm, preferEarly, wantPrep) {
         <span>End study time</span>              
       </label>
       <div class="optionInput">
-        <label for="algorithm">Change Algorithm:</label>
+        <label for="algorithm">Change Scheduling strategy:</label>
         <select name="algorithm" id="algorithm">
           <option value="emptyFirstComeFirstServe">First Come First Serve</option>
           <option value="fiveDayStudyPlan">5 Day Study Plan</option>
@@ -92,7 +93,7 @@ function displayScheduleOptions(settings, algorithm, preferEarly, wantPrep) {
         </select>
         <div class="tooltip">
           <span id="algoInfo">?</span>
-          <span class="tooltiptext">Algorithm info</span>
+          <span class="tooltiptext">Scheduling strategy info</span>
         </div>
       </div>
       <div class="optionInput">
@@ -100,7 +101,7 @@ function displayScheduleOptions(settings, algorithm, preferEarly, wantPrep) {
         <input type="checkbox" id="preferEarly" name="preferEarly"/>
       </div>
       <div class="optionInput">
-        <label for="wantPrep">Have a preparation day for each exam, as close the exam as possible:</label>
+        <label for="wantPrep">Have a preparation day for each exam, as close to the exam as possible:</label>
         <input type="checkbox" id="wantPrep" name="wantPrep"/>
       </div>  
     </div>
@@ -110,18 +111,13 @@ function displayScheduleOptions(settings, algorithm, preferEarly, wantPrep) {
   $('#wantPrep').prop('checked', wantPrep);
 }
 
-function displayAccountSettings(id, settings) {
+function displayAccountSettings() {
   $('#formSettings').append(createCollapsible('Account', 'accountSettings'));
   $('#accountSettings').append(`
     <div class="optionBlock" id="accountSettingsInputs">
-      <label class="optionInput" for="email">
-        <span>Change Email</span>              
-        <input type="email" id="useremail" name="email" placeholder"example@gmail.com"
-        value="${settings.email || ''}" ${!settings.email ? 'required="false"' : ''}/>
-      </label>
       <label class="optionInput" for="logout&removeData">
         <a id="logout" class="btn btn-primary" href="/logout">Logout</a>
-        <button id="removedata" class="btn btn-primary" href="/removeData">Delete all stored data</button>                            
+        <button id="removedata" class="btn btn-primary">Delete all stored data</button>                            
       </label>
     </div>
   `);
@@ -230,6 +226,25 @@ function collapseListener() {
   });
 }
 
+function displayError() {
+  const url = window.location.href;
+  const error = url.split('?error=')[1];
+  if (error) console.error(error);
+  if (error === 'notEnoughtTimeToStudyForLectures') {
+    // eslint-disable-next-line no-undef
+    Toastify({
+      text: 'Not enough time to study for all lectures. Please either allocate more study-time, change schedule strategy or select fewer lectures.',
+      close: true,
+      duration: -1,
+      gravity: 'top',
+      position: 'center',
+      style: {
+        background: 'linear-gradient(to right, #ff416c, #ff4b2b)',
+      },
+    }).showToast();
+  }
+}
+
 function titleCheckboxChange() {
   const $checkbox = $(this);
   if ($checkbox.hasClass('checkboxTitle')) {
@@ -277,6 +292,7 @@ function plusButtonListener() {
   $('#syncCalendarPlus').on('click', () => {
     const syncCalendarInputs = $('#syncCalendarInputs .SyncCalendarInput');
     let valid = true;
+    // eslint-disable-next-line consistent-return
     syncCalendarInputs.each((index, input) => {
       const url = $(input).find(`#syncCalendarUrl${index}`).val();
       const name = $(input).find(`#syncCalendarName${index}`).val();
@@ -302,7 +318,7 @@ function recalculateOptionBlockHeight() {
 
 function removeButtonListener(importedCalendars) {
   const removeIcalFileBtn = $('.removeIcalFileBtn');
-  removeIcalFileBtn.on('click', function listener(event) {
+  removeIcalFileBtn.on('click', function listener() {
     const Filename = $(this).parent().find('span').text();
     console.log('Removing iCal file:', Filename);
     const removeFile = {
@@ -329,7 +345,9 @@ async function saveOptions(User) {
     User.courses.forEach((course, index) => {
       course.chosen = $(`#checkboxTitle${index}`).is(':checked');
       course.color = $(`#color${index}`).val();
-      course.examDate = $(`#date${index}`).val();
+      const newExamDate = $(`#date${index}`).val();
+      if (newExamDate !== course.examDate) User.schedule.outDated = true;
+      course.examDate = newExamDate;
       course.contents.forEach((lecture, k) => {
         lecture.chosen = $(`#checkbox${k}-forList${index}`).is(':checked');
       });
@@ -387,7 +405,6 @@ async function saveOptions(User) {
       ...User.settings,
       startStudyTime: Scheduleinputs.startStudyTime,
       endStudyTime: Scheduleinputs.endStudyTime,
-      email: $('#useremail').val(),
     };
     User.schedule.algorithm = Scheduleinputs.algorithm;
     User.schedule.preferEarly = Scheduleinputs.preferEarly;
@@ -416,6 +433,25 @@ function mergeArrays(oldArray, newArray) {
   return oldArray;
 }
 
+function deleteBtnListener() {
+  $('#removedata').on('click', async () => {
+    try {
+      const response = await fetch('http://localhost:3000/deleteAllUserData', {
+        method: 'DELETE',
+        cache: 'no-cache',
+      });
+      if (!response.ok) {
+        toastifyError('Error deleting user data');
+        throw new Error('Network response error');
+      }
+      window.location.href = '/logout';
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  });
+}
+
 const User = await APIgetCall('getUserData', 'Error fetching user data');
 console.log(User);
 
@@ -427,4 +463,5 @@ checkboxListener();
 plusButtonListener();
 removeButtonListener(User.settings.importedCalendars);
 infoBoxListener();
+deleteBtnListener();
 saveOptions(User);

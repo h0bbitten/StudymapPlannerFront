@@ -104,9 +104,12 @@ function goToNextPage() {
     }
     index++;
     console.log(`index is ${index}`);
-    let index2 = 0;
+    let formIndex = 1;
     checkboxes.each((i, checkbox) => {
-      createCourseForm(checkbox, i, index2);
+      createCourseForm(checkbox, i, formIndex);
+      if (checkbox.checked) {
+        formIndex++;
+      }
     });
 
     // Show study time form
@@ -163,19 +166,19 @@ function goToNextPage() {
   }
 }
 
-function createCourseForm(checkbox, i, index2) {
+function createCourseForm(checkbox, i, formIndex) {
   if (checkbox.checked) {
-    index2++;
+    console.log(`index2 is ${formIndex}`);
     // Appends a form for each course
     $('#forms').append(`
-        <div id="form${index2}div" class="forms">
-          <form id="form${index2}" style="display: none;">
+        <div id="form${formIndex}div" class="forms">
+          <form id="form${formIndex}" style="display: none;">
             <h3 id="${User.courses[i].id}">${User.courses[i].fullnamedisplay}</h3>
           </form>
         </div>
       `);
     // Appends a datepicker to each course form
-    $(`#form${index2}`).append(`
+    $(`#form${formIndex}`).append(`
         <div class="datepicker-container">
           <label for="datepicker${i}">Exam date:</label>
           <input type="date" id="datepicker${i}" class="datepicker" name="datepicker" required>
@@ -183,14 +186,14 @@ function createCourseForm(checkbox, i, index2) {
       `);
 
     // Save the chosen exam date for each course
-    $(`#datepicker${i}`).change(function() {
+    $(`#datepicker${i}`).change(function assignDate() {
       const examDate = $(this).val();
       User.courses[i].examDate = examDate;
     });
     // Initialize datepicker
     // Appends a checkbox for each lecture
     User.courses[i].contents.forEach((lecture, j) => {
-      $(`#form${index2}`).append(`
+      $(`#form${formIndex}`).append(`
         <div class="checkbox lecture-container">
           <label class="lectureLabel" for="lecture${j}">
             <input type="checkbox" id="lecture${j}" name="type" value="${j}" checked>
@@ -205,7 +208,6 @@ function createCourseForm(checkbox, i, index2) {
 async function saveOptions() {
   console.log('Saving options');
   console.log(User);
-  let index = 0;
   const startStudyTime = $('#startStudyTime').val();
   const endStudyTime = $('#endStudyTime').val();
 
@@ -213,6 +215,7 @@ async function saveOptions() {
     callToastify('Invalid study time. Please select a valid study time.');
     return;
   }
+  let checkboxIndex = 0;
   checkboxes.each((i, checkbox) => {
     User.courses[i].chosen = checkbox.checked;
     if (User.courses[i].chosen === false) {
@@ -220,8 +223,8 @@ async function saveOptions() {
         lecture.chosen = false;
       });
     } else {
-      index++;
-      $(`#form${index} input[type=checkbox]`).each((j, subcheckbox) => {
+      checkboxIndex++;
+      $(`#form${checkboxIndex} input[type=checkbox]`).each((j, subcheckbox) => {
         console.log('i is', i, 'j is', j);
         User.courses[i].contents[j].chosen = subcheckbox.checked;
       });
