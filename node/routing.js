@@ -110,7 +110,7 @@ const routing = function routes(app, upload) {
   });
   /**
      * @swagger
-     * /getUserData:
+     * /logout:
      *   get:
      *     description: Gets user data from server database
      *     responses:
