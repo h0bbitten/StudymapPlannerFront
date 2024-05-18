@@ -141,10 +141,14 @@ const routing = function routes(app, upload) {
      *         description: Internal server error
      */
   app.get('/getSchedule', async (req, res) => {
-    await getSchedule(req, res).catch((error) => {
-      console.error('Error in getting calculating schedule:', error);
-      res.status(500).send('Internal Server Error');
-    });
+    try {
+      const schedule = await getSchedule(req);
+      res.json(schedule);
+    } catch (error) {
+      console.error('Error retrieving schedule:', error.message);
+      const statusCode = error.statusCode || 500; 
+      res.status(statusCode).send(error.message);
+    }
   });
 
   app.get('/changeLectureChosen', async (req, res) => {

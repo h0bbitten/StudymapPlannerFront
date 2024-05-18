@@ -10,18 +10,18 @@ async function scheduleInitialization() {
     const User = await APIgetCall('getUserData', 'Error fetching user data');
     console.log('User data:', User);
 
-    if (User && User.schedule) {
-      console.log('User schedule:', User.schedule);
+    // Ensure 'schedule' and 'algorithm' exist before attempting to display or process
+    if (User && User.details && User.details.schedule && User.details.schedule.algorithm) {
+      console.log('User schedule:', User.details.schedule);
       displayProfile(User);
-      displayCal(User.schedule);
+      displayCal(User.details.schedule);
     } else {
       console.error('User data or schedule is missing or incomplete.');
     }
-
-    LoadingScreen.hide();
   } catch (error) {
-    LoadingScreen.hide();
     console.error('Failed to display profile info:', error);
+  } finally {
+    LoadingScreen.hide();
   }
 }
 
@@ -31,15 +31,21 @@ async function displayCal(schedule, ForceRecalculate = false) {
     return;
   }
   const Algorithm = schedule.algorithm;
-  const Schedule = await APIgetCall(`getSchedule?algorithm=${Algorithm}&forcerecalculate=${ForceRecalculate}`, 'Error calculating schedule');
-  console.log(Schedule);
-  if (Schedule.error) {
-    console.error(Schedule.error);
-    window.location.href = Schedule.redirect;
+  try {
+    const Schedule = await APIgetCall(`getSchedule?algorithm=${Algorithm}&forcerecalculate=${ForceRecalculate}`, 'Error calculating schedule');
+    console.log(Schedule);
+    if (Schedule.error) {
+      console.error(Schedule.error);
+      window.location.href = Schedule.redirect;
+    } else {
+      initButtons(Schedule.Timeblocks);
+      loadCalendar(Schedule.Timeblocks);
+    }
+  } catch (error) {
+    console.error('Failed to load schedule:', error);
   }
-  initButtons(Schedule.Timeblocks);
-  loadCalendar(Schedule.Timeblocks);
 }
+
 
 
 async function recalculateListener() {

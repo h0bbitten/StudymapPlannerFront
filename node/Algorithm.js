@@ -14,25 +14,27 @@ const { promises: fsPromises } = fs;
 
 const currentFilename = fileURLToPath(import.meta.url);
 const currentDir = dirname(currentFilename);
-const HourMilliSec = 3600000;
+const HourMilliSec = 3600000; // One hour in milliseconds
 
 class PreAlgoMethods {
   constructor(User, algorithm) {
-    console.log('Calculating schedule for:', User.fullname);
-    this.algorithm = algorithm;
-    this.EarlyLectures = User.schedule.preferEarly;
-    this.preparation = User.schedule.wantPrep;
-    this.StartStudyTime = User.settings.startStudyTime;
-    this.EndStudyTime = User.settings.endStudyTime;
-    this.studyTimePrDay = this.studyTimePrDay(this.StartStudyTime, this.EndStudyTime);
-    this.freeTimePrDay = (HourMilliSec * 24) - this.studyTimePrDay;
-    this.Courses = this.prepCourses(User.courses);
+    console.log('Calculating schedule for:', User.fullname || 'Unknown user');
+    this.algorithm = algorithm || 'default';
+    this.EarlyLectures = User.schedule?.preferEarly ?? false;
+    this.preparation = User.schedule?.wantPrep ?? false;
+    this.StartStudyTime = User.settings?.startStudyTime || '08:00';
+    this.EndStudyTime = User.settings?.endStudyTime || '17:00';
+    this.studyTimePrDay = this.calculateStudyTimePrDay(this.StartStudyTime, this.EndStudyTime);
+    this.freeTimePrDay = (24 * HourMilliSec) - this.studyTimePrDay;
+    this.Courses = this.prepCourses(User.courses || []);
     this.theTime = moment().valueOf();
     this.schedule = this.prepSchedule();
-    this.id = User.userid;
-    this.syncCalendars = User.settings.syncCalendars;
+    this.id = User.userid || 0;
+    this.syncCalendars = User.settings?.syncCalendars || [];
   }
-
+  calculateStudyTimePrDay(start, end) {
+    return moment.duration(moment(end, 'HH:mm').diff(moment(start, 'HH:mm'))).asMilliseconds();
+  }
   async init() {
     this.events = await getEvents(this.id, this.syncCalendars);
   }

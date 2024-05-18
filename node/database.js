@@ -2,59 +2,49 @@ import mysql from 'mysql2/promise';
 
 // Database connection pool
 const pool = mysql.createPool({
-  host: 'mysql',
+  host: 'localhost',
   user: 'root',
-  password: 'rootyroot',
+  password: 'studymaproot',
   database: 'userData',
 });
 
-// Ensure User Exists function
+// Ensures that the user exists or inserts a new one if not.
 async function ensureUserExists(externalUserID) {
   try {
-    console.log(`Checking existence for user ID: ${externalUserID}`);
-    const [user] = await pool.query('SELECT id FROM users WHERE userID = ?', [externalUserID]);
-    if (user.length === 0) {
-      console.log(`No user found with ID: ${externalUserID}, creating new user.`);
-      const [result] = await pool.query('INSERT INTO users (userID) VALUES (?)', [externalUserID]);
-      if (result.insertId) {
-        console.log(`New user inserted with ID: ${result.insertId}`);
-        return result.insertId;
-      } else {
-        console.log(`Failed to insert new user with ID: ${externalUserID}`);
+      const [user] = await pool.query('SELECT id FROM users WHERE userID = ?', [externalUserID]);
+      if (user.length === 0) {
+          const [result] = await pool.query('INSERT INTO users (userID) VALUES (?)', [externalUserID]);
+          console.log(`Inserted new user with ID: ${result.insertId}`);
+          return result.insertId;  // Return the new user ID.
       }
-    } else {
-      console.log(`User found with ID: ${externalUserID}, DB ID: ${user[0].id}`);
-      return user[0].id;
-    }
+      console.log(`User already exists with ID: ${externalUserID}, DB ID: ${user[0].id}`);
+      return user[0].id;  // Return existing user ID.
   } catch (error) {
-    console.error('Error ensuring user exists:', error);
-    throw error;
+      console.error('Error ensuring user exists:', error);
+      throw error; // Important to throw errors to handle them in calling function.
   }
 }
 
-// Save User Details function
-async function saveUserDetails(userId, userDetailsJson) {
+// Updates the user details in the database.
+async function saveUserDetails(userId, userDetails) {
+  const userDetailsJson = JSON.stringify(userDetails);  // Convert userDetails object to JSON string.
   try {
-    console.log('Saving these details to MySQL:', userDetailsJson);
-    const [result] = await pool.query('UPDATE users SET details = ? WHERE id = ?', [userDetailsJson, userId]);
-    if (result.affectedRows === 0) {
-      console.error('No rows updated, possible user does not exist');
-      return false; // Indicate that the save operation was unsuccessful
-    }
-    return true;  // Indicate successful update
+      const [result] = await pool.query('UPDATE users SET details = ? WHERE userID = ?', [userDetailsJson, userId]);
+      if (result.affectedRows === 0) {
+          console.error(`No rows updated for User ID: ${userId}. User might not exist or data has not changed.`);
+          return false; // Return false if no rows were updated.
+      }
+      console.log(`User details updated successfully for User ID: ${userId}`);
+      return true; // Return true if update was successful.
   } catch (error) {
-    console.error('Error updating user details:', error);
-    return false;  // Indicate that the save operation failed
+      console.error('Error updating user details:', error);
+      return false;
   }
 }
 
-// Retrieve and Parse User Data function
-async function retrieveAndParseUserData(userid) {
-  const [rows] = await pool.query('SELECT * FROM users WHERE id = ?', [userid]);
-  if (rows.length === 0) {
-    return null;
-  }
-  return rows[0]; // Assumes user data is stored directly in columns, adjust as needed
-}
 
-export { ensureUserExists, saveUserDetails, retrieveAndParseUserData, pool };
+
+
+
+
+export { ensureUserExists, saveUserDetails, pool };

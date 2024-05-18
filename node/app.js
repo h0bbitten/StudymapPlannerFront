@@ -2,7 +2,7 @@ import fs from 'fs';
 import { fileURLToPath } from 'url';
 import path, { dirname } from 'path';
 import Webscraper from './scraping.js';
-import Algorithm from './Algorithm.js';
+import calculateSchedule from './Algorithm.js';
 import { ensureUserExists, saveUserDetails, pool} from './database.js';
 
 // Normal exports
@@ -57,34 +57,37 @@ class WSfunctions {
 }
 async function logIn(req, res) {
   const test = new WSfunctions(req.query.token);
-  const answer = {};
   try {
-    const tokenTry = await test.core_webservice_get_site_info();
-    if (tokenTry.errorcode === 'invalidtoken') {
-      answer.validity = 'Invalid Token';
-    } else {
+      const tokenInfo = await test.core_webservice_get_site_info();
+      if (tokenInfo.errorcode === 'invalidtoken') {
+          return res.status(401).send('Invalid Token');
+      }
+      
       req.session.token = req.query.token;
-      req.session.userid = tokenTry.userid;
-      req.session.fullname = tokenTry.fullname;
-      req.session.userpictureurl = tokenTry.userpictureurl;
+      req.session.userid = tokenInfo.userid;
+      req.session.fullname = tokenInfo.fullname;
+      req.session.userpictureurl = tokenInfo.userpictureurl;
       req.session.loggedIn = true;
 
-      answer.validity = 'Valid Token';
+      const userId = await ensureUserExists(req.session.userid);
+      const userDetails = await retrieveAndParseUserData(userId);
 
-      try {
-        const User = await retrieveAndParseUserData(req.session.userid);
-        answer.redirect = User.settings.setupDone ? 'schedule' : 'setup';
-      } catch (error) {
-        console.log('User not found, redirecting to setup');
-        answer.redirect = 'setup';
+      if (!userDetails) {
+          console.log('User details not found, redirecting to setup');
+          return res.send({ validity: 'Valid Token', redirect: '/setup' });
       }
-    }
-    console.log('answer is:', answer);
-    res.send(JSON.stringify(answer));
+
+      console.log('User details found:', userDetails);
+      const redirectUrl = userDetails.settings && userDetails.settings.setupDone ? '/schedule' : '/setup';
+      res.send({ validity: 'Valid Token', redirect: redirectUrl });
   } catch (error) {
-    console.error('Failed logging in:', error);
+      console.error('Failed logging in:', error);
+      res.status(500).send('Internal Server Error');
   }
 }
+
+
+
 async function getMoodleInfo(req, res) {
   try {
     const token = req.session.token;
@@ -192,39 +195,39 @@ async function writeUserToDB(User) {
 
 async function getSchedule(req, res) {
   try {
-    const userId = req.session.userid;
-    const User = await retrieveAndParseUserData(userId);
-    let Schedule = User.schedule;
-    const algorithm = req.query.algorithm || User.schedule.algorithm; 
-    const ForceRecalculate = req.query.forcerecalculate === 'true';
-    const algorithmChanged = User.schedule.algorithm !== algorithm;
-    
-    
-    const recalculate = ForceRecalculate || Schedule.outDated || algorithmChanged;
-
-    console.log(`Recalculate condition met: ${recalculate}, due to force recalculate: ${ForceRecalculate}, outdated: ${Schedule.outDated}, algorithm change: ${algorithmChanged}`);
-
-    if (recalculate) {
-      console.log(`Recalculating schedule using algorithm: ${algorithm}`);
-
+      const userId = req.session.userid;
+      const User = await retrieveAndParseUserData(userId);
       
-      Schedule = await calculateSchedule(User, algorithm);
-
-      
-      User.schedule = Schedule;
-      User.schedule.algorithm = algorithm; 
-      User.schedule.outDated = false; 
-
-      
-      const saveSuccess = await saveUserDetails(userId, User); 
-      if (!saveSuccess) {
-          throw new Error("Failed to save user details to the database.");
+      if (!User || !User.schedule) {
+          console.error('User data or schedule not available');
+          return res.status(404).send('User data or schedule not available');
       }
-    }
-    res.send(JSON.stringify(User.schedule));
+
+      let Schedule = User.schedule;
+      const algorithm = req.query.algorithm || Schedule.algorithm;
+      const ForceRecalculate = req.query.forcerecalculate === 'true';
+      const algorithmChanged = Schedule.algorithm !== algorithm;
+
+      const recalculate = ForceRecalculate || Schedule.outDated || algorithmChanged;
+      console.log(`Recalculate condition met: ${recalculate}`);
+
+      if (recalculate) {
+          console.log(`Recalculating schedule using algorithm: ${algorithm}`);
+          Schedule = await calculateSchedule(User, algorithm);
+          User.schedule = Schedule;
+          User.schedule.algorithm = algorithm;
+          User.schedule.outDated = false;
+
+          const saveSuccess = await saveUserDetails(userId, JSON.stringify(User));
+          if (!saveSuccess) {
+              throw new Error("Failed to save user details to the database.");
+          }
+      }
+
+      res.json(User.schedule);
   } catch (error) {
-    console.error('Failed to calculate schedule:', error);
-    res.status(500).send('Internal Server Error');
+      console.error('Failed to calculate schedule:', error);
+      res.status(500).send('Internal Server Error');
   }
 }
 
@@ -253,40 +256,24 @@ function changeLectureChosenStatus(courses, courseID, lectureID, chosen) {
   });
 }
 
-async function retrieveAndParseUserData(userid) {
+async function retrieveAndParseUserData(userID) {
   try {
-    console.log(`Retrieving and parsing user data for user ID: ${userid}`);
-    const [rows] = await pool.query('SELECT id, userID, details FROM users WHERE userID = ?', [userid]);
-    if (rows.length === 0) {
-      console.log(`No user found with ID: ${userid}`);
-      return null;
-    }
-    console.log(`User data retrieved successfully for user ID: ${userid}`);
-    
-    let details;
-    if (typeof rows[0].details === 'object') {
-      details = rows[0].details;
-    } else {
-      details = JSON.parse(rows[0].details);
-    }
-
-    // Assuming 'details' column contains JSON data
-    const userData = {
-      id: rows[0].id,
-      userID: rows[0].userID,
-      details: details
-    };
-    console.log(`User data parsed successfully for user ID: ${userid}`);
-    console.log(userData); // Log the parsed user data
-    return userData;
+      console.log(`Retrieving and parsing user data for user ID: ${userID}`);
+      const [results] = await pool.query('SELECT details FROM users WHERE userID = ?', [userID]);
+      if (results.length === 0) {
+          console.error(`No user found with ID: ${userID}`);
+          return null;
+      }
+      
+      const userDetails = results[0].details;
+      // Assuming the details are already an object as fetched from the database.
+      console.log(`User data retrieved and parsed successfully for user ID: ${userID}`);
+      return userDetails;
   } catch (error) {
-    console.error('Error retrieving and parsing user data:', error);
-    throw error;
+      console.error('Error retrieving and parsing user data:', error);
+      throw error; // It's important to rethrow the error so the calling function can handle it
   }
 }
-
-
-
 
 
 async function getUserData(req, res) {
