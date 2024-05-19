@@ -25,3 +25,15 @@ ADD COLUMN pages LONGTEXT;
 
 ALTER TABLE users MODIFY details JSON;
 ALTER TABLE courses ADD contents JSON, ADD pages JSON;
+
+CREATE TABLE `events` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `user_id` INT,
+  `title` VARCHAR(255),
+  `description` TEXT,
+  `start_time` BIGINT,
+  `end_time` BIGINT,
+  `color` VARCHAR(7),
+  `type` VARCHAR(50),
+  FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE
+);

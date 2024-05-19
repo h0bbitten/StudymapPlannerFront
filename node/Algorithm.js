@@ -4,7 +4,7 @@ import { fileURLToPath } from 'url';
 import path, { dirname } from 'path';
 import ICAL from 'ical.js';
 import fetch from 'node-fetch';
-
+import { ensureUserExists, saveUserDetails, pool} from './database.js';
 export default calculateSchedule;
 
 // Jest test exports
@@ -431,10 +431,9 @@ function darkenColor(color, amount) {
   return `#${((256 ** 3) + (r * 256 ** 2) + (g * 256) + b).toString(16).slice(1)}`;
 }
 
-async function getEvents(userid, syncCalendars) {
+async function getEvents(userId) {
   try {
-    const urls = await retrieveICalURLs(userid, syncCalendars);
-    const events = await parseICalFiles(urls);
+    const [events] = await pool.query('SELECT title, description, start_time as startTime, end_time as endTime, color FROM events WHERE user_id = ?', [userId]);
     return events;
   } catch (error) {
     console.error('Error fetching events:', error);

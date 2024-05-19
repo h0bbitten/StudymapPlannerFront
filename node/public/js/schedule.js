@@ -11,10 +11,10 @@ async function scheduleInitialization() {
     console.log('User data:', User);
 
     // Ensure 'schedule' and 'algorithm' exist before attempting to display or process
-    if (User && User.details && User.details.schedule && User.details.schedule.algorithm) {
-      console.log('User schedule:', User.details.schedule);
+    if (User && User.schedule && User.schedule.algorithm) {  // Adjusted to the correct path
+      console.log('User schedule:', User.schedule);
       displayProfile(User);
-      displayCal(User.details.schedule);
+      displayCal(User.schedule);
     } else {
       console.error('User data or schedule is missing or incomplete.');
     }

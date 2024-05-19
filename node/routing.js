@@ -142,14 +142,14 @@ const routing = function routes(app, upload) {
      */
   app.get('/getSchedule', async (req, res) => {
     try {
-      const schedule = await getSchedule(req);
-      res.json(schedule);
+      // Directly pass both req and res to the function if it needs to handle the response itself.
+      await getSchedule(req, res);
     } catch (error) {
       console.error('Error retrieving schedule:', error.message);
-      const statusCode = error.statusCode || 500; 
-      res.status(statusCode).send(error.message);
+      res.status(500).send('Internal Server Error');
     }
   });
+  
 
   app.get('/changeLectureChosen', async (req, res) => {
     await changeLectureChosen(req, res).catch((error) => {
@@ -234,6 +234,7 @@ const routing = function routes(app, upload) {
       res.status(500).send('Internal Server Error');
     });
   });
+  
   // DELETE Endpoints
   app.delete('/deleteAllUserData', async (req, res) => {
     await deleteAllUserData(req, res).catch((error) => {
