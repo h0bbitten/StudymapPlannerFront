@@ -14,7 +14,7 @@ const { promises: fsPromises } = fs;
 
 const currentFilename = fileURLToPath(import.meta.url);
 const currentDir = dirname(currentFilename);
-const HourMilliSec = 3600000; // One hour in milliseconds
+const HourMilliSec = 3600000; 
 
 class PreAlgoMethods {
   constructor(User, algorithm) {
@@ -59,8 +59,7 @@ class PreAlgoMethods {
         return new Date(a.examDate) - new Date(b.examDate);
       })
       .map((course) => {
-        // ECTS point hardcoded to 5 if not present
-        course.studyPeriodTotal = 10 * (course.ECTS ?? 5) * HourMilliSec; // 10 timer pr. ECTS point
+        course.studyPeriodTotal = 10 * (course.ECTS ?? 5) * HourMilliSec;
         course.studyPeriodPrLecture = Math.ceil(course.studyPeriodTotal / course.contents.length);
         course.contents = course.contents.filter((lecture) => lecture.chosen === true);
         if (reverse) course.contents.reverse();

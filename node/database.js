@@ -1,6 +1,6 @@
 import mysql from 'mysql2/promise';
 
-// Database connection pool
+
 const pool = mysql.createPool({
   host: 'localhost',
   user: 'root',
@@ -8,7 +8,6 @@ const pool = mysql.createPool({
   database: 'userData',
 });
 
-// Ensures that the user exists or inserts a new one if not.
 
 async function ensureUserExists(externalUserID) {
   try {
@@ -30,17 +29,17 @@ async function ensureUserExists(externalUserID) {
 
 
 
-// Updates the user details in the database.
+
 async function saveUserDetails(userID, userDetails) {
-  const userDetailsJson = JSON.stringify(userDetails);  // Convert userDetails object to JSON string.
+  const userDetailsJson = JSON.stringify(userDetails); 
   try {
     const [result] = await pool.query('UPDATE users SET details = ? WHERE userID = ?', [userDetailsJson, userID]);
     if (result.affectedRows === 0) {
       console.error(`No rows updated for userID: ${userID}. User might not exist or data has not changed.`);
-      return false; // Return false if no rows were updated.
+      return false; 
     }
     console.log(`User details updated successfully for userID: ${userID}`);
-    return true; // Return true if update was successful.
+    return true; 
   } catch (error) {
     console.error('Error updating user details:', error);
     return false;

@@ -10,8 +10,7 @@ async function scheduleInitialization() {
     const User = await APIgetCall('getUserData', 'Error fetching user data');
     console.log('User data:', User);
 
-    // Ensure 'schedule' and 'algorithm' exist before attempting to display or process
-    if (User && User.schedule && User.schedule.algorithm) {  // Adjusted to the correct path
+    if (User && User.schedule && User.schedule.algorithm) {  
       console.log('User schedule:', User.schedule);
       displayProfile(User);
       displayCal(User.schedule);

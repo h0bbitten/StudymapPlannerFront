@@ -142,7 +142,6 @@ const routing = function routes(app, upload) {
      */
   app.get('/getSchedule', async (req, res) => {
     try {
-      // Directly pass both req and res to the function if it needs to handle the response itself.
       await getSchedule(req, res);
     } catch (error) {
       console.error('Error retrieving schedule:', error.message);
@@ -186,13 +185,11 @@ const routing = function routes(app, upload) {
     try {
       const userData = req.body;
       
-      // Ensure the user exists or create a new one
       const userId = await ensureUserExists(userData.userid);
       
-      // Serialize the user data into JSON for storing in the database
       const userDetailsJson = JSON.stringify(userData);
       
-      // Save or update the user details in the database
+
       const saveResult = await saveUserDetails(userId, userDetailsJson);
 
       if (saveResult) {
