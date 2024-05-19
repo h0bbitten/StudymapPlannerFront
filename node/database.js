@@ -9,36 +9,41 @@ const pool = mysql.createPool({
 });
 
 // Ensures that the user exists or inserts a new one if not.
+
 async function ensureUserExists(externalUserID) {
   try {
-      const [user] = await pool.query('SELECT id FROM users WHERE userID = ?', [externalUserID]);
-      if (user.length === 0) {
-          const [result] = await pool.query('INSERT INTO users (userID) VALUES (?)', [externalUserID]);
-          console.log(`Inserted new user with ID: ${result.insertId}`);
-          return result.insertId;  // Return the new user ID.
-      }
-      console.log(`User already exists with ID: ${externalUserID}, DB ID: ${user[0].id}`);
-      return user[0].id;  // Return existing user ID.
+    const [users] = await pool.query('SELECT userID FROM users WHERE userID = ?', [externalUserID]);
+    if (users.length === 0) {
+      console.log(`No user found with userID: ${externalUserID}, creating new user.`);
+      const [result] = await pool.query('INSERT INTO users (userID) VALUES (?)', [externalUserID]);
+      console.log(`New user inserted with userID: ${externalUserID}`);
+      return externalUserID;  // Return the external userID
+    } else {
+      console.log(`User found with userID: ${externalUserID}`);
+      return externalUserID;  // Return the found userID
+    }
   } catch (error) {
-      console.error('Error ensuring user exists:', error);
-      throw error; // Important to throw errors to handle them in calling function.
+    console.error('Error ensuring user exists:', error);
+    throw error;
   }
 }
 
+
+
 // Updates the user details in the database.
-async function saveUserDetails(userId, userDetails) {
+async function saveUserDetails(userID, userDetails) {
   const userDetailsJson = JSON.stringify(userDetails);  // Convert userDetails object to JSON string.
   try {
-      const [result] = await pool.query('UPDATE users SET details = ? WHERE userID = ?', [userDetailsJson, userId]);
-      if (result.affectedRows === 0) {
-          console.error(`No rows updated for User ID: ${userId}. User might not exist or data has not changed.`);
-          return false; // Return false if no rows were updated.
-      }
-      console.log(`User details updated successfully for User ID: ${userId}`);
-      return true; // Return true if update was successful.
+    const [result] = await pool.query('UPDATE users SET details = ? WHERE userID = ?', [userDetailsJson, userID]);
+    if (result.affectedRows === 0) {
+      console.error(`No rows updated for userID: ${userID}. User might not exist or data has not changed.`);
+      return false; // Return false if no rows were updated.
+    }
+    console.log(`User details updated successfully for userID: ${userID}`);
+    return true; // Return true if update was successful.
   } catch (error) {
-      console.error('Error updating user details:', error);
-      return false;
+    console.error('Error updating user details:', error);
+    return false;
   }
 }
 

@@ -258,29 +258,55 @@ function changeLectureChosenStatus(courses, courseID, lectureID, chosen) {
 
 async function retrieveAndParseUserData(userID) {
   try {
-      console.log(`Retrieving and parsing user data for user ID: ${userID}`);
-      const [results] = await pool.query('SELECT details FROM users WHERE userID = ?', [userID]);
-      if (results.length === 0) {
-          console.error(`No user found with ID: ${userID}`);
-          return null;
-      }
-      
-      const userDetails = results[0].details;
-      // Assuming the details are already an object as fetched from the database.
-      console.log(`User data retrieved and parsed successfully for user ID: ${userID}`);
+    console.log(`Retrieving and parsing user data for userID: ${userID}`);
+    const [results] = await pool.query('SELECT details FROM users WHERE userID = ?', [userID]);
+    if (results.length === 0) {
+      console.error(`No user found with userID: ${userID}`);
+      return null;
+    }
+    
+
+    if (typeof results[0].details === 'string') {
+      const userDetails = JSON.parse(results[0].details);
+      console.log(`User data retrieved and parsed successfully for userID: ${userID}`);
       return userDetails;
+    } else {
+      console.error('Expected a string for JSON parsing, received:', results[0].details);
+      return null;  // or throw an error or handle accordingly
+    }
   } catch (error) {
-      console.error('Error retrieving and parsing user data:', error);
-      throw error; // It's important to rethrow the error so the calling function can handle it
+    console.error('Error retrieving and parsing user data:', error);
+    throw error;
   }
 }
+
+
+
+
+
 
 
 async function getUserData(req, res) {
   try {
     const userId = req.session.userid;
     const user = await retrieveAndParseUserData(userId);
-    if (!user) {
+    if (!user) {async function retrieveAndParseUserData(userID) {
+  try {
+    console.log(`Retrieving and parsing user data for userID: ${userID}`);
+    const [results] = await pool.query('SELECT details FROM users WHERE userID = ?', [userID]);
+    if (results.length === 0) {
+      console.error(`No user found with userID: ${userID}`);
+      return null;
+    }
+    const userDetails = JSON.parse(results[0].details);
+    console.log(`User data retrieved and parsed successfully for userID: ${userID}`);
+    return userDetails;
+  } catch (error) {
+    console.error('Error retrieving and parsing user data:', error);
+    throw error;
+  }
+}
+
       return res.status(404).send('User not found');
     }
     res.json(user);
