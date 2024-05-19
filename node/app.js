@@ -152,7 +152,7 @@ async function saveOptions(req, res) {
     return res.status(400).send('No data provided');
   }
 
-  const userData = req.body;  // Received user data from frontend
+  const userData = req.body;  
 
   if (!userData.userid) {
     console.error('User ID is missing');
@@ -161,10 +161,10 @@ async function saveOptions(req, res) {
 
   try {
     console.log('Attempting to ensure user exists in database');
-    const userId = await ensureUserExists(userData.userid); // Ensures the user exists or creates a new one
-    const detailsJson = JSON.stringify(userData);  // Serialize user data into JSON
+    const userId = await ensureUserExists(userData.userid); 
+    const detailsJson = JSON.stringify(userData);  
     console.log(`Attempting to save details for user ID: ${userId}`);
-    const updateResult = await saveUserDetails(userId, detailsJson);  // Attempt to save or update user details in MySQL
+    const updateResult = await saveUserDetails(userId, detailsJson);  
 
     if (updateResult) {
       console.log('User data saved successfully');
@@ -184,12 +184,12 @@ const writeFileAsync = fs.promises.writeFile;
 
 async function writeUserToDB(User) {
   try {
-    const userId = await ensureUserExists(User.userid);  // Confirm user existence
-    await saveUserDetails(userId, User);  // Save full user object
+    const userId = await ensureUserExists(User.userid);  
+    await saveUserDetails(userId, User);  
     console.log('User data updated successfully in MySQL');
   } catch (err) {
     console.error('Error updating User data:', err);
-    throw err;  // Ensure exceptions are thrown to be caught by caller
+    throw err;  
   }
 }
 
@@ -288,7 +288,7 @@ async function retrieveAndParseUserData(userID) {
     } else {
 
       console.error('Expected a string for JSON parsing, received:', results[0].details);
-      return null;  // or throw an error or handle accordingly
+      return null;  
     }
   } catch (error) {
     console.error('Error retrieving and parsing user data:', error);
@@ -476,13 +476,13 @@ async function importIcalFile(req, res) {
     const userId = req.session.userid;
 
     for (const file of files) {
-      // Assuming the file's content is directly available as a buffer
+      
       const icalData = file.buffer.toString('utf-8');
       const jcalData = ICAL.parse(icalData);
       const vcalendar = new ICAL.Component(jcalData);
       const vevents = vcalendar.getAllSubcomponents('vevent');
 
-      // Prepare events for database insertion
+     
       const events = vevents.map(vevent => ({
         userId: userId,
         title: vevent.getFirstPropertyValue('summary'),
@@ -492,7 +492,7 @@ async function importIcalFile(req, res) {
         color: '#FF0000', // Example color
       }));
 
-      // Insert events into the database
+      
       await insertEvents(events);
     }
 
