@@ -169,7 +169,7 @@ function plusButton(id, text = '') {
   return HTML;
 }
 
-function displayImportExport(userid, settings) {
+function displayImportExport(userID, settings) {
   $('#formSettings').append(createCollapsible('Import/Export iCal file', 'importExport'));
   $('#importExport').append(`
     <div class="optionBlock" id="importExportInputs">
@@ -179,8 +179,8 @@ function displayImportExport(userid, settings) {
       </div>
       <div class="optionInput" id="importedIcalFiles">
       </div>
-      <label class="optionInput" id="exportIcalFile">
-        <a id="exportIcalFile" class="btn btn-primary" href="/exportIcalFile">Export Calendar</a>                            
+      <label class="optionInput" for="exportIcalFile">
+        <a id="exportIcalLink" class="btn btn-primary" href="/exportIcalSchedule?userID=${userID}" download>Export Calendar</a>                            
       </label>
     </div>
   `);
