@@ -2,9 +2,9 @@ import mysql from 'mysql2/promise';
 
 
 const pool = mysql.createPool({
-  host: 'localhost',
+  host: 'mysql',
   user: 'root',
-  password: 'studymaproot',
+  password: 'rootyroot',
   database: 'userData',
 });
 
@@ -16,10 +16,10 @@ async function ensureUserExists(externalUserID) {
       console.log(`No user found with userID: ${externalUserID}, creating new user.`);
       const [result] = await pool.query('INSERT INTO users (userID) VALUES (?)', [externalUserID]);
       console.log(`New user inserted with userID: ${externalUserID}`);
-      return externalUserID;  // Return the external userID
+      return externalUserID; 
     } else {
       console.log(`User found with userID: ${externalUserID}`);
-      return externalUserID;  // Return the found userID
+      return externalUserID;
     }
   } catch (error) {
     console.error('Error ensuring user exists:', error);
