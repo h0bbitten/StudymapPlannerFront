@@ -11,7 +11,7 @@ export {
 };
 
 // Jest exports
-export { checkIfLecturesDone, findModulelink };
+export { checkIfLecturesDone, findModulelink, WSfunctions };
 
 const currentFilename = fileURLToPath(import.meta.url);
 const currentDir = dirname(currentFilename);
