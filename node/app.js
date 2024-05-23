@@ -540,19 +540,7 @@ async function deleteAllUserData(req, res) {
   const userID = req.session.userid;
 
   try {
-    // Delete user files
-    const userDataFile = `./database/${userID}.json`;
-    const icalsDirectory = `./database/icals/${userID}`;
-
-    await Promise.all([
-      fs.promises.unlink(userDataFile).catch((error) => {
-        if (error.code !== 'ENOENT') throw error;
-      }),
-      fs.promises.rm(icalsDirectory, { recursive: true }).catch((error) => {
-        if (error.code !== 'ENOENT') throw error;
-      })
-    ]);
-
+    
     // Delete user data from MySQL
     const [result] = await pool.query('DELETE FROM users WHERE userID = ?', [userID]);
     if (result.affectedRows === 0) {
