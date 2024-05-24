@@ -40,5 +40,34 @@ async function validToken(token) {
   }
 }
 
+  const tutorialBtn = document.getElementById('tutorial_id');
+  tutorialBtn.addEventListener('click', () => {
+    const modalContentHTML = `
+      <div class="modal-header">How to find your Moodle token</div>
+      <div class="modal-section">
+      <video width="720" height="440 controls>
+      <source src="/img/tokenTutorial.mp4" type="video/mp4">
+      <source src="/img/tokenTutorial.mp4" type="video/ogg">
+    Your browser does not support the video tag.
+    </video>
+    `;
+    $('#modalContent').html(modalContentHTML);
+    $('#infoModal').css('display', 'flex');
+    $('.modal-content').css({
+      width: '60vw',
+      'overflow-y': 'auto',
+      height: '80vh',
+    });
+  });
+  $(document).keydown((event) => {
+    if (event.key === 'Escape') {
+      closePopup();
+    }
+  });
+  $('.close').on('click', closePopup);
+  function closePopup() {
+    $('#infoModal').css('display', 'none');
+  }
+
 applyTheme();
 handleLogin();
