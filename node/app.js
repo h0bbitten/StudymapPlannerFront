@@ -63,6 +63,7 @@ async function logIn(req, res) {
     const tokenTry = await test.core_webservice_get_site_info();
     if (tokenTry.errorcode === 'invalidtoken') {
       answer.validity = 'Invalid Token';
+      res.status(400).send(JSON.stringify(answer));
     } else {
       req.session.token = req.query.token;
       req.session.userid = tokenTry.userid;
@@ -79,9 +80,9 @@ async function logIn(req, res) {
         console.log('User not found, redirecting to setup');
         answer.redirect = 'setup';
       }
+      res.send(JSON.stringify(answer));
     }
     console.log('answer is:', answer);
-    res.send(JSON.stringify(answer));
   } catch (error) {
     console.error('Failed loggin in:', error);
   }

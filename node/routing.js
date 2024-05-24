@@ -59,91 +59,92 @@ const routing = function routes(app, upload) {
 
   // GET Endpoints
   /**
-     * @swagger
-     * /getMoodleInfo:
-     *   get:
-     *     description: Retrieves Moodle information about the logged-in user and their enrolled courses.
-     *     responses:
-     *       200:
-     *         description: Successful response containing user and course information.
-     *         content:
-     *           application/json:
-     *         schema:
-     *           type: object
-     *           properties:
-     *             userid:
-     *               type: integer
-     *               description: The user's unique ID on the Moodle platform.
-     *             fullname:
-     *               type: string
-     *               description: The user's full name as displayed in Moodle.
-     *             userpictureurl:
-     *               type: string
-     *               description: (optional) The URL to the user's profile picture in Moodle.
-     *             sitename:
-     *               type: string
-     *               description: The name of the Moodle site.
-     *             siteurl:
-     *               type: string
-     *               description: The base URL of the Moodle site.
-     *             lang:
-     *               type: string
-     *               description: The language used in the Moodle site interface.
-     *             courses:
-     *               type: array
-     *               items:
-     *                 type: object
-     *                 properties:
-     *                   id:
-     *                     type: integer
-     *                     description: The unique ID of the course on the Moodle platform.
-     *                   shortname:
-     *                     type: string
-     *                     description: The short name of the course as displayed in Moodle.
-     *                   fullnamecourse:  # Changed to fullname
-     *                     type: string
-     *                     description: The full name of the course.
-     *                   categoryid:
-     *                     type: integer
-     *                     description: (optional) The ID of the category the course belongs to (if applicable).
-     *                   startdate:
-     *                     type: string
-     *                     description: The start date of the course in ISO 8601 format.
-     *                   visible:
-     *                     type: boolean
-     *                     description: Whether the course is visible to the user.
-     *                   progress:
-     *                     type: number
-     *                     description: (optional) The user's progress percentage in the course (if available from Moodle webservice).
-     *                   moduleLinks:
-     *                     type: array
-     *                     items:
-     *                       type: string
-     *                       description: (optional) An array containing links to the user's enrolled modules within the course.
-     *             examples:
-     *               application/json:
-     *                 value:
-     *                   userid: 123
-     *                   fullname: "John Doe"
-     *                   userpictureurl: "https://moodle.org/user123.jpg"
-     *                   sitename: "My Moodle Site"
-     *                   siteurl: "https://moodle.org"
-     *                   lang: "en"
-     *                   courses:
-     *                     -  # Use a hyphen for the first element in the list
-     *                       id: 456
-     *                       shortname: "MATH101"
-     *                       fullname: "Introduction to Mathematics"  # Corrected property name
-     *                       categoryid: 1
-     *                       startdate: "2022-01-01T00:00:00Z"
-     *                       visible: true
-     *                       progress: 50
-     *                       moduleLinks:
-     *                         - "https://moodle.org/course456/module1"
-     *                         - "https://moodle.org/course456/module2"
-     *       500:
-     *         description: Internal server error occurred during processing.
-     */
+  * @swagger
+  * /getMoodleInfo:
+  *         get:
+  *           summary: Get Moodle information
+  *           description: Retrieves Moodle information about the logged-in user and their enrolled courses.
+  *           responses:
+  *             200:
+  *               description: Successful response containing user and course information.
+  *               content:
+  *                 application/json:
+  *                   schema:
+  *                     type: object
+  *                     properties:
+  *                       userid:
+  *                         type: integer
+  *                         description: The user's unique ID on the Moodle platform.
+  *                       fullname:
+  *                         type: string
+  *                         description: The user's full name as displayed in Moodle.
+  *                       userpictureurl:
+  *                         type: string
+  *                         description: (optional) The URL to the user's profile picture in Moodle.
+  *                       sitename:
+  *                         type: string
+  *                         description: The name of the Moodle site.
+  *                       siteurl:
+  *                         type: string
+  *                         description: The base URL of the Moodle site.
+  *                       lang:
+  *                         type: string
+  *                         description: The language used in the Moodle site interface.
+  *                       courses:
+  *                         type: array
+  *                         items:
+  *                           type: object
+  *                           properties:
+  *                             id:
+  *                               type: integer
+  *                               description: The unique ID of the course on the Moodle platform.
+  *                             shortname:
+  *                               type: string
+  *                               description: The short name of the course as displayed in Moodle.
+  *                             fullnamecourse:  # Changed to fullname
+  *                               type: string
+  *                               description: The full name of the course.
+  *                             categoryid:
+  *                               type: integer
+  *                               description: (optional) The ID of the category the course belongs to (if applicable).
+  *                             startdate:
+  *                               type: string
+  *                               description: The start date of the course in ISO 8601 format.
+  *                             visible:
+  *                               type: boolean
+  *                               description: Whether the course is visible to the user.
+  *                             progress:
+  *                               type: number
+  *                               description: (optional) The user's progress percentage in the course (if available from Moodle webservice).
+  *                             moduleLinks:
+  *                               type: array
+  *                               items:
+  *                                 type: string
+  *                                 description: (optional) An array containing links to the user's enrolled modules within the course.
+  *                   examples:
+  *                     application/json:
+  *                       value:
+  *                         userid: 123
+  *                         fullname: "John Doe"
+  *                         userpictureurl: "https://moodle.org/user123.jpg"
+  *                         sitename: "My Moodle Site"
+  *                         siteurl: "https://moodle.org"
+  *                         lang: "en"
+  *                         courses:
+  *                           -  # Use a hyphen for the first element in the list
+  *                             id: 456
+  *                             shortname: "MATH101"
+  *                             fullname: "Introduction to Mathematics"  # Corrected property name
+  *                             categoryid: 1
+  *                             startdate: "2022-01-01T00:00:00Z"
+  *                             visible: true
+  *                             progress: 50
+  *                             moduleLinks:
+  *                               - "https://moodle.org/course456/module1"
+  *                               - "https://moodle.org/course456/module2"
+  *             500:
+  *               description: Internal server error occurred during processing.
+  */
   app.get('/getMoodleInfo', async (req, res) => {
     await getMoodleInfo(req, res).catch((error) => {
       console.error('Error in getMoodleInfo:', error);
@@ -152,12 +153,21 @@ const routing = function routes(app, upload) {
   });
   /**
      * @swagger
-     * /testToken:
+     * /getLogIn:
      *   get:
+     *     summary: Log in
      *     description: Tests user token against Moodle API
+     *     parameters:
+     *      - in: path
+     *        name: token
+     *        type: string
+     *        required: true
+     *        description: The Moodle access token to test against the Moodle API
      *     responses:
      *       200:
      *         description: Successful response
+     *       400:
+     *         description: Invalid token
      *       500:
      *         description: Internal server error
      */
@@ -168,16 +178,71 @@ const routing = function routes(app, upload) {
     });
   });
   /**
-     * @swagger
-     * /getUserData:
-     *   get:
-     *     description: Gets user data from server database
-     *     responses:
-     *       200:
-     *         description: Successful response
-     *       500:
-     *         description: Internal server error
-     */
+  * @swagger
+  * /getUserData:
+  *     get:
+  *       summary: Get user data
+  *       description: Gets users data from server database
+  *       responses:
+  *         200:
+  *           description: Successful response
+  *           content:
+  *             application/json:
+  *               schema:
+  *                 type: object
+  *                 properties:
+  *                       userid:
+  *                         type: integer
+  *                         description: The user's unique ID on the Moodle platform.
+  *                       fullname:
+  *                         type: string
+  *                         description: The user's full name as displayed in Moodle.
+  *                       userpictureurl:
+  *                         type: string
+  *                         description: (optional) The URL to the user's profile picture in Moodle.
+  *                       sitename:
+  *                         type: string
+  *                         description: The name of the Moodle site.
+  *                       siteurl:
+  *                         type: string
+  *                         description: The base URL of the Moodle site.
+  *                       lang:
+  *                         type: string
+  *                         description: The language used in the Moodle site interface.
+  *                       courses:
+  *                         type: array
+  *                         items:
+  *                           type: object
+  *                           properties:
+  *                             id:
+  *                               type: integer
+  *                               description: The unique ID of the course on the Moodle platform.
+  *                             shortname:
+  *                               type: string
+  *                               description: The short name of the course as displayed in Moodle.
+  *                             fullnamecourse:  # Changed to fullname
+  *                               type: string
+  *                               description: The full name of the course.
+  *                             categoryid:
+  *                               type: integer
+  *                               description: (optional) The ID of the category the course belongs to (if applicable).
+  *                             startdate:
+  *                               type: string
+  *                               description: The start date of the course in ISO 8601 format.
+  *                             visible:
+  *                               type: boolean
+  *                               description: Whether the course is visible to the user.
+  *                             progress:
+  *                               type: number
+  *                               description: (optional) The user's progress percentage in the course (if available from Moodle webservice).
+  *                             moduleLinks:
+  *                               type: array
+  *                               items:
+  *                                 type: string
+  *                                 description: (optional) An array containing links to the user's enrolled modules within the course.
+  *         500:
+  *           description: Internal server error
+  */
   app.get('/getUserData', async (req, res) => {
     await getUserData(req, res).catch((error) => {
       console.error('Error in getting user:', error);
@@ -188,10 +253,11 @@ const routing = function routes(app, upload) {
      * @swagger
      * /logout:
      *   get:
-     *     description: Gets user data from server database
+     *     summary: Logs out the user
+     *     description: Logs out the user and invalidates the session
      *     responses:
-     *       200:
-     *         description: Successful response
+     *       302:
+     *         description: Successfully logged out and redirected to login page
      *       500:
      *         description: Internal server error
      */
@@ -205,16 +271,24 @@ const routing = function routes(app, upload) {
     });
   });
   /**
-     * @swagger
-     * /getSchedule:
-     *   get:
-     *     description: Gets schedule from Moodle server database
-     *     responses:
-     *       200:
-     *         description: Successful response
-     *       500:
-     *         description: Internal server error
-     */
+  * @swagger
+  * /getSchedule:
+  *     get:
+  *       summary: Get schedule
+  *       description: Gets schedule from Moodle server database
+  *       responses:
+  *         200:
+  *           description: Successful response
+  *           content:
+  *               application/json:
+  *                 schema:
+  *                   type: object
+  *                   properties:
+  *                     Schedule:
+  *                       description: Information about the user's schedule (Structure needed here)
+  *         500:
+  *           description: Internal server error
+  */
   app.get('/getSchedule', async (req, res) => {
     await getSchedule(req, res).catch((error) => {
       console.error('Error in getting calculating schedule:', error);
@@ -222,36 +296,86 @@ const routing = function routes(app, upload) {
     });
   });
   /**
-     * @swagger
-     * /changeLectureChosen:
-     *   get:
-     *     summary: Changes the chosen status of a lecture
-     *     description: Gets schedule from Moodle server database
-     *     requestbody:
-     *       required: true
-     *       content:
-     *         application/json:
-     *           schema:
-     *             type: object
-     *             properties:
-     *               lectureID:
-     *                 type: integer
-     *                 description: The unique ID of the lecture to change the chosen status of
-     *                 required: true
-     *               courseID:
-     *                 type: integer
-     *                 description: The unique ID of the course the lecture belongs to
-     *                 required: true
-     *               chosen:
-     *                 type: boolean
-     *                 description: The new chosen status of the lecture
-     *                 required: true
-     *     responses:
-     *       200:
-     *         description: Lecture chosen status changed successfully
-     *       500:
-     *         description: Internal server error
-     */
+  * @swagger
+  * /changeLectureChosen:
+  *     get:
+  *       summary: Change lecture chosen status
+  *       description: Updates the chosen status of a lecture for a course belonging to the logged-in user.
+  *       security:
+  *         - Moodle_Authentication_Token: []
+  *       parameters:
+  *         - in: query
+  *           name: courseID
+  *           description: The unique ID of the course.
+  *           required: true
+  *           schema:
+  *             type: integer
+  *         - in: query
+  *           name: lectureID
+  *           description: The unique ID of the lecture.
+  *           required: true
+  *           schema:
+  *             type: integer
+  *         - in: query
+  *           name: chosen
+  *           description: The new chosen status for the lecture (true or false).
+  *           required: true
+  *           schema:
+  *             type: string
+  *       responses:
+  *         200:
+  *           description: Lecture chosen status changed successfully.
+  *           content:
+  *             application/json:
+  *               schema:
+  *                 type: object
+  *                 properties:
+  *                   success:
+  *                     type: boolean
+  *                     description: Indicates successful operation.
+  *                   lectureID:
+  *                     type: integer
+  *                     description: The ID of the updated lecture.
+  *                   courseID:
+  *                     type: integer
+  *                     description: The ID of the course the lecture belongs to.
+  *                   chosen:
+  *                     type: boolean
+  *                     description: The updated chosen status of the lecture.
+  *         400:
+  *           description: Bad request (missing or invalid parameters).
+  *           content:
+  *             application/json:
+  *               schema:
+  *                 type: object
+  *                 properties:
+  *                   error:
+  *                     type: string
+  *                     description: Error message indicating the issue.
+  *         401:
+  *           description: Unauthorized access (requires authentication).
+  *           content:
+  *             application/json:
+  *               schema:
+  *                 type: object
+  *                 properties:
+  *                   error:
+  *                     type: string
+  *                     description: Error message indicating unauthorized access.
+  *         500:
+  *           description: Internal server error occurred during processing.
+  *           content:
+  *             application/json:
+  *               schema:
+  *                 type: object
+  *                 properties:
+  *                   success:
+  *                     type: boolean
+  *                     description: Indicates failure.
+  *                   error:
+  *                     type: string
+  *                     description: Generic error message.
+  */
   app.get('/changeLectureChosen', async (req, res) => {
     await changeLectureChosen(req, res).catch((error) => {
       console.error('Error in changing value of chosen for lecture:', error);
@@ -259,14 +383,47 @@ const routing = function routes(app, upload) {
     });
   });
   /**
-     * @swagger
-     * /exportIcalSchedule:
-     *   get:
-     *     description: Exports the schedule in ICAL format for the user
-     *     responses:
-     *       500:
-     *         description: Internal server error
-     */
+  * @swagger
+  * /exportIcalSchedule:
+  *     get:
+  *       summary: Export iCal schedule
+  *       description: Retrieves and exports the user's iCal schedule containing lectures, exams, and exam repetitions.
+  *       parameters:
+  *         - in: query
+  *           name: userID
+  *           description: The unique ID of the user.
+  *           required: true
+  *           schema:
+  *             type: string
+  *       responses:
+  *         200:
+  *           description: Successful response with iCal data.
+  *           content:
+  *             text/calendar:
+  *               schema:
+  *                 type: string
+  *                 description: The user's schedule data in iCal format.
+  *         400:
+  *           description: Bad request (missing or invalid user ID).
+  *           content:
+  *             application/json:
+  *               schema:
+  *                 type: object
+  *                 properties:
+  *                   error:
+  *                     type: string
+  *                     description: Error message indicating the issue.
+  *         500:
+  *           description: Internal server error occurred during processing.
+  *           content:
+  *             application/json:
+  *               schema:
+  *                 type: object
+  *                 properties:
+  *                   error:
+  *                     type: string
+  *                     description: Generic error message.
+  */
   app.get('/exportIcalSchedule', async (req, res) => {
     await exportIcalSchedule(req, res).catch((error) => {
       console.error('Error in changing value of chosen for lecture:', error);
@@ -276,27 +433,50 @@ const routing = function routes(app, upload) {
 
   // POST Endpoints
   /**
-     * @swagger
-     * /saveOptions:
-     *   post:
-     *     description: Saves user options in server database
-     *     requestBody:
-     *       required: true
-     *       content:
-     *         application/json:
-     *           schema:
-     *             type: object
-     *             properties:
-     *               option1:
-     *                 type: string
-     *                 description: Description of option1
-     *               option2:
-     *                 type: boolean
-     *                 description: Description of option2
-     *     responses:
-     *       '200':
-     *         description: Successful response
-     */
+  * @swagger
+  * /saveOptions:
+  *     post:
+  *       summary: Save user options
+  *       description: Saves the user's options, including imported calendar settings. This endpoint allows users to remove specific imported calendars.
+  *       requestBody:
+  *         required: true
+  *         content:
+  *           application/json:
+  *             schema:
+  *               type: object
+  *               properties:
+  *                 settings:
+  *                   type: object
+  *                   description: User settings object containing imported calendar data.
+  *                   properties:
+  *                     importedCalendars:
+  *                       type: array
+  *                       description: An array of imported calendar objects.
+  *                       items:
+  *                         type: object
+  *                         properties:
+  *                           type:
+  *                             type: string
+  *                             description: Indicates the action for the calendar ("remove" for removing a calendar).
+  *                           name:
+  *                             type: string
+  *                             description: The name of the imported calendar file.
+  *       responses:
+  *         200:
+  *           description: User data saved successfully.
+  *           content:
+  *             application/json:
+  *               schema:
+  *                 type: string
+  *                 description: Success message.
+  *         500:
+  *           description: Internal server error occurred during processing.
+  *           content:
+  *             application/json:
+  *               schema:
+  *                 type: string
+  *                 description: Generic error message.
+  */
   app.post('/saveOptions', async (req, res) => {
     await saveOptions(req, res).catch((error) => {
       console.error('Error in saving user options:', error);
@@ -304,27 +484,40 @@ const routing = function routes(app, upload) {
     });
   });
   /**
-     * @swagger
-     * /importIcalFile:
-     *   post:
-     *     description: Imports ICAL file and saves it in server database
-     *     requestBody:
-     *       required: true
-     *       content:
-     *         application/json:
-     *           schema:
-     *             type: object
-     *             properties:
-     *               option1:
-     *                 type: string
-     *                 description: Description of option1
-     *               option2:
-     *                 type: boolean
-     *                 description: Description of option2
-     *     responses:
-     *       '200':
-     *         description: Successful response
-     */
+  * @swagger
+  * /importIcalFile:
+  *     post:
+  *       summary: Import iCal file(s)
+  *       description: Allows users to upload iCal files containing calendar data.
+  *       requestBody:
+  *         required: true
+  *         content:
+  *           multipart/form-data:
+  *             schema:
+  *               type: object
+  *               properties:
+  *                 files:
+  *                   type: array
+  *                   description: An array of uploaded iCal files.
+  *                   items:
+  *                     type: string
+  *                     format: binary
+  *       responses:
+  *         200:
+  *           description: Files uploaded successfully.
+  *           content:
+  *             application/json:
+  *               schema:
+  *                 type: string
+  *                 description: Success message.
+  *         500:
+  *           description: Internal server error occurred during processing.
+  *           content:
+  *             application/json:
+  *               schema:
+  *                 type: string
+  *                 description: Generic error message.
+  */
   app.post('/importIcalFile', upload.array('ics', 5), async (req, res) => {
     await importIcalFile(req, res).catch((error) => {
       console.error('Error in importing ICAL file:', error);
@@ -333,16 +526,39 @@ const routing = function routes(app, upload) {
   });
   // DELETE Endpoints
   /**
-     * @swagger
-     * /deleteAllUserData:
-     *   delete:
-     *     description: Removes all user data from the server database
-     *     responses:
-     *       200:
-     *         description: User data deleted successfully
-     *       500:
-     *         description: Failed to delete user data
-     */
+  * @swagger
+  * /deleteAllUserData:
+  *     delete:
+  *       summary: Delete all user data
+  *       description: Deletes all user data associated with the logged-in user, including their JSON data file and any imported calendar files.
+  *       security:
+  *         - Moodle_Authentication_Token: []
+  *       responses:
+  *         200:
+  *           description: User data deleted successfully.
+  *           content:
+  *             application/json:
+  *               schema:
+  *                 type: string
+  *                 description: Success message.
+  *         401:
+  *           description: Unauthorized access (requires authentication).
+  *           content:
+  *             application/json:
+  *               schema:
+  *                 type: object
+  *                 properties:
+  *                   error:
+  *                     type: string
+  *                     description: Error message indicating unauthorized access.
+  *         500:
+  *           description: Internal server error occurred during processing.
+  *           content:
+  *             application/json:
+  *               schema:
+  *                 type: string
+  *                 description: Generic error message.
+  */
   app.delete('/deleteAllUserData', async (req, res) => {
     await deleteAllUserData(req, res).catch((error) => {
       console.error('Error in deleting user data:', error);

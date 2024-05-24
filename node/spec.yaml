@@ -1,0 +1,81 @@
+/changeLectureChosen:
+    put:  # This might be a PUT request based on data modification
+      summary: Change lecture chosen status
+      description: Updates the chosen status of a lecture for a course belonging to the logged-in user.
+      security:
+        - api_key: []  # Replace with your actual authentication scheme (optional)
+      parameters:
+        - in: query
+          name: courseID
+          description: The unique ID of the course.
+          required: true
+          schema:
+            type: integer
+        - in: query
+          name: lectureID
+          description: The unique ID of the lecture.
+          required: true
+          schema:
+            type: integer
+        - in: query
+          name: chosen
+          description: The new chosen status for the lecture (true or false).
+          required: true
+          schema:
+            type: string  # Consider changing to boolean for clarity
+      responses:
+        200:
+          description: Lecture chosen status changed successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    description: Indicates successful operation.
+                  message:
+                    type: string
+                    description: Informative message about the operation.
+                  lectureID:
+                    type: integer
+                    description: The ID of the updated lecture.
+                  courseID:
+                    type: integer
+                    description: The ID of the course the lecture belongs to.
+                  chosen:
+                    type: boolean
+                    description: The updated chosen status of the lecture.
+        400:
+          description: Bad request (missing or invalid parameters).
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Error message indicating the issue.
+        401:
+          description: Unauthorized access (requires authentication).
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Error message indicating unauthorized access.
+        500:
+          description: Internal server error occurred during processing.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    description: Indicates failure.
+                  error:
+                    type: string
+                    description: Generic error message.
