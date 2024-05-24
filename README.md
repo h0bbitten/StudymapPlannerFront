@@ -1,4 +1,5 @@
 To start the server:
+
     1. Type "npm install" in the terminal.
 
     2. Type "npm run server" in the terminal.
