@@ -5,7 +5,6 @@ import Webscraper from './scraping.js';
 import calculateSchedule from './Algorithm.js';
 import generateIcal from './exportIcal.js';
 
-// Normal exports
 export {
   getMoodleInfo, logIn, saveOptions, getUserData, getSchedule, importIcalFile, changeLectureChosen, deleteAllUserData, exportIcalSchedule,
 };
@@ -16,12 +15,14 @@ export { checkIfLecturesDone, findModulelink, WSfunctions };
 const currentFilename = fileURLToPath(import.meta.url);
 const currentDir = dirname(currentFilename);
 
+// Class for handling WebService functions
 class WSfunctions {
   constructor(token) {
     this.token = token;
     this.urlStart = `https://www.moodle.aau.dk/webservice/rest/server.php?wstoken=${this.token}&moodlewsrestformat=json&wsfunction=`;
   }
 
+  // Method for fetching data from Moodle
   static async getMoodleData(url, errorCallback) {
     try {
       const response = await fetch(url);
@@ -35,27 +36,32 @@ class WSfunctions {
     }
   }
 
+  //method for getting enrolled courses
   async core_course_get_enrolled_courses_by_timeline_classification() {
     const url = `${this.urlStart}core_course_get_enrolled_courses_by_timeline_classification&classification=inprogress`;
     return WSfunctions.getMoodleData(url, 'Error fetching enrolled courses:');
   }
 
+  //method for getting site info
   async core_webservice_get_site_info() {
     const url = `${this.urlStart}core_webservice_get_site_info`;
     return WSfunctions.getMoodleData(url, 'Error fetching User info:');
   }
 
+  //method for getting course contents
   async core_course_get_contents(courseID) {
     const url = `${this.urlStart}core_course_get_contents&courseid=${courseID}`;
     return WSfunctions.getMoodleData(url, 'Error fetching course contents:');
   }
 
+  //method for getting pages by course
   async mod_page_get_pages_by_courses(courseID) {
     const url = `${this.urlStart}mod_page_get_pages_by_courses&courseids[0]=${courseID}`;
     return WSfunctions.getMoodleData(url, 'Error fetching course pages:');
   }
 }
 
+// Function for logging in
 async function logIn(req, res) {
   const test = new WSfunctions(req.query.token);
   const answer = {};
@@ -88,6 +94,7 @@ async function logIn(req, res) {
   }
 }
 
+// Function for getting Moodle info
 async function getMoodleInfo(req, res) {
   try {
     const token = req.session.token;
@@ -119,6 +126,7 @@ async function getMoodleInfo(req, res) {
   }
 }
 
+// Function for scraping module links
 async function scrapeModuleLinks(courses, Moodle) {
   const enrichedCourses = courses.map(async (course) => {
     const contents = await Moodle.core_course_get_contents(course.id);
@@ -146,6 +154,7 @@ async function scrapeModuleLinks(courses, Moodle) {
   return Promise.all(enrichedCourses);
 }
 
+// Function for saving options to the database
 async function saveOptions(req, res) {
   try {
     console.log('Saving options');
@@ -178,6 +187,7 @@ async function saveOptions(req, res) {
 
 const writeFileAsync = fs.promises.writeFile;
 
+// Function for writing user data to the database
 async function writeUserToDB(User) {
   try {
     await writeFileAsync(`./database/${User.userid}.json`, JSON.stringify(User));
@@ -189,6 +199,7 @@ async function writeUserToDB(User) {
   }
 }
 
+// Function for getting the schedule
 async function getSchedule(req, res) {
   try {
     const algorithm = req.query.algorithm;
@@ -214,6 +225,7 @@ async function getSchedule(req, res) {
   }
 }
 
+// Function for checking if lectures are done
 function checkIfLecturesDone(Schedule, courses) {
   const currentTimeMillis = new Date().getTime();
   Schedule.Timeblocks.forEach((timeblock) => {
@@ -226,6 +238,7 @@ function checkIfLecturesDone(Schedule, courses) {
   return [Schedule, courses];
 }
 
+// Function for changing the lecture chosen status
 function changeLectureChosenStatus(courses, courseID, lectureID, chosen) {
   courses.forEach((course) => {
     if (course.id === courseID) {
@@ -238,6 +251,7 @@ function changeLectureChosenStatus(courses, courseID, lectureID, chosen) {
   });
 }
 
+// Function for retrieving and parsing user data
 function retrieveAndParseUserData(userid) {
   return new Promise((resolve, reject) => {
     fs.readFile(`./database/${userid}.json`, (err, data) => {
@@ -250,6 +264,7 @@ function retrieveAndParseUserData(userid) {
   });
 }
 
+// Function for getting user data from the database
 async function getUserData(req, res) {
   try {
     const User = await retrieveAndParseUserData(req.session.userid);
@@ -260,6 +275,7 @@ async function getUserData(req, res) {
   }
 }
 
+// Function for finding the module link
 async function findModulelink(pages) {
   const regex = /https:\/\/moduler\.aau\.dk\/course\/([^?]+)/;
 
@@ -386,6 +402,7 @@ const colors = [
   '#FFFFFF', // White
 ];
 
+// Function for assigning a color to a course
 async function assignColor(integer) {
   return new Promise((resolve, reject) => {
     if (Number.isInteger(integer) && integer > 0) {
@@ -401,6 +418,7 @@ async function assignColor(integer) {
   });
 }
 
+// Function for importing an iCal file
 async function importIcalFile(req, res) {
   try {
     const { files } = req;
@@ -423,6 +441,7 @@ async function importIcalFile(req, res) {
   }
 }
 
+// Function for changing the lecture chosen status
 async function changeLectureChosen(req, res) {
   try {
     const courseID = Number(req.query.courseID);
@@ -448,6 +467,7 @@ async function changeLectureChosen(req, res) {
   }
 }
 
+// Function for deleting all user data
 async function deleteAllUserData(req, res) {
   try {
     const userDataFile = `./database/${req.session.userid}.json`;
@@ -477,6 +497,7 @@ async function deleteAllUserData(req, res) {
   }
 }
 
+// Function for exporting an iCal schedule
 async function exportIcalSchedule(req, res) {
   try {
     const UserID = req.query.userID;

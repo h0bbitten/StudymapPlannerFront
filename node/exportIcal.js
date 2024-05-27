@@ -2,6 +2,7 @@ import ICAL from 'ical.js';
 
 export default generateIcal;
 
+// Function that generates an iCal file for the user's schedule
 function generateIcal(events) {
   console.log('Creating calendar...');
   try {

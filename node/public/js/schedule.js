@@ -3,6 +3,7 @@ import {
 } from './script.js';
 import {loadCalendar, initButtons} from './calender.js';
 
+// function that initializes the schedule page
 async function scheduleInitialization() {
   LoadingScreen.add();
   LoadingScreen.show();
@@ -21,6 +22,7 @@ async function scheduleInitialization() {
   }
 }
 
+// function that displays the schedule
 async function displayCal(schedule, ForceRecalculate = false) {
   const Algorithm = schedule.algorithm;
   const Schedule = await APIgetCall(`getSchedule?algorithm=${Algorithm}&forcerecalculate=${ForceRecalculate}`, 'Error calculating schedule');
@@ -33,6 +35,7 @@ async function displayCal(schedule, ForceRecalculate = false) {
   loadCalendar(Schedule.Timeblocks);
 }
 
+// function that recalculates the schedule
 async function recalculateListener() {
   document.getElementById('recalculateButton').addEventListener('click', async () => {
     const User = await APIgetCall('getUserData', 'Error fetching user data');
@@ -44,8 +47,6 @@ async function recalculateListener() {
     }
     loadCalendar(Schedule.Timeblocks);
     initButtons(Schedule.Timeblocks);
-    // $('#container').empty();
-    // displayCal(User.schedule, true);
   });
 }
 

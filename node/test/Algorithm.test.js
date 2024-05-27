@@ -100,8 +100,6 @@ describe('PreAlgoMethods', () => {
       expect(algo.theTime).toBeGreaterThan(0);
       expect(algo.id).toBe('123');
       expect(algo.syncCalendars).toEqual([]);
-      // expect(algo.schedule).toEqual([]);
-      // expect(algo.Courses).toEqual([testCourseOne, testCourseTwo, testCourseThree, testCourseFour]);
     });
   });
   describe('prepSchedule', () => {
@@ -155,7 +153,7 @@ describe('PreAlgoMethods', () => {
     });
 
     it('should correctly sort courses by exam date in ascending order for emptyFirstComeFirstServe algorithm', () => {
-      algo.algorithm = 'emptyFirstComeFirstServe'; // Explicitly set to default to avoid ambiguity
+      algo.algorithm = 'emptyFirstComeFirstServe';
       const sortedCourses = algo.prepCourses(algo.Courses);
       expect(sortedCourses.map((course) => course.examDate)).toEqual(['2024-11-25', '2024-12-10', '2024-12-15']);
     });
@@ -192,17 +190,17 @@ describe('PreAlgoMethods', () => {
 describe('getUNIXfromTimeOfDay function', () => {
   // Test case 1: Test with a time before the original timestamp
   test('Returns correct timestamp for time before original timestamp', () => {
-    const originalTimestamp = 1621000000000; // Example original timestamp (in milliseconds)
-    const timeOfDay = '05:30'; // Example time of day
-    const expectedTimestamp = 1620963000000; // Expected timestamp for the given time of day
+    const originalTimestamp = 1621000000000;
+    const timeOfDay = '05:30'; 
+    const expectedTimestamp = 1620963000000;
     expect(getUNIXfromTimeOfDay(originalTimestamp, timeOfDay)).toBe(expectedTimestamp);
   });
 
   // Test case 2: Test with a time after the original timestamp
   test('Returns correct timestamp for time after original timestamp', () => {
-    const originalTimestamp = 1621000000000; // Example original timestamp (in milliseconds)
-    const timeOfDay = '15:45'; // Example time of day
-    const expectedTimestamp = 1620999900000; // Expected timestamp for the given time of day
+    const originalTimestamp = 1621000000000;
+    const timeOfDay = '15:45'; 
+    const expectedTimestamp = 1620999900000; 
     expect(getUNIXfromTimeOfDay(originalTimestamp, timeOfDay)).toBe(expectedTimestamp);
   });
 
@@ -220,5 +218,4 @@ describe('getUNIXfromTimeOfDay function', () => {
     const expectedTimestamp = 1725000000000;
     expect(getUNIXfromTimeOfDay(originalTimestamp, timeOfDay)).toBe(expectedTimestamp);
   });
-  // Add more test cases as needed to cover different scenarios
 });

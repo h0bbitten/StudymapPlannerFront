@@ -7,20 +7,16 @@ export { loadCalendar, initButtons };
 let nav = 0;
 let view = 'week';
 const calendar = document.getElementById('calendar');
-
 const now = moment();
 let weekNumber = now.isoWeek();
 let yearNumber = now.year();
-
-// const startStudyTimeValue = sessionStorage.getItem('startStudyTime');
-const startStudyTime = 0;//= parseInt(startStudyTimeValue, 10);
-
-// const endStudyTimeValue = sessionStorage.getItem('endStudyTime');
-const endStudyTime = 24;//= parseInt(endStudyTimeValue, 10);
-
+const startStudyTime = 0;
+const endStudyTime = 24;
 const dayPX = (1000 / 24) * (endStudyTime - startStudyTime);
 const hourPX = dayPX / (endStudyTime - startStudyTime);
 const minutePX = hourPX / 60;
+
+// function to load the calendar
 function loadCalendar(inputTimeblocks) {
   if (view === 'week') {
     loadWeekView(inputTimeblocks);
@@ -29,6 +25,7 @@ function loadCalendar(inputTimeblocks) {
   }
 }
 
+// function to generate the popup content for a specific day
 function generatePopupContentForDay(day, timeblocks) {
   // Filter the timeblocks for the selected day
   const timeblocksForDay = timeblocks.filter((block) => {
@@ -51,19 +48,17 @@ function generatePopupContentForDay(day, timeblocks) {
   return popupContent;
 }
 
+// function to load the month view
 function loadMonthView(timeblocks) {
   calendar.classList.remove('week-view');
   const baseDate = new Date();
   const dt = new Date(baseDate.getFullYear(), baseDate.getMonth() + nav, 1);
-
   const month = dt.getMonth();
   const year = dt.getFullYear();
   const daysInMonth = new Date(year, month + 1, 0).getDate();
-
   const dateString = dt.toLocaleDateString('en-GB', {
     weekday: 'long',
   });
-
   const weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
   const paddingDays = weekdays.indexOf(dateString);
 
@@ -112,7 +107,6 @@ function loadMonthView(timeblocks) {
 
     daySquare.addEventListener('click', () => {
       const popupContent = generatePopupContentForDay(i, monthTimeblocks);
-      // Assuming you have a modal with id 'infoModal' and a content container with id 'modalContent'
       document.getElementById('modalContent').innerHTML = popupContent;
       document.getElementById('infoModal').style.display = 'flex';
     });
@@ -124,6 +118,7 @@ document.querySelector('.close').addEventListener('click', () => {
   document.getElementById('infoModal').style.display = 'none';
 });
 
+// function to load the week view
 function loadWeekView(timeblocks) {
   calendar.classList.add('week-view');
   const today = new Date();
@@ -198,6 +193,7 @@ function loadWeekView(timeblocks) {
   popupBtnListener();
 }
 
+// function to listen for the popup button click
 function popupBtnListener() {
   $(document).on('click', '.popupBtn', async function updateStatus() {
     const lectureID = $(this).data('lectureid');
@@ -208,10 +204,11 @@ function popupBtnListener() {
   });
 }
 
+// function to create the hourly lines in the calendar
 function createLines() {
   $('.day').each(function dostuff() {
     const dayBox = $(this);
-    const boxHeight = 1000 //dayBox.height();
+    const boxHeight = 1000;
     const numLines = 24;
 
     for (let i = 1; i < numLines; i++) {
@@ -223,6 +220,7 @@ function createLines() {
   });
 }
 
+// function to create and move the red now line
 function createAndMoveNowLine() {
   const currentDay = $('.currentDay');
   if (currentDay.length > 0) {
@@ -238,18 +236,21 @@ function createAndMoveNowLine() {
 
     updateLinePosition();
 
-    setInterval(updateLinePosition, 60000); // 1 minute
+    setInterval(updateLinePosition, 60000);
   }
 }
 
+// function to get the start of the week
 function getStartOfWeek(week, year) {
   return moment().year(year).isoWeek(weekNumber).startOf('isoWeek').valueOf();
 }
 
+// function to get the end of the week
 function getEndOfWeek(week, year) {
   return moment().year(year).isoWeek(weekNumber).endOf('isoWeek').valueOf();
 }
 
+// function to add a time block to the calendar
 function addTimeBlock(startTime, endTime, title, description, color, type, ID) {
   const currentWeekStartTime = getStartOfWeek(weekNumber, yearNumber);
   const currentWeekEndTime = getEndOfWeek(weekNumber, yearNumber);
@@ -271,6 +272,7 @@ function addTimeBlock(startTime, endTime, title, description, color, type, ID) {
     }
   }
 
+  // function to create a time block segment
   function createTimeBlockSegment(start, end, dayOfWeek) {
     if (startTime >= currentWeekStartTime && startTime < currentWeekEndTime) {
       $(`#day${dayOfWeek}`).append(createTimeBlock(start, end, title, description, color, type, ID));
@@ -278,6 +280,7 @@ function addTimeBlock(startTime, endTime, title, description, color, type, ID) {
   }
 }
 
+// function to create a time block
 function createTimeBlock(startTime, endTime, title, description, color, type, ID) {
   const top = (minutesIntoDay(startTime) * (1000 / 24 / 60));
   const minuteDuration = (endTime - startTime) / 60000;
@@ -294,6 +297,7 @@ function createTimeBlock(startTime, endTime, title, description, color, type, ID
   return html;
 }
 
+// function to convert a timestamp to a time string
 function convertToTimeString(timestamp) {
   const momentObj = moment(timestamp);
   const timeString = momentObj.format('HH:mm');
@@ -301,6 +305,7 @@ function convertToTimeString(timestamp) {
   return timeString;
 }
 
+// function to convert a timestamp to minutes into the day
 function minutesIntoDay(timestamp) {
   const momentObj = moment(timestamp);
   const startOfDay = momentObj.clone().startOf('day');
@@ -309,6 +314,7 @@ function minutesIntoDay(timestamp) {
   return minutesDifference;
 }
 
+// function to create the popup for the timeblocks
 function createPopUp(timeblocks) {
   $('.timeblock').click(function popupHandler() {
     const description = $(this).find('.description').text();
@@ -357,6 +363,7 @@ function createPopUp(timeblocks) {
   });
 }
 
+// function to initialize the buttons used to navigate the calendar
 function initButtons(timeblocks) {
   document.getElementById('nextButton').addEventListener('click', () => {
     if (view === 'month') {
@@ -380,7 +387,6 @@ function initButtons(timeblocks) {
     }
   });
 
-  // weekButton don't work as intended now because of the weekNumber and yearNumber
   document.getElementById('weekButton').addEventListener('click', () => {
     view = 'week';
     nav = 0;

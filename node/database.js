@@ -8,6 +8,7 @@ const pool = mysql.createPool({
   database: 'users',
 });
 
+//function that ensures a user exists in the database
 async function ensureUserExists(externalUserID) {
   try {
     console.log(`Trying to ensure user exists with ID: ${externalUserID}`);
@@ -25,7 +26,7 @@ async function ensureUserExists(externalUserID) {
   }
 }
 
-// Gemmer ellere opdatere course
+// Saving or updating a course in the database
 async function saveOrUpdateCourse(userID, courseName, ects) {
   const [course] = await pool.query('SELECT id FROM courses WHERE userID = ? AND courseName = ?', [userID, courseName]);
   if (course.length === 0) {

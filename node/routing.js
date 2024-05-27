@@ -13,7 +13,7 @@ const routing = function routes(app, upload) {
   // Swagger setup
   swaggerDocs(app, PORT);
 
-  // Side routes
+  // Routes setup 
   app.get('/', async (req, res) => {
     console.log(req.session.loggedIn);
     if (req.session.loggedIn === true) {

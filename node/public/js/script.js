@@ -2,6 +2,7 @@ export {
   applyTheme, setCookie, getCookie, LoadingScreen, displayProfile, settingsBtn, saveUserDataToDB, Button, APIgetCall, APIpostCall, callToastify, infoBoxListener,
 };
 
+// Theme
 async function applyTheme() {
   const savedTheme = getCookie('theme');
   if (savedTheme === 'dark') {
@@ -26,6 +27,7 @@ $('#settingsBtn').click(() => {
   settingsBtn();
 });
 
+// Settings button
 function settingsBtn() {
   window.location.href = 'settings';
 }
@@ -68,6 +70,7 @@ class LoadingScreen {
   }
 }
 
+// Profile display function
 function displayProfile(profile) {
   $('#user_profile').html(`<p>Welcome ${profile.fullname}</p><img src="${profile.userpictureurl}" alt="Profile pic">`);
 }
@@ -91,6 +94,8 @@ async function saveUserDataToDB(User) {
     throw error;
   }
 }
+
+// API calls
 async function APIpostCall(url, data, errorCallback, contentType = 'application/json') {
   try {
     const response = await fetch(`http://localhost:3000/${url}`, {
@@ -111,6 +116,7 @@ async function APIpostCall(url, data, errorCallback, contentType = 'application/
   }
 }
 
+// API calls
 async function APIgetCall(url, errorCallback) {
   try {
     const response = await fetch(`http://localhost:3000/${url}`);
@@ -149,8 +155,8 @@ class Button {
   }
 }
 
+// function to display a toast message
 function callToastify(message) {
-  // eslint-disable-next-line no-undef
   Toastify({
     text: message,
     duration: 1500,
@@ -163,6 +169,7 @@ function callToastify(message) {
   }).showToast();
 }
 
+// function to display a popup with information about the different algorithms
 function infoBoxListener() {
   $(document).on('click', '#algoInfo', () => {
     console.log('info clicked');

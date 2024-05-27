@@ -69,7 +69,7 @@ describe('checkIfLecturesDone function', () => {
   });
 
   it('marks lectures as done and unchecks them if endTime is in the past', () => {
-    const currentTime = new Date().getTime(); // Current time in milliseconds
+    const currentTime = new Date().getTime();
     // Set endTime of Lecture 1 to a past time
     testSchedule.Timeblocks[0].endTime = currentTime - 10000;
 
@@ -81,7 +81,7 @@ describe('checkIfLecturesDone function', () => {
   });
 
   it('does not mark lectures as done if endTime is in the future', () => {
-    const currentTime = new Date().getTime(); // Current time in milliseconds
+    const currentTime = new Date().getTime();
     // Set endTime of Lecture 2 to a future time
     testSchedule.Timeblocks[1].endTime = currentTime + 10000;
 
@@ -93,7 +93,7 @@ describe('checkIfLecturesDone function', () => {
   });
 
   it('does not mark lectures as done if endTime is equal to the current time', () => {
-    const currentTime = new Date().getTime(); // Current time in milliseconds
+    const currentTime = new Date().getTime();
     // Set endTime of Lecture 1 to the current time
     testSchedule.Timeblocks[0].endTime = currentTime;
 
@@ -103,8 +103,6 @@ describe('checkIfLecturesDone function', () => {
     expect(updatedSchedule.Timeblocks[0].status).toBe('active');
     expect(updatedUserCourses[0].contents[0].chosen).toBe(true);
   });
-
-// Add more it statements and test cases as needed to cover different scenarios
 });
 
 describe('findModulelink', () => {

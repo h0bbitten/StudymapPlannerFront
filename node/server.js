@@ -16,7 +16,6 @@ app.use(session({
   rolling: true,
   cookie: {
     maxAge: 3600000, // 60 mins
-    // secure: true, breaks stuff, so guess we won't have it secure :shrug:
     httpOnly: true,
   },
 }));

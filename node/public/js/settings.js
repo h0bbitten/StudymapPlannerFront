@@ -2,6 +2,7 @@ import {
   applyTheme, LoadingScreen, displayProfile, saveUserDataToDB, APIgetCall, APIpostCall, infoBoxListener,
 } from './script.js';
 
+// function that initializes the settings page
 async function displaySettings(User) {
   LoadingScreen.add();
   LoadingScreen.show();
@@ -17,6 +18,7 @@ async function displaySettings(User) {
   LoadingScreen.hide();
 }
 
+// function that creates a collapsible container
 function createCollapsible(name, id, addclass = '') {
   const HTML = `
   <div class="collapsible-container" id="${id}">
@@ -35,6 +37,7 @@ function createCollapsible(name, id, addclass = '') {
   return HTML;
 }
 
+// function that displays the courses in the collapsible container
 function displayCourses(courses) {
   $('#formSettings').append(createCollapsible('Courses and Lectures', 'courses'));
   $('#courses').append('<div class="optionBlock courseContainer"></div>');
@@ -58,6 +61,7 @@ function displayCourses(courses) {
   });
 }
 
+// function that adds the course options to the collapsible container
 function addCourseOptions(index, course) {
   $(`#CourseOptions${index}`).append(`
     <label class="optionInput" for="date${index}">
@@ -71,6 +75,7 @@ function addCourseOptions(index, course) {
   `);
 }
 
+// function that displays the schedule options in the collapsible container
 function displayScheduleOptions(settings, algorithm, preferEarly, wantPrep) {
   $('#formSettings').append(createCollapsible('Schedule', 'scheduleOptions'));
   $('#scheduleOptions').append(`
@@ -111,6 +116,7 @@ function displayScheduleOptions(settings, algorithm, preferEarly, wantPrep) {
   $('#wantPrep').prop('checked', wantPrep);
 }
 
+// function that displays the account settings in the collapsible container
 function displayAccountSettings() {
   $('#formSettings').append(createCollapsible('Account', 'accountSettings'));
   $('#accountSettings').append(`
@@ -125,6 +131,7 @@ function displayAccountSettings() {
   $('#removedata').css({ 'background-color': 'red', color: 'white' });
 }
 
+// function that displays the sync calendar in the collapsible container
 function displaySyncCalendar(userid, settings) {
   $('#formSettings').append(createCollapsible('Sync Calendar', 'syncCalendar'));
   $('#syncCalendar').append(`
@@ -142,6 +149,7 @@ function displaySyncCalendar(userid, settings) {
   $('#syncCalendarInputs').append(plusButton('syncCalendarPlus', 'Add new calendar'));
 }
 
+// function that adds the sync calendar input to the collapsible container
 function addSyncCalendarInput(index = 0, url = '', name = '', color = '#385280') {
   const HTML = `
   <div class="optionInput SyncCalendarInput">
@@ -161,6 +169,7 @@ function addSyncCalendarInput(index = 0, url = '', name = '', color = '#385280')
   return HTML;
 }
 
+// function that adds a plus button to the collapsible container
 function plusButton(id, text = '') {
   const HTML = `
     <label for="${id}">
@@ -169,6 +178,7 @@ function plusButton(id, text = '') {
   return HTML;
 }
 
+// function that displays the import/export in the collapsible container
 function displayImportExport(userID, settings) {
   $('#formSettings').append(createCollapsible('Import/Export iCal file', 'importExport'));
   $('#importExport').append(`
@@ -190,6 +200,7 @@ function displayImportExport(userID, settings) {
   }
 }
 
+// function that displays the imported calendars in the collapsible container
 function displayImportedCalendars(calendars) {
   calendars.forEach((calendar, index) => {
     $('#importedIcalFiles').append(`
@@ -201,6 +212,7 @@ function displayImportedCalendars(calendars) {
   });
 }
 
+// function that handles the collapsible container
 function collapseListener() {
   $('.collapsible').on('click', function listener(event) {
     if (!event.target.matches('input[type="checkbox"]')) {
@@ -226,12 +238,12 @@ function collapseListener() {
   });
 }
 
+// function that displays an error message
 function displayError() {
   const url = window.location.href;
   const error = url.split('?error=')[1];
   if (error) console.error(error);
   if (error === 'notEnoughtTimeToStudyForLectures') {
-    // eslint-disable-next-line no-undef
     Toastify({
       text: 'Not enough time to study for all lectures. Please either allocate more study-time, change schedule strategy or select fewer lectures.',
       close: true,
@@ -245,6 +257,7 @@ function displayError() {
   }
 }
 
+// function that handles the checkbox change
 function titleCheckboxChange() {
   const $checkbox = $(this);
   if ($checkbox.hasClass('checkboxTitle')) {
@@ -255,6 +268,7 @@ function titleCheckboxChange() {
   }
 }
 
+// function that handles the sub checkbox change
 function subCheckboxChange() {
   const $checkbox = $(this);
   if ($checkbox.hasClass('subCheckbox')) {
@@ -274,8 +288,8 @@ function handleCheckboxChange() {
   titleCheckboxChange.call(this);
 }
 
+// function that displays a toast message
 function toastifyError(message) {
-  // eslint-disable-next-line no-undef
   Toastify({
     text: message,
     duration: 1500,
@@ -288,11 +302,11 @@ function toastifyError(message) {
   }).showToast();
 }
 
+// function that handles the plus button
 function plusButtonListener() {
   $('#syncCalendarPlus').on('click', () => {
     const syncCalendarInputs = $('#syncCalendarInputs .SyncCalendarInput');
     let valid = true;
-    // eslint-disable-next-line consistent-return
     syncCalendarInputs.each((index, input) => {
       const url = $(input).find(`#syncCalendarUrl${index}`).val();
       const name = $(input).find(`#syncCalendarName${index}`).val();
@@ -309,6 +323,7 @@ function plusButtonListener() {
   });
 }
 
+// function that recalculates the option block height
 function recalculateOptionBlockHeight() {
   const optionBlock = $('#syncCalendarInputs');
   const SyncCalendarInput = $('.SyncCalendarInput');
@@ -316,6 +331,7 @@ function recalculateOptionBlockHeight() {
   optionBlock.css('max-height', optionBlockHeight);
 }
 
+// function that removes the button listener
 function removeButtonListener(importedCalendars) {
   const removeIcalFileBtn = $('.removeIcalFileBtn');
   removeIcalFileBtn.on('click', function listener() {
@@ -336,10 +352,12 @@ function removeButtonListener(importedCalendars) {
   });
 }
 
+// function that checks if all files are removed
 function allFilesRemoved(importedCalendars) {
   return importedCalendars.every((file) => file.type === 'remove');
 }
 
+// function that saves the options
 async function saveOptions(User) {
   $('#saveBtn').on('click', async () => {
     User.courses.forEach((course, index) => {
@@ -418,6 +436,7 @@ async function saveOptions(User) {
   });
 }
 
+// function that merges the arrays of imported calendars and new imported calendars together
 function mergeArrays(oldArray, newArray) {
   const oldMap = new Map(oldArray.map((obj) => [obj.name, obj]));
 
@@ -433,6 +452,7 @@ function mergeArrays(oldArray, newArray) {
   return oldArray;
 }
 
+// function that deletes the user data
 function deleteBtnListener() {
   $('#removedata').on('click', async () => {
     try {

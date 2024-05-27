@@ -16,6 +16,7 @@ const currentFilename = fileURLToPath(import.meta.url);
 const currentDir = dirname(currentFilename);
 const HourMilliSec = 3600000;
 
+// PreAlgoMethods class that contains all the necessary methods for the algorithm
 class PreAlgoMethods {
   constructor(User, algorithm) {
     console.log('Calculating schedule for:', User.fullname);
@@ -37,11 +38,13 @@ class PreAlgoMethods {
     this.events = await getEvents(this.id, this.syncCalendars);
   }
 
+  // Method that calculates the study time per day
   studyTimePrDay() {
     return moment.duration(moment(this.EndStudyTime, 'HH:mm')
       .diff(moment(this.StartStudyTime, 'HH:mm'))).asMilliseconds();
   }
 
+  // Method that prepares the courses for the algorithm by filtering out the courses that are not chosen
   prepCourses(Courses) {
     let reverse = false;
     if (this.algorithm !== 'emptyFirstComeFirstServe') {
@@ -67,6 +70,7 @@ class PreAlgoMethods {
     return Courses;
   }
 
+  // Method that prepares the schedule object by setting the algorithm and other properties
   prepSchedule() {
     return {
       algorithm: this.algorithm === 'default' ? 'addaptiveGapNoMixing' : this.algorithm,
@@ -78,6 +82,7 @@ class PreAlgoMethods {
     };
   }
 
+  // Method that returns the parameters for the algorithm based on the user's settings
   params() {
     return {
       courses: this.Courses,
@@ -91,6 +96,7 @@ class PreAlgoMethods {
   }
 }
 
+// Function that calculates the schedule based on the user's settings and chosen algorithm
 async function calculateSchedule(User, algorithm) {
   const Algo = new PreAlgoMethods(User, algorithm);
   // Try with IIFE async constructor function later
@@ -112,6 +118,7 @@ async function calculateSchedule(User, algorithm) {
   return Algo.schedule;
 }
 
+// Function that returns the correct algorithm strategy based on the chosen algorithm
 function getAlgorithmStrategy(algorithm) {
   switch (algorithm) {
   case 'emptyFirstComeFirstServe':
@@ -126,6 +133,8 @@ function getAlgorithmStrategy(algorithm) {
     return (params) => Algorithm(params, true, true, false);
   }
 }
+
+// Function that calculates the schedule based on the user's settings and chosen algorithm
 function Algorithm(params, reverse = false, addaptive = false, mixing = false) {
   const {
     courses,
@@ -153,6 +162,7 @@ function Algorithm(params, reverse = false, addaptive = false, mixing = false) {
   console.log('Returning lectures:', lectures.length, lectures.error);
   return lectures;
 
+  // Function that calculates the start point for the lectures based on the course index
   function calcStartPoint(examDate, courseIndex) {
     let studyStartPoint;
     if (courseIndex === 0 || mixing || !addaptive) {
@@ -163,6 +173,7 @@ function Algorithm(params, reverse = false, addaptive = false, mixing = false) {
     return studyStartPoint;
   }
 
+  // Function that processes the lectures for each course
   function processLectures(course, startPoint) {
     course.contents.forEach((lecture) => {
       if (failed) return;
@@ -181,6 +192,7 @@ function Algorithm(params, reverse = false, addaptive = false, mixing = false) {
     });
   }
 
+  // Function that tries to recalculate the schedule with a reduced event gap
   function tryAdaptiveGap() {
     if (addaptive && failed && eventGap > (HourMilliSec / 4)) {
       lectures = tryWithReducedEventGap(params, originalCourses, events, Algorithm, reverse, mixing);
@@ -195,14 +207,15 @@ function Algorithm(params, reverse = false, addaptive = false, mixing = false) {
     }
   }
 
+  // Function that adjusts the lectures based on the user's settings
   function adjustLectures() {
-    // add logic to group lectures together pr day
     if (preferEarlyLectures && !lectures.error) {
       lectures = prioritiseEarlyDayLectures(lectures, events, startStudyTime, endStudyTime);
     }
   }
 }
 
+// Function that creates a lecture time block
 function createLectureTimeBlock(course, lecture, startTime, endTime) {
   return {
     title: course.fullname,
@@ -218,6 +231,7 @@ function createLectureTimeBlock(course, lecture, startTime, endTime) {
   };
 }
 
+// Function that tries to recalculate the schedule with a reduced event gap
 function tryWithReducedEventGap(params, courses, events, retryFunction, reverse = true, mixing = false) {
   if (!params.firstCall) {
     params.firstCall = true;
@@ -235,6 +249,7 @@ function tryWithReducedEventGap(params, courses, events, retryFunction, reverse 
   return retryFunction(params, reverse, true, mixing);
 }
 
+// Function that checks for overlap between events and lectures
 function checkOverlap(reverse, startTime, endTime, eventArray, lectureArray, startStudyTime, endStudyTime, eventGap = HourMilliSec) {
   const duration = (endTime - startTime);
 
@@ -255,6 +270,7 @@ function checkOverlap(reverse, startTime, endTime, eventArray, lectureArray, sta
   return [startTime, endTime];
 }
 
+// Function that adjusts the times based on the study interval
 function adjustTimesByStudyInterval(reverse, startTime, endTime, duration, studyStartTime, studyEndTime) {
   const startTimeOfDay = getUNIXfromTimeOfDay(endTime, studyStartTime);
   const endTimeOfDay = getUNIXfromTimeOfDay(endTime, studyEndTime);
@@ -283,6 +299,7 @@ function adjustTimesByStudyInterval(reverse, startTime, endTime, duration, study
   return [startTime, endTime, outsideStudyInterval];
 }
 
+// Function that adjusts the times based on the overlap between events
 function adjustTimesByOverlapFromEvents(reverse, startTime, endTime, duration, eventArray, eventGap) {
   let overlap = false;
   let chosenEvent = null;
@@ -299,6 +316,7 @@ function adjustTimesByOverlapFromEvents(reverse, startTime, endTime, duration, e
   return [startTime, endTime, overlap];
 }
 
+// Function that checks for overlap between events and time blocks
 function checkForOverlapWithEvents(StartTime, EndTime, events) {
   let overlap = false;
   events.forEach((event) => {
@@ -309,6 +327,7 @@ function checkForOverlapWithEvents(StartTime, EndTime, events) {
   return overlap;
 }
 
+// Function that prioritises early day time blocks
 function prioritiseEarlyDayLectures(lectures, events, startStudyTime) {
   lectures = lectures.sort((a, b) => a.startTime - b.startTime);
   const lecturesByDay = groupEventsByDay(lectures);
@@ -339,6 +358,7 @@ function prioritiseEarlyDayLectures(lectures, events, startStudyTime) {
   return newLectures;
 }
 
+// Function that groups events by day meaning that all events that are on the same day are grouped together
 function groupEventsByDay(events) {
   const groupedEvents = [];
 
@@ -361,16 +381,17 @@ function groupEventsByDay(events) {
   return groupedEvents;
 }
 
+// Function that gets the UNIX timestamp from a time of day
 function getUNIXfromTimeOfDay(originalTimestamp, timeOfDay) {
   const originalMoment = moment(originalTimestamp);
   const originalDate = originalMoment.format('YYYY-MM-DD');
   const combinedDateTime = `${originalDate} ${timeOfDay}`;
   const combinedMoment = moment(combinedDateTime, 'YYYY-MM-DD HH:mm');
-  const newTimestamp = combinedMoment.unix() * 1000; // Multiply by 1000 to get milliseconds
-  // console.log('Original timestamp:', originalTimestamp, 'Time of day:', timeOfDay, 'New timestamp:', newTimestamp);
+  const newTimestamp = combinedMoment.unix() * 1000;
   return newTimestamp;
 }
 
+// Function that creates exam events
 function createExamEvents(courses, events, startStudyTime, endStudyTime, preparation = false) {
   const examEvents = [];
   courses.forEach((course) => {
@@ -429,6 +450,7 @@ function darkenColor(color, amount) {
   return `#${((256 ** 3) + (r * 256 ** 2) + (g * 256) + b).toString(16).slice(1)}`;
 }
 
+// Function that fetches the events from the user's calendars
 async function getEvents(userid, syncCalendars) {
   try {
     const urls = await retrieveICalURLs(userid, syncCalendars);
@@ -440,6 +462,7 @@ async function getEvents(userid, syncCalendars) {
   }
 }
 
+// Function that retrieves the ICAL URLs from the user's calendars
 async function retrieveICalURLs(userid, syncCalendars) {
   const parentDir = path.resolve(currentDir, '..');
   const directory = path.join(parentDir, 'database', 'icals', userid.toString());
@@ -474,6 +497,7 @@ async function retrieveICalURLs(userid, syncCalendars) {
   }
 }
 
+// Function that parses the ICAL files
 async function parseICalFiles(icalURLs) {
   try {
     console.log('Parsing ICAL files:', icalURLs);

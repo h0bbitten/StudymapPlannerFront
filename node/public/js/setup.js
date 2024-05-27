@@ -11,6 +11,7 @@ const previous = new Button('goToPreviousPage', 'Previous');
 const next = new Button('goToNextPage', 'Next');
 const save = new Button('save', 'Save');
 
+// Function that initializes the setup page
 async function setupInitialization() {
   LoadingScreen.add();
   LoadingScreen.show();
@@ -34,6 +35,7 @@ async function setupInitialization() {
   }
 }
 
+// Function that resets the form
 function resetForm() {
   for (let i = 1; i <= amountOfCourses + 2; i++) {
     $(`#form${i}div`).remove();
@@ -44,6 +46,7 @@ function resetForm() {
   checkboxes = null;
 }
 
+// Function that goes to the previous page
 function goToPreviousPage() {
   if (index > 0) {
     index--;
@@ -70,11 +73,11 @@ function goToPreviousPage() {
   }
 }
 
+// Function that goes to the next page
 function goToNextPage() {
   if (index > 0) {
     const examDate = $(`#datepicker${index - 1}`).val();
     if (examDate === '') {
-      // Displays error message if no exam date is selected
       callToastify('Please select an exam date for each course.');
       return;
     }
@@ -166,10 +169,10 @@ function goToNextPage() {
   }
 }
 
+// Function that creates a form for each course
 function createCourseForm(checkbox, i, formIndex) {
   if (checkbox.checked) {
     console.log(`index2 is ${formIndex}`);
-    // Appends a form for each course
     $('#forms').append(`
         <div id="form${formIndex}div" class="forms">
           <form id="form${formIndex}" style="display: none;">
@@ -190,8 +193,6 @@ function createCourseForm(checkbox, i, formIndex) {
       const examDate = $(this).val();
       User.courses[i].examDate = examDate;
     });
-    // Initialize datepicker
-    // Appends a checkbox for each lecture
     User.courses[i].contents.forEach((lecture, j) => {
       $(`#form${formIndex}`).append(`
         <div class="checkbox lecture-container">
@@ -205,6 +206,7 @@ function createCourseForm(checkbox, i, formIndex) {
   }
 }
 
+// Function that saves the user's options
 async function saveOptions() {
   console.log('Saving options');
   console.log(User);
@@ -231,7 +233,7 @@ async function saveOptions() {
     }
   });
 
-  // Gemmer start / end study time.
+  // Saving start and end study time
   User.settings = {};
   User.settings.startStudyTime = startStudyTime;
   User.settings.endStudyTime = endStudyTime;
@@ -252,6 +254,7 @@ async function saveOptions() {
   window.location.href = 'schedule';
 }
 
+// Function that shows the courses the user is enrolled in
 function showCourses(Courses) {
   if (Courses.length === 0) {
     $('#header').text('You are not enrolled in any courses.');
